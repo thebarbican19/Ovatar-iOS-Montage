@@ -1,0 +1,6 @@
+module Pods_Ovatar_iOS_Montage {
+  umbrella header "Pods-Ovatar-iOS-Montage-umbrella.h"
+
+  export *
+  module * { export * }
+}

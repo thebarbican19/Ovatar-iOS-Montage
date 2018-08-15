@@ -1,0 +1,34 @@
+PODS:
+  - GBDeviceInfo (4.4.0):
+    - GBDeviceInfo/Core (= 4.4.0)
+  - GBDeviceInfo/Core (4.4.0)
+  - Mixpanel (3.3.3)
+  - Ovatar-iOS (1.0.1)
+  - TYBlurImage (1.2.1)
+  - UIImage-Helpers (0.0.3)
+
+DEPENDENCIES:
+  - GBDeviceInfo (~> 4.4.0)
+  - Mixpanel
+  - Ovatar-iOS
+  - TYBlurImage
+  - UIImage-Helpers
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - GBDeviceInfo
+    - Mixpanel
+    - Ovatar-iOS
+    - TYBlurImage
+    - UIImage-Helpers
+
+SPEC CHECKSUMS:
+  GBDeviceInfo: 2ec90c6808d063061b16773ec8e857257058dc5d
+  Mixpanel: 3c3925c27f7a321d5978319a72f53f8f0885afc5
+  Ovatar-iOS: 17a021213d44e20d6fff91ef3f649b6f79c6b6f9
+  TYBlurImage: a931704cfbfb31aa00a5b658063e0742b34e4043
+  UIImage-Helpers: 06b04a42bdd222844035602e87e936765c80f620
+
+PODFILE CHECKSUM: 9698293a581873b8a92e0ffb2e4237969f3e8279
+
+COCOAPODS: 1.5.2

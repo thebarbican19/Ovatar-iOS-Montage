@@ -1,0 +1,1 @@
+../../../Ovatar-iOS/OOvatarIcon.h
