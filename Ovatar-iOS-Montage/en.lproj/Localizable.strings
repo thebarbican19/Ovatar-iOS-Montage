@@ -7,3 +7,35 @@
 //
 
 
+"Main_Settings_Title" = "Settings";
+"Main_Editor_Title" = "Editor";
+"Main_ImageSelect_Title" = "Select Media";
+"Main_GettingStarted_Title" = "Getting Started";
+"Main_Permissions_Title" = "Permissions";
+"Main_Preview_Title" = "Preview";
+"Main_Support_Title" = "Support";
+
+"Settings_About_Title" = "*montage* by ovatar.io";
+"Settings_About_Subtitle" = "Version %@ Build #%@";
+"Settings_Item_Share" = "Share";
+"Settings_Item_Support" = "Support";
+"Settings_Item_Ovatar" = "Ovatar.io";
+"Settings_Item_Purchases" = "Restore Purchases";
+"Settings_Share_Text" = "Create a stunning video montages with #montage by ovatar.io";
+
+"Permissions_Gallery_Text" = "Montage first requires access to your photo library, because what are Montages without images or videos.";
+"Permissions_Notifications_Text" = "Allow us to notify you when we create montages for you automatically when momories are made.";
+"Permissions_Allow_Action" = "Allow";
+"Permissions_Update_Action" = "Update Permissions";
+
+"Error_LimitedMedia_Title" = "At-least 2 items required to preview your montage.";
+"Error_GallerySelectionEmpty_Title" = "No item was selected.";
+"Error_PaymentRestored_Title" = "Your Subscription/Purchase was restored.";
+"Error_Unknown_Title" = "Unknown Error";
+
+"Feedback_Send_Action" = "Send";
+"Feedback_Retry_Action" = "Retry";
+"Feedback_Default_Placeholder" = "Got a question, or just want to say hello? Write it here...";
+"Feedback_Sent_Placeholder" = "Your message was sent!\n\nWe will review this request shortly and will be in-touch if necessary";
+"Feedback_Sending_Title" = "Sending...";
+

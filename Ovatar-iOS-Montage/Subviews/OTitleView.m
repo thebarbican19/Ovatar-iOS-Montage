@@ -20,7 +20,7 @@
         self.viewGradient = [CAGradientLayer layer];
         self.viewGradient.frame = self.viewContainer.bounds;
         self.viewGradient.colors = @[(id)[UIColorFromRGB(0xF4F6F8) colorWithAlphaComponent:1.0].CGColor, (id)[UIColorFromRGB(0xF4F6F8) colorWithAlphaComponent:0.0].CGColor];
-        self.viewGradient.startPoint = CGPointMake(0.0, 0.92);
+        self.viewGradient.startPoint = CGPointMake(0.0, 0.7);
         self.viewGradient.endPoint = CGPointMake(0.0, 1.0);
         [self.viewContainer.layer addSublayer:self.viewGradient];
         
@@ -44,6 +44,7 @@
             viewButton.tag = i;
             viewButton.alpha = 0.0;
             viewButton.backgroundColor = [UIColor clearColor];
+            viewButton.transform = CGAffineTransformMakeTranslation(0.8, 0.8);
             [viewButton setImage:[UIImage imageNamed:@""] forState:UIControlStateNormal];
             [viewButton addTarget:self action:@selector(action:) forControlEvents:UIControlEventTouchUpInside];
             [self.viewContainer addSubview:viewButton];
@@ -62,10 +63,12 @@
                 if (i <= actions.count) {
                     [(UIButton *)[self.viewContainer viewWithTag:i] setImage:[UIImage imageNamed:[actions objectAtIndex:i - 1]] forState:UIControlStateNormal];
                     [(UIButton *)[self.viewContainer viewWithTag:i] setAlpha:1.0];
+                    [(UIButton *)[self.viewContainer viewWithTag:i] setTransform:CGAffineTransformMakeTranslation(1.0, 1.0)];
 
                 }
                 else {
                     [(UIButton *)[self.viewContainer viewWithTag:i] setAlpha:0.0];
+                    [(UIButton *)[self.viewContainer viewWithTag:i] setTransform:CGAffineTransformMakeTranslation(0.8, 0.8)];
 
                 }
 
@@ -115,7 +118,7 @@
     }
     else [self.viewTitle setText:text];
     
-    self.title = text.uppercaseString;
+    self.title = text;
     
 }
 
@@ -139,6 +142,14 @@
             }
             else if ([[self.buttons objectAtIndex:type.tag - 1] isEqualToString:@"navigation_settings"]) {
                 [self.delegate titleNavigationButtonTapped:OTitleButtonTypeSettings];
+                
+            }
+            else if ([[self.buttons objectAtIndex:type.tag - 1] isEqualToString:@"navigation_select"]) {
+                [self.delegate titleNavigationButtonTapped:OTitleButtonTypeSelect];
+                
+            }
+            else if ([[self.buttons objectAtIndex:type.tag - 1] isEqualToString:@"navigation_close"]) {
+                [self.delegate titleNavigationButtonTapped:OTitleButtonTypeClose];
                 
             }
             

@@ -8,9 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		5B17ADA53467D5E0B826B806 /* libPods-Ovatar-iOS-MontageTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 281F72D5B37504CCC52B79DD /* libPods-Ovatar-iOS-MontageTests.a */; };
+		771C4A5F212D116E0099EBC9 /* complete_sfx.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 771C4A5E212D116E0099EBC9 /* complete_sfx.mp3 */; };
+		772E2480213527130025DD85 /* OFeedbackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E247F213527130025DD85 /* OFeedbackController.m */; };
+		772E2483213528060025DD85 /* UITextView+Placeholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E2482213528060025DD85 /* UITextView+Placeholder.m */; };
+		772E248E2136B0BF0025DD85 /* NSTimer+Block.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E248C2136B0BE0025DD85 /* NSTimer+Block.m */; };
+		772E24922136C8070025DD85 /* Montage-App-Loop.mov in Resources */ = {isa = PBXBuildFile; fileRef = 772E24912136C8070025DD85 /* Montage-App-Loop.mov */; };
+		772E24952136C8DE0025DD85 /* OTickerLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E24942136C8DE0025DD85 /* OTickerLabel.m */; };
 		77465C3D2122974300EAF97E /* NSlackObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C3B2122974300EAF97E /* NSlackObject.m */; };
-		77465C4021229D5300EAF97E /* AVAssetTrack+Transform.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C3E21229D5300EAF97E /* AVAssetTrack+Transform.m */; };
 		77465C4321229DCE00EAF97E /* OSettingsHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C4221229DCE00EAF97E /* OSettingsHeader.m */; };
+		77465C462124078300EAF97E /* OExportObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C452124078300EAF97E /* OExportObject.m */; };
+		77465C4921242D6D00EAF97E /* OStoriesLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C4821242D6D00EAF97E /* OStoriesLayout.m */; };
+		77465CAC2125B7CA00EAF97E /* PHAsset+Utility.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465CAA2125B7CA00EAF97E /* PHAsset+Utility.m */; };
+		77465CAF2125B8CC00EAF97E /* OInformationLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465CAE2125B8CC00EAF97E /* OInformationLabel.m */; };
 		77DF60AA211DBA4D00073439 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 77DF60A9211DBA4D00073439 /* AppDelegate.m */; };
 		77DF60B0211DBA4D00073439 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 77DF60AE211DBA4D00073439 /* Main.storyboard */; };
 		77DF60B2211DBA5200073439 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 77DF60B1211DBA5200073439 /* Assets.xcassets */; };
@@ -41,7 +50,6 @@
 		77DF612B211EB76F00073439 /* ONotificationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 77DF612A211EB76F00073439 /* ONotificationView.m */; };
 		77DF612E21200A9A00073439 /* OLoaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 77DF612D21200A9A00073439 /* OLoaderView.m */; };
 		77DF613121200E1C00073439 /* OSettingsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 77DF613021200E1C00073439 /* OSettingsCell.m */; };
-		77DF613521201C6400073439 /* HJCarouselViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 77DF613421201C6400073439 /* HJCarouselViewLayout.m */; };
 		93971367691F43912D15DFB5 /* libPods-Ovatar-iOS-MontageUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AFFEFC2AA1DB7624801A4AB /* libPods-Ovatar-iOS-MontageUITests.a */; };
 		E9BF044E69E635045C507491 /* libPods-Ovatar-iOS-Montage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E0FAC231F6935BCB6E990D3D /* libPods-Ovatar-iOS-Montage.a */; };
 /* End PBXBuildFile section */
@@ -68,12 +76,28 @@
 		3C5E8396CE143657E33DDA8A /* Pods-Ovatar-iOS-MontageTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ovatar-iOS-MontageTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Ovatar-iOS-MontageTests/Pods-Ovatar-iOS-MontageTests.release.xcconfig"; sourceTree = "<group>"; };
 		4FC9D68DF616759529730870 /* Pods-Ovatar-iOS-MontageTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ovatar-iOS-MontageTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Ovatar-iOS-MontageTests/Pods-Ovatar-iOS-MontageTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5AFFEFC2AA1DB7624801A4AB /* libPods-Ovatar-iOS-MontageUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Ovatar-iOS-MontageUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		771C4A5E212D116E0099EBC9 /* complete_sfx.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = complete_sfx.mp3; sourceTree = "<group>"; };
+		772E247E213527130025DD85 /* OFeedbackController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OFeedbackController.h; sourceTree = "<group>"; };
+		772E247F213527130025DD85 /* OFeedbackController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OFeedbackController.m; sourceTree = "<group>"; };
+		772E2481213528050025DD85 /* UITextView+Placeholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextView+Placeholder.h"; sourceTree = "<group>"; };
+		772E2482213528060025DD85 /* UITextView+Placeholder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextView+Placeholder.m"; sourceTree = "<group>"; };
+		772E248C2136B0BE0025DD85 /* NSTimer+Block.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+Block.m"; sourceTree = "<group>"; };
+		772E248D2136B0BF0025DD85 /* NSTimer+Block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+Block.h"; sourceTree = "<group>"; };
+		772E24912136C8070025DD85 /* Montage-App-Loop.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "Montage-App-Loop.mov"; sourceTree = "<group>"; };
+		772E24932136C8DE0025DD85 /* OTickerLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OTickerLabel.h; sourceTree = "<group>"; };
+		772E24942136C8DE0025DD85 /* OTickerLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OTickerLabel.m; sourceTree = "<group>"; };
 		77465C3B2122974300EAF97E /* NSlackObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSlackObject.m; sourceTree = "<group>"; };
 		77465C3C2122974300EAF97E /* NSlackObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSlackObject.h; sourceTree = "<group>"; };
-		77465C3E21229D5300EAF97E /* AVAssetTrack+Transform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "AVAssetTrack+Transform.m"; sourceTree = "<group>"; };
-		77465C3F21229D5300EAF97E /* AVAssetTrack+Transform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AVAssetTrack+Transform.h"; sourceTree = "<group>"; };
 		77465C4121229DCE00EAF97E /* OSettingsHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSettingsHeader.h; sourceTree = "<group>"; };
 		77465C4221229DCE00EAF97E /* OSettingsHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OSettingsHeader.m; sourceTree = "<group>"; };
+		77465C442124078300EAF97E /* OExportObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OExportObject.h; sourceTree = "<group>"; };
+		77465C452124078300EAF97E /* OExportObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OExportObject.m; sourceTree = "<group>"; };
+		77465C4721242D6D00EAF97E /* OStoriesLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OStoriesLayout.h; sourceTree = "<group>"; };
+		77465C4821242D6D00EAF97E /* OStoriesLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OStoriesLayout.m; sourceTree = "<group>"; };
+		77465CAA2125B7CA00EAF97E /* PHAsset+Utility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "PHAsset+Utility.m"; sourceTree = "<group>"; };
+		77465CAB2125B7CA00EAF97E /* PHAsset+Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PHAsset+Utility.h"; sourceTree = "<group>"; };
+		77465CAD2125B8CC00EAF97E /* OInformationLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OInformationLabel.h; sourceTree = "<group>"; };
+		77465CAE2125B8CC00EAF97E /* OInformationLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OInformationLabel.m; sourceTree = "<group>"; };
 		77DF60A5211DBA4D00073439 /* Ovatar-iOS-Montage.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ovatar-iOS-Montage.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		77DF60A8211DBA4D00073439 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		77DF60A9211DBA4D00073439 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -128,8 +152,6 @@
 		77DF612D21200A9A00073439 /* OLoaderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OLoaderView.m; sourceTree = "<group>"; };
 		77DF612F21200E1C00073439 /* OSettingsCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSettingsCell.h; sourceTree = "<group>"; };
 		77DF613021200E1C00073439 /* OSettingsCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OSettingsCell.m; sourceTree = "<group>"; };
-		77DF613321201C6400073439 /* HJCarouselViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HJCarouselViewLayout.h; sourceTree = "<group>"; };
-		77DF613421201C6400073439 /* HJCarouselViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HJCarouselViewLayout.m; sourceTree = "<group>"; };
 		8A40DD76551E723DE30171FB /* Pods-Ovatar-iOS-MontageUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ovatar-iOS-MontageUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Ovatar-iOS-MontageUITests/Pods-Ovatar-iOS-MontageUITests.release.xcconfig"; sourceTree = "<group>"; };
 		CE9298F0DE5FCB28D3686E23 /* Pods-Ovatar-iOS-Montage.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ovatar-iOS-Montage.release.xcconfig"; path = "Pods/Target Support Files/Pods-Ovatar-iOS-Montage/Pods-Ovatar-iOS-Montage.release.xcconfig"; sourceTree = "<group>"; };
 		D587C41A2D1EDFE8ED6FF644 /* Pods-Ovatar-iOS-Montage.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ovatar-iOS-Montage.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Ovatar-iOS-Montage/Pods-Ovatar-iOS-Montage.debug.xcconfig"; sourceTree = "<group>"; };
@@ -173,6 +195,22 @@
 				5AFFEFC2AA1DB7624801A4AB /* libPods-Ovatar-iOS-MontageUITests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		771C4A5D212D11630099EBC9 /* SFX */ = {
+			isa = PBXGroup;
+			children = (
+				771C4A5E212D116E0099EBC9 /* complete_sfx.mp3 */,
+			);
+			path = SFX;
+			sourceTree = "<group>";
+		};
+		772E2486213560490025DD85 /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				772E24912136C8070025DD85 /* Montage-App-Loop.mov */,
+			);
+			path = Video;
 			sourceTree = "<group>";
 		};
 		77DF609C211DBA4D00073439 = {
@@ -239,6 +277,8 @@
 		77DF60E0211DBAA200073439 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				772E2486213560490025DD85 /* Video */,
+				771C4A5D212D11630099EBC9 /* SFX */,
 				77DF60E1211DBAA200073439 /* Fonts */,
 			);
 			path = Assets;
@@ -271,6 +311,12 @@
 				77DF612D21200A9A00073439 /* OLoaderView.m */,
 				77465C4121229DCE00EAF97E /* OSettingsHeader.h */,
 				77465C4221229DCE00EAF97E /* OSettingsHeader.m */,
+				77465C4721242D6D00EAF97E /* OStoriesLayout.h */,
+				77465C4821242D6D00EAF97E /* OStoriesLayout.m */,
+				77465CAD2125B8CC00EAF97E /* OInformationLabel.h */,
+				77465CAE2125B8CC00EAF97E /* OInformationLabel.m */,
+				772E24932136C8DE0025DD85 /* OTickerLabel.h */,
+				772E24942136C8DE0025DD85 /* OTickerLabel.m */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -311,6 +357,8 @@
 				77DF6101211DBAAE00073439 /* OEntryController.m */,
 				77DF60FF211DBAAE00073439 /* OGalleryPickerController.h */,
 				77DF6102211DBAAE00073439 /* OGalleryPickerController.m */,
+				772E247E213527130025DD85 /* OFeedbackController.h */,
+				772E247F213527130025DD85 /* OFeedbackController.m */,
 			);
 			path = Subview;
 			sourceTree = "<group>";
@@ -324,6 +372,8 @@
 				77DF610A211DBAAE00073439 /* OImageObject.m */,
 				77DF610C211DBAAE00073439 /* OPaymentObject.h */,
 				77DF610B211DBAAE00073439 /* OPaymentObject.m */,
+				77465C442124078300EAF97E /* OExportObject.h */,
+				77465C452124078300EAF97E /* OExportObject.m */,
 			);
 			path = Object;
 			sourceTree = "<group>";
@@ -331,12 +381,14 @@
 		77DF613221201C3B00073439 /* Imported */ = {
 			isa = PBXGroup;
 			children = (
-				77465C3F21229D5300EAF97E /* AVAssetTrack+Transform.h */,
-				77465C3E21229D5300EAF97E /* AVAssetTrack+Transform.m */,
+				772E2481213528050025DD85 /* UITextView+Placeholder.h */,
+				772E2482213528060025DD85 /* UITextView+Placeholder.m */,
+				77465CAB2125B7CA00EAF97E /* PHAsset+Utility.h */,
+				77465CAA2125B7CA00EAF97E /* PHAsset+Utility.m */,
 				77465C3C2122974300EAF97E /* NSlackObject.h */,
 				77465C3B2122974300EAF97E /* NSlackObject.m */,
-				77DF613321201C6400073439 /* HJCarouselViewLayout.h */,
-				77DF613421201C6400073439 /* HJCarouselViewLayout.m */,
+				772E248D2136B0BF0025DD85 /* NSTimer+Block.h */,
+				772E248C2136B0BE0025DD85 /* NSTimer+Block.m */,
 			);
 			path = Imported;
 			sourceTree = "<group>";
@@ -462,6 +514,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				772E24922136C8070025DD85 /* Montage-App-Loop.mov in Resources */,
 				77DF60E9211DBAA200073439 /* Muli-SemiBold.ttf in Resources */,
 				77DF60B5211DBA5200073439 /* LaunchScreen.storyboard in Resources */,
 				77DF60EB211DBAA200073439 /* Muli-Regular.ttf in Resources */,
@@ -471,6 +524,7 @@
 				77DF60B0211DBA4D00073439 /* Main.storyboard in Resources */,
 				77DF60E7211DBAA200073439 /* Muli-Black.ttf in Resources */,
 				77DF60EA211DBAA200073439 /* Muli-Light.ttf in Resources */,
+				771C4A5F212D116E0099EBC9 /* complete_sfx.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -534,6 +588,7 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Ovatar-iOS-Montage/Pods-Ovatar-iOS-Montage-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/BLMultiColorLoader/BLMultiColorLoader.bundle",
 				"${PODS_ROOT}/Mixpanel/Mixpanel/Images/MPArrowLeft.png",
 				"${PODS_ROOT}/Mixpanel/Mixpanel/Images/MPArrowLeft@2x.png",
 				"${PODS_ROOT}/Mixpanel/Mixpanel/Images/MPArrowRight.png",
@@ -554,6 +609,7 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/BLMultiColorLoader.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPArrowLeft.png",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPArrowLeft@2x.png",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MPArrowRight.png",
@@ -604,23 +660,29 @@
 			files = (
 				77DF6114211DBAAE00073439 /* OSettingsController.m in Sources */,
 				77DF610F211DBAAE00073439 /* OGalleryCell.m in Sources */,
-				77DF613521201C6400073439 /* HJCarouselViewLayout.m in Sources */,
+				772E248E2136B0BF0025DD85 /* NSTimer+Block.m in Sources */,
 				77DF6116211DBAAE00073439 /* OEntryController.m in Sources */,
 				77DF611D211DBAAE00073439 /* OPaymentObject.m in Sources */,
-				77465C4021229D5300EAF97E /* AVAssetTrack+Transform.m in Sources */,
 				77DF6115211DBAAE00073439 /* OMainController.m in Sources */,
 				77DF6119211DBAAE00073439 /* OPresentationController.m in Sources */,
 				77DF613121200E1C00073439 /* OSettingsCell.m in Sources */,
+				772E2483213528060025DD85 /* UITextView+Placeholder.m in Sources */,
 				77DF60DF211DBA7C00073439 /* ODataModel.xcdatamodeld in Sources */,
 				77DF6118211DBAAE00073439 /* OPermissionsController.m in Sources */,
 				77DF611C211DBAAE00073439 /* OImageObject.m in Sources */,
 				77DF6112211DBAAE00073439 /* OTitleView.m in Sources */,
 				77465C3D2122974300EAF97E /* NSlackObject.m in Sources */,
 				77DF60B8211DBA5200073439 /* main.m in Sources */,
+				77465C462124078300EAF97E /* OExportObject.m in Sources */,
+				77465CAF2125B8CC00EAF97E /* OInformationLabel.m in Sources */,
 				77DF6110211DBAAE00073439 /* ODayCell.m in Sources */,
 				77DF611B211DBAAE00073439 /* ODataObject.m in Sources */,
+				77465C4921242D6D00EAF97E /* OStoriesLayout.m in Sources */,
 				77DF60AA211DBA4D00073439 /* AppDelegate.m in Sources */,
+				772E24952136C8DE0025DD85 /* OTickerLabel.m in Sources */,
 				77DF6113211DBAAE00073439 /* OActionButton.m in Sources */,
+				772E2480213527130025DD85 /* OFeedbackController.m in Sources */,
+				77465CAC2125B7CA00EAF97E /* PHAsset+Utility.m in Sources */,
 				77DF612E21200A9A00073439 /* OLoaderView.m in Sources */,
 				77465C4321229DCE00EAF97E /* OSettingsHeader.m in Sources */,
 				77DF612B211EB76F00073439 /* ONotificationView.m in Sources */,
@@ -809,6 +871,7 @@
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 2TG3C5JT66;
 				INFOPLIST_FILE = "Ovatar-iOS-Montage/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -831,6 +894,7 @@
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 2TG3C5JT66;
 				INFOPLIST_FILE = "Ovatar-iOS-Montage/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

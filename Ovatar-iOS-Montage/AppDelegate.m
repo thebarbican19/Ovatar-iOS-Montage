@@ -36,6 +36,8 @@
     
     [self.data setBool:true forKey:@"app_installed"];
     
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
+    
     return true;
     
 }
@@ -102,11 +104,14 @@
     self.mixpanel = [Mixpanel sharedInstance];
     self.model = [[ODataObject alloc] init];
     if (self.applicationTimer > 60 * 3 && self.applicationRated == false && self.model.storyExports > 0) {
-        if (APP_DEVICE_FLOAT >= 10.3) {
+        if (@available(iOS 10.3, *)) {
             [SKStoreReviewController requestReview];
+            
             [self.data setObject:@(true) forKey:@"app_rated"];
             [self.mixpanel track:@"App Rated"];
-            
+        }
+        else {
+            // Fallback on earlier versions
         }
         
     }
@@ -167,6 +172,12 @@
 
 
 -(void)applicationDidBecomeActive:(UIApplication *)application {
+    self.data =  [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
+
+    [self.data setBool:false forKey:@"app_inactive"];
+    [self.data synchronize];
+    
+    [self applicationSetActiveTimer:true];
     
 }
 
@@ -204,6 +215,54 @@
     
     [self.timer invalidate];
         
+}
+
+-(void)applicationLoadingScreen:(BOOL)loading {
+    if (loading) {
+        if (self.lassets.count == 0 || self.lassets == nil) {
+            self.lassets = @[@"splash_loader_0", @"splash_loader_1", @"splash_loader_2", @"splash_loader_3", @"splash_loader_4", @"splash_loader_5", @"splash_loader_6", @"splash_loader_7"];
+            
+        }
+        
+        self.splash = [[UIView alloc] initWithFrame:self.window.bounds];
+        self.splash.backgroundColor = [UIColor whiteColor];
+        self.splash.alpha = 0.0;
+
+        [[UIApplication sharedApplication].delegate.window setWindowLevel:UIWindowLevelNormal];
+        [[UIApplication sharedApplication].delegate.window addSubview:self.splash];
+        
+        self.loader = [[OLoaderView alloc] initWithFrame:CGRectMake(self.splash.bounds.size.width * 0.5 - 80.0, (self.splash.bounds.size.height * 0.5 - 80.0) - 17.0, 160.0, 160.0)];
+        self.loader.backgroundColor = [UIColor clearColor];
+        self.loader.speed = 0.6;
+        [self.splash addSubview:self.loader];
+        [self.loader loaderPresentWithImages:self.lassets animated:false];
+
+        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations: ^{
+            [self.splash setAlpha:1.0];
+            
+        } completion:nil];
+        
+    }
+    else {
+        [UIView animateWithDuration:0.2 delay:2.0 options:UIViewAnimationOptionCurveEaseIn animations: ^{
+            [self.loader setTransform:CGAffineTransformMakeScale(0.7, 0.7)];
+            
+        } completion:nil];
+        
+        [UIView animateWithDuration:0.4 delay:1.0 options:UIViewAnimationOptionCurveEaseOut animations: ^{
+            [self.splash setAlpha:0.0];
+            
+        } completion:^(BOOL finished) {
+            [self.loader.timer invalidate];
+            [self.splash removeFromSuperview];
+            
+            [[UIApplication sharedApplication].delegate.window removeFromSuperview];
+            [[UIApplication sharedApplication].delegate.window setWindowLevel:UIWindowLevelNormal];
+
+        }];
+        
+    }
+    
 }
 
 

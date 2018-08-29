@@ -13,34 +13,48 @@
 
 -(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
+    self.imageobj = [[OImageObject alloc] init];
     if (self) {
-        self.cellImage = [[UIImageView alloc] initWithFrame:self.bounds];
+        self.cellImage = [[UIImageView alloc] initWithFrame:CGRectMake(self.contentView.frame.origin.x + 12.0, self.contentView.frame.origin.y + 6.0, self.contentView.bounds.size.width - 24.0, self.contentView.bounds.size.height - 12.0)];
         self.cellImage.contentMode = UIViewContentModeCenter;
         self.cellImage.clipsToBounds = true;
+        self.cellImage.layer.cornerRadius = 8.0;
         self.cellImage.backgroundColor = UIColorFromRGB(0x464655);
         self.cellImage.image = [UIImage imageNamed:@"editor_placeholder"];
+        self.cellImage.userInteractionEnabled = true;
+        self.cellImage.alpha = 1.0;
         [self.contentView addSubview:self.cellImage];
         
         self.cellPlayer = [[AVPlayerViewController alloc] init];
-        self.cellPlayer.view.frame = self.bounds;
+        self.cellPlayer.view.frame = self.cellImage.bounds;
         self.cellPlayer.view.backgroundColor = [UIColor clearColor];
         self.cellPlayer.showsPlaybackControls = false;
         self.cellPlayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
         self.cellPlayer.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
         self.cellPlayer.player.muted = true;
         self.cellPlayer.player.allowsExternalPlayback = false;
-        self.cellPlayer.view.userInteractionEnabled = false;
         self.cellPlayer.allowsPictureInPicturePlayback = false;
-        [self.contentView addSubview:self.cellPlayer.view];
-
-        self.cellShadow = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, 20.0, self.bounds.size.width, self.bounds.size.height)];
-        self.cellShadow.backgroundColor = [UIColor clearColor];
-        //[self addSubview:self.cellShadow];
+        self.cellPlayer.view.alpha = 0.0;
+        [self.cellImage addSubview:self.cellPlayer.view];
         
-
+        self.cellShadow = [[UIView alloc] initWithFrame:CGRectMake(self.cellImage.frame.origin.x + 4.0, self.cellImage.frame.origin.y + 14.0, self.cellImage.bounds.size.width - 8.0, self.cellImage.bounds.size.height - 16.0)];
+        self.cellShadow.layer.shadowOffset = CGSizeMake(0.0, 2.0);
+        self.cellShadow.layer.shadowRadius = 10.0;
+        self.cellShadow.layer.shadowOpacity = 0.4;
+        self.cellShadow.layer.masksToBounds = false;
+        self.cellShadow.backgroundColor = UIColorFromRGB(0x464655);
+        [self.contentView addSubview:self.cellShadow];
+        [self.contentView sendSubviewToBack:self.cellShadow];
+        
+        self.cellLoader = [[BLMultiColorLoader alloc] initWithFrame:CGRectMake((self.cellImage.bounds.size.width * 0.5) - 25.0, (self.cellImage.bounds.size.height * 0.5) - 25.0, 50.0, 50.0)];
+        self.cellLoader.lineWidth = 3.0;
+        self.cellLoader.colorArray = @[[UIColor whiteColor]];
+        self.cellLoader.backgroundColor = [UIColor clearColor];
+        [self.cellImage addSubview:self.cellLoader];
+    
     }
     
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loop:)  name:AVPlayerItemDidPlayToEndTimeNotification object:self.cellPlayer.player.currentItem];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loop:)  name:AVPlayerItemDidPlayToEndTimeNotification object:self.cellPlayer.player.currentItem];
     
     return self;
     
@@ -52,18 +66,18 @@
     
 }
 
--(void)setup:(NSDictionary *)content {
-    self.image = [UIImage imageWithData:[content objectForKey:@"image"]];
-    self.filename = [NSString stringWithFormat:@"/%@.mov" ,[content objectForKey:@"key"]];
+-(void)setup:(NSDictionary *)content animated:(BOOL)animated {
+    self.data = [[NSDictionary alloc] initWithDictionary:content];
+    self.image = [UIImage imageWithData:[self.data objectForKey:@"image"]];
+    self.filename = [NSString stringWithFormat:@"/%@.mov" ,[self.data objectForKey:@"key"]];
     self.video = [NSURL fileURLWithPath:[APP_DOCUMENTS stringByAppendingString:self.filename]];
-    self.timestamp = [content objectForKey:@"timestamp"];
-    self.key = [content objectForKey:@"key"];
-    self.asset = [content objectForKey:@"assetid"];
+    self.timestamp = [self.data objectForKey:@"timestamp"];
+    self.key = [self.data objectForKey:@"key"];
+    self.asset = [self.data objectForKey:@"assetid"];
     
-    if (self.asset != nil) {
+    if (self.asset.length > 2) {
         if (self.video != nil) {
             [self.cellPlayer setPlayer:[AVPlayer playerWithURL:self.video]];
-            [self.cellPlayer.player play];
             [self.cellPlayer.player setMuted:true];
 
         }
@@ -73,26 +87,111 @@
 
         }
         
-        [self.cellPlayer.view setHidden:false];
-        
+        if (animated) {
+            [UIView transitionWithView:self.cellImage duration:0.5 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+                [self.cellImage setImage:self.thumbnail];
+                [self.cellShadow setBackgroundColor:[self colour:(self.cellShadow.bounds.size.width / 2) - 0.02 ycoordinate:self.cellImage.bounds.size.height - 0.02]];
+                [self.cellShadow.layer setShadowColor:self.cellShadow.backgroundColor.CGColor];
+                [self.cellPlayer.view setAlpha:1.0];
+
+            } completion:^(BOOL finished) {
+                [UIView animateWithDuration:0.3 animations:^{
+                    [self.cellPlayer.view setAlpha:1.0];
+                    
+                } completion:nil];
+                
+            }];
+
+        }
+        else {
+            [self.cellImage setContentMode:UIViewContentModeScaleAspectFill];
+            [self.cellImage setImage:self.thumbnail];
+            [self.cellPlayer.view setAlpha:1.0];
+
+        }
+
     }
     else {
-        [self.cellPlayer.view setHidden:true];
+        if (animated) {
+            [UIView animateWithDuration:0.3 animations:^{
+                [self.cellPlayer.view setAlpha:0.0];
+                
+            } completion:^(BOOL finished) {
+                [UIView transitionWithView:self.cellImage duration:0.3 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+                    [self.cellImage setContentMode:UIViewContentModeCenter];
+                    [self.cellImage setImage:[UIImage imageNamed:@"editor_placeholder"]];
+                    
+                    [self.cellShadow setBackgroundColor:[self colour:(self.cellShadow.bounds.size.width / 2) - 0.02 ycoordinate:self.cellImage.bounds.size.height - 0.02]];
+                    [self.cellShadow.layer setShadowColor:self.cellShadow.backgroundColor.CGColor];
+                    
+                } completion:nil];
+                
+            }];
+            
+        }
+        else {
+            [self.cellPlayer.view setAlpha:0.0];
+            [self.cellImage setContentMode:UIViewContentModeCenter];
+            [self.cellImage setImage:[UIImage imageNamed:@"editor_placeholder"]];
+            
+            [self.cellShadow setBackgroundColor:[self colour:(self.cellShadow.bounds.size.width / 2) - 0.02 ycoordinate:self.cellImage.bounds.size.height - 0.02]];
+            [self.cellShadow.layer setShadowColor:self.cellShadow.backgroundColor.CGColor];
+            
+        }
 
     }
     
+}
+
+-(UIColor *)colour:(int)x ycoordinate:(int)y {
+    if (self.cellImage.image.CGImage != NULL && self.cellImage.image.CGImage != nil) {
+        CFDataRef pixelData = CGDataProviderCopyData(CGImageGetDataProvider(self.cellImage.image.CGImage));
+        const UInt8* data = CFDataGetBytePtr(pixelData);
+        
+        int pixelInfo = ((self.cellImage.bounds.size.width * y) + x ) * 4;
+
+        UInt8 red = data[pixelInfo];
+        UInt8 green = data[(pixelInfo + 1)];
+        UInt8 blue = data[pixelInfo + 2];
+        CFRelease(pixelData);
+        
+        UIColor *colour = [UIColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0];
+        if ([self isdark:colour]) return colour;
+        else return UIColorFromRGB(0x464655);
+        
+    }
+    else return UIColorFromRGB(0x464655);
     
-    //if (image) {
-    //NSLog(@"load image: %@" ,self.image);
-        //[self.cellImage setImage:self.image];
-        //[self.cellShadow setImage:[UIImage ty_imageByApplyingBlurToImage:self.image withRadius:40.0 tintColor:[UIColor colorWithWhite:0.0 alpha:0.15] saturationDeltaFactor:1.0 maskImage:nil]];
+}
 
-    //}
-    //else {
-        //[self.cellImage setImage:nil];
+-(BOOL)isdark:(UIColor *)color {
+    const CGFloat *componentColors = CGColorGetComponents(color.CGColor);
+    CGFloat colorBrightness = ((componentColors[0] * 299) + (componentColors[1] * 587) + (componentColors[2] * 114)) / 1000;
+    if (colorBrightness < 0.5) return true;
+    else return false;
+    
+}
 
-    //}
+    
+-(UIImage *)thumbnail {
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:self.video options:nil];
+    AVAssetImageGenerator *gen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    gen.appliesPreferredTrackTransform = true;
+    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+    CMTime actualTime;
+    
+    CGImageRef image = [gen copyCGImageAtTime:time actualTime:&actualTime error:nil];
+    
+    return [[UIImage alloc] initWithCGImage:image];
+    
+}
 
+-(void)delete:(UIButton *)button {
+    NSLog(@"deleted");
+//    if ([self.delegate respondsToSelector:@selector(collectionViewDeleteAsset:)]) {
+//        [self.delegate collectionViewDeleteAsset:self];;
+//
+//    }
     
 }
 

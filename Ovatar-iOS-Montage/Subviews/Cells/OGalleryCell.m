@@ -23,11 +23,10 @@
         [self.contentView addSubview:self.viewContainer];
         
         self.viewOverlay = [[UIImageView alloc] initWithFrame:self.bounds];
-        self.viewOverlay.backgroundColor = [UIColorFromRGB(0x69DCCB) colorWithAlphaComponent:0.7];
+        self.viewOverlay.backgroundColor = [UIColorFromRGB(0x7490FD) colorWithAlphaComponent:0.7];
         self.viewOverlay.contentMode = UIViewContentModeCenter;
-        self.viewOverlay.image = [UIImage imageNamed:@"camera_gallery_item_selected"];
+        self.viewOverlay.image = [UIImage imageNamed:@"gallery_select"];
         self.viewOverlay.alpha = 0.0;
-        self.viewOverlay.transform = CGAffineTransformMakeScale(1.15, 1.15);
         [self.viewContainer addSubview:self.viewOverlay];
         
     }

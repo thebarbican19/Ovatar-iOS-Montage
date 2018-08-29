@@ -7,7 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVKit/AVKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import <AudioToolbox/AudioServices.h>
 
 @interface OSettingsHeader : UIView
+
+@property (nonatomic, strong) AVPlayerViewController *viewLogo;
+@property (nonatomic, strong) UILabel *viewLabel;
 
 @end

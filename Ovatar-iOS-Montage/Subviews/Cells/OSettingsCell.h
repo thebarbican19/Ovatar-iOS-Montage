@@ -10,4 +10,10 @@
 
 @interface OSettingsCell : UITableViewCell
 
+@property (nonatomic, strong) UIImageView *cellIcon;
+@property (nonatomic, strong) UILabel *cellTitle;
+@property (nonatomic, strong) UIImageView *cellAccessory;
+
+@property (nonatomic ,strong) NSIndexPath *index;
+
 @end

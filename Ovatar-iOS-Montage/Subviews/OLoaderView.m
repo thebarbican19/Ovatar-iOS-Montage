@@ -14,25 +14,29 @@
 -(void)drawRect:(CGRect)rect {
     if (self.animation == 0) self.animation = 3.0;
     if (self.speed == 0) self.speed = 0.5;
-    if (self.scale == 0) self.scale = 90.0;
+    if (self.scale == 0) self.scale = 65.0;
     
     self.imageobj = [[OImageObject alloc] init];
     
-    UIImage *image = [UIImage imageNamed:@"logo_placeholder"];
+    UIImage *image = [UIImage imageNamed:@"splash_icon"];
     float imagescale = self.scale / image.size.width;
     float imageheight = image.size.height * imagescale;
     float imagewidth = image.size.width * imagescale;
     
     self.viewMask = [CALayer layer];
-    self.viewMask.contents = (id)[[UIImage imageNamed:@"logo_placeholder"] CGImage];
+    self.viewMask.contents = (id)[[UIImage imageNamed:@"splash_icon"] CGImage];
     self.viewMask.frame = CGRectMake((self.bounds.size.width / 2) - (imagewidth / 2), (self.bounds.size.height / 2) - (imageheight / 2), imagewidth, imageheight);
     
     self.viewContainer = [[UIImageView alloc] initWithFrame:self.bounds];
-    self.viewContainer.contentMode = UIViewContentModeScaleAspectFill;
     self.viewContainer.backgroundColor = UIColorFromRGB(0x7490FD);
     self.viewContainer.layer.mask = self.viewMask;
     self.viewContainer.layer.masksToBounds = true;
     [self addSubview:self.viewContainer];
+    
+    self.viewImages = [[UIImageView alloc] initWithFrame:CGRectMake(self.viewMask.frame.origin.x - 5.0, self.viewMask.frame.origin.y - 5.0, self.viewMask.bounds.size.width + 5.0, self.viewMask.bounds.size.height + 5.0)];
+    self.viewImages.contentMode = UIViewContentModeScaleAspectFill;
+    self.viewImages.image = nil;
+    [self.viewContainer addSubview:self.viewImages];
     
 }
 
@@ -49,8 +53,8 @@
         
     }
     
-    self.images = [[NSArray alloc] initWithArray:images];
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:self.speed target:self selector:@selector(loaderChangeImage) userInfo:nil repeats:true];
+    if (self.images.count == 0) self.images = [[NSArray alloc] initWithArray:images];
+    if (self.timer.valid == false) self.timer = [NSTimer scheduledTimerWithTimeInterval:self.speed target:self selector:@selector(loaderChangeImage) userInfo:nil repeats:true];
 
     [self loaderChangeImage];
 
@@ -61,12 +65,25 @@
     else self.index += 1;
     
     if ([[self.images objectAtIndex:self.index] isKindOfClass:[UIImage class]]) {
-        [self.viewContainer setImage:[self.images objectAtIndex:self.index]];
+        [UIView transitionWithView:self.viewImages duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+            [self.viewImages setImage:[self.images objectAtIndex:self.index]];
+            
+        } completion:nil];
+        
+    }
+    else if ([[self.images objectAtIndex:self.index] isKindOfClass:[NSString class]]) {
+        [UIView transitionWithView:self.viewImages duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+            [self.viewImages setImage:[UIImage imageNamed:[self.images objectAtIndex:self.index]]];
+            
+        } completion:nil];
         
     }
     else if ([[self.images objectAtIndex:self.index] isKindOfClass:[PHAsset class]]) {
         [self.imageobj imagesFromAsset:[self.images objectAtIndex:self.index] thumbnail:false completion:^(NSDictionary *exifdata, NSData *image) {
-            [self.viewContainer setImage:[UIImage imageWithData:image]];
+            [UIView transitionWithView:self.viewImages duration:0.1 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+                [self.viewImages setImage:[UIImage imageWithData:image]];
+                
+            } completion:nil];
 
         }];
 

@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "65F098F032AC95CEC03E8D6567B58610"
+               BlueprintIdentifier = "B8FA2749715CCEFB008A0F086B9FF6BF"
                BlueprintName = "TYBlurImage"
                ReferencedContainer = "container:Pods.xcodeproj"
                BuildableName = "libTYBlurImage.a">

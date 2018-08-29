@@ -39,7 +39,6 @@
     
     for (Entry *entry in [self.context executeFetchRequest:fetch error:nil]) {
         [self.context deleteObject:entry];
-        NSLog(@"entry deteted %@" ,self.context.deletedObjects);
         
     }
     
@@ -64,6 +63,7 @@
         newstory.created = [NSDate date];
         newstory.name = [data objectForKey:@"name"];
         newstory.key = self.uniquekey;
+        newstory.assetid = @"";
 
         NSError *saveerr;
         if ([self.context save:&saveerr]) {
@@ -111,6 +111,11 @@
     
 }
 
+-(NSURL *)storyDirectory:(NSString *)story {
+    return [NSURL fileURLWithPath:[APP_DOCUMENTS stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_export.mov", story]]];
+    
+}
+
 -(NSString *)storyActiveKey {
     return [self.data objectForKey:@"story_active_key"];
     
@@ -123,39 +128,43 @@
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
     fetch.sortDescriptors = @[sort];
     fetch.predicate = predicate;
-    fetch.resultType = NSDictionaryResultType;
     fetch.returnsDistinctResults = true;
-    
-    NSArray *entries = [self.context executeFetchRequest:fetch error:nil];
-//    if (entries.count > 0) {
-//        for (int i = 0; i < entries.count - 1; i++) {
-//            //if ([[[entries objectAtIndex:i] objectForKey:@"assetid"] length] > 0) {
-//                [output addObject:[entries objectAtIndex:i]];
-//
-//            //}
-//
-//        }
-//
-//        if ([[entries.lastObject objectForKey:@"assetid"] length] > 0) {
-//            [self entryCreate:self.storyActiveKey completion:^(NSError *error, NSString *key) {
-//                NSLog(@"error %@" ,error);
-//                [output addObject:[self entryWithKey:key]];
-//
-//            }];
-//
-//            return output;
-//
-//        }
-//        else {
-//            return output;
-//
-//        }
-//
-//    }
-//    else return output;
-    
-    return entries;
+    fetch.resultType = NSDictionaryResultType;
 
+    NSArray *entrys = [self.context executeFetchRequest:fetch error:nil];
+    for (NSDictionary *entry in entrys) {
+        if ([[entry objectForKey:@"assetid"] length] > 0 || [entrys.lastObject isEqual:entry]) {
+            NSMutableDictionary *formatted = [[NSMutableDictionary alloc] init];
+            for (NSString *key in entry.allKeys) {
+                if (![[entry objectForKey:key] isEqual:[NSNull null]]) {
+                    [formatted setObject:[entry objectForKey:key] forKey:key];
+                    
+                }
+                
+            }
+            
+            [output addObject:formatted];
+            
+        }
+        else {
+            if ([self storyEntry:[entry objectForKey:@"key"]] != nil) {
+                [self.context deleteObject:[self storyEntry:[entry objectForKey:@"key"]]];
+                
+                NSString *key = [NSString stringWithFormat:@"%@" ,[entry objectForKey:@"key"]];
+                NSString *path = [APP_DOCUMENTS stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", key]];
+                if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+                    [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+    return output;
+    
 }
 
 -(int)storyEntriesWithAssets:(NSString *)key {
@@ -186,7 +195,6 @@
         
     }
     
-    NSLog(@"identifyers %@" ,identifyers);
     PHFetchResult *result = [PHAsset fetchAssetsWithLocalIdentifiers:identifyers options:nil];
     [result enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [output addObject:obj];
@@ -194,6 +202,83 @@
     }];
 
     return output;
+    
+}
+
+-(void)storyExport:(NSString *)story completion:(void (^)(NSError *error))completion {
+    CLLocation *location = [self storyCentralLocation:story];
+    NSLog(@"Story Location: %f - %f" ,location.coordinate.latitude ,location.coordinate.longitude);
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,story];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
+    fetch.predicate = predicate;
+    fetch.returnsDistinctResults = true;
+    
+    Story *astory  =[[self.context executeFetchRequest:fetch error:nil] firstObject];
+    id value = nil;
+    if (astory.assetid.length == 0) value = [self storyDirectory:self.storyActiveKey];
+    else value = astory.assetid;
+    
+    if (value != nil) {
+        [self.imageobj imageExportWithValue:value location:location completion:^(NSError *error, NSString *asseid) {
+            if (error == nil || error.code == 200) {
+                astory.assetid = asseid;
+                astory.exported = [NSDate date];
+                
+                [self.context save:nil];
+                
+                completion([NSError errorWithDomain:@"Exported" code:200 userInfo:nil]);
+                
+            }
+            else {
+                if (error.code == 404) {
+                    [self.imageobj imageExportWithValue:[self storyDirectory:self.storyActiveKey] location:location completion:^(NSError *error, NSString *asseid) {
+                        astory.assetid = asseid;
+                        astory.exported = [NSDate date];
+                        
+                        [self.context save:nil];
+                        
+                        completion([NSError errorWithDomain:@"Exported" code:200 userInfo:nil]);
+                        
+                    }];
+                    
+                }
+                else completion(error);
+                
+            }
+            
+        }];
+        
+    }
+   
+}
+
+-(CLLocation *)storyCentralLocation:(NSString *)key {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"story == %@" ,key];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
+    fetch.predicate = predicate;
+    fetch.resultType = NSDictionaryResultType;
+  
+    float maxLat = -200;
+    float maxLong = -200;
+    float minLat = MAXFLOAT;
+    float minLong = MAXFLOAT;
+    
+    for (NSDictionary *entry in [self.context executeFetchRequest:fetch error:nil]) {
+        float latitude = [[entry objectForKey:@"latitude"] floatValue];
+        float longitude = [[entry objectForKey:@"longitude"] floatValue];
+        
+        if (latitude != 0 && longitude != 0) {
+            if (latitude < minLat) minLat = latitude;
+            if (longitude < minLong) minLong = longitude;
+            if (latitude > maxLat) maxLat = latitude;
+            if (longitude > maxLong) maxLong = longitude;
+            
+        }
+        
+    }
+    
+    CLLocationCoordinate2D center = CLLocationCoordinate2DMake((maxLat + minLat) * 0.5, (maxLong + minLong) * 0.5);
+    return [[CLLocation alloc] initWithLatitude:center.latitude longitude:center.longitude];
     
 }
 
@@ -213,230 +298,6 @@
     else [self.data setObject:story forKey:@"story_active_key"];
     [self.data synchronize];
     
-}
-
--(void)storyCreateVideo:(NSString *)story completion:(void (^)(NSString *file, NSError *error))completion {
-    AVMutableComposition *mutableComposition = [AVMutableComposition composition];
-    AVMutableCompositionTrack *videoCompositionTrack = [mutableComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-    NSMutableArray *instructions = [[NSMutableArray alloc] init];
-    
-    //CGSize videosize = CGSizeMake(1080.0, 1920.0);
-    CMTime videotime = kCMTimeZero;
-    CGSize videosize = CGSizeZero;
-    CGRect videoresize = CGRectMake(0.0, 0.0, 1080, 1920);
-    CGFloat videoscale = 0.0;
-    
-    for (NSDictionary *item in [self storyEntries:story]) {
-        NSString *filename = [NSString stringWithFormat:@"%@/%@.mov", APP_DOCUMENTS ,[item objectForKey:@"key"]];
-        AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:filename]];
-        
-        if ([[asset tracksWithMediaType:AVMediaTypeVideo] count] > 0) {
-            AVAssetTrack *videoAssetTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-            NSError *videoError;
-            [videoCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAssetTrack.timeRange.duration)
-                                           ofTrack:videoAssetTrack
-                                            atTime:videotime
-                                             error:&videoError];
-            if (videoError) {
-                NSLog(@"\\Video Error - %@", videoError.debugDescription);
-                completion(nil, videoError);
-                
-            }
-            
-           
-            //
-            /*
-            if (videoCompositionTrack.naturalSize.width < videoCompositionTrack.naturalSize.height) {
-                videoscale = videoresize.width / videoCompositionTrack.naturalSize.width;
-            }
-            else {
-                videoscale = videoresize.width / videoCompositionTrack.naturalSize.height;
-            }
-            
-            CGSize scaledSize = CGSizeMake(videoCompositionTrack.naturalSize.width * videoscale, videoCompositionTrack.naturalSize.height * videoscale);
-            CGPoint topLeft = CGPointMake(videoresize.width * 0.5 - scaledSize.width * 0.5, videosize.width  * .5 - scaledSize.height * .5);
-            
-            CGAffineTransform orientationTransform = videoAssetTrack.preferredTransform;
-            if (orientationTransform.tx == videoCompositionTrack.naturalSize.width || orientationTransform.tx == videoCompositionTrack.naturalSize.height) {
-                orientationTransform.tx = videoresize.width;
-            }
-            
-            if (orientationTransform.ty == videoCompositionTrack.naturalSize.width || orientationTransform.ty == videoCompositionTrack.naturalSize.height) {
-                orientationTransform.ty = videoresize.width;
-            }
-            
-            CGAffineTransform transform = CGAffineTransformConcat(CGAffineTransformConcat(CGAffineTransformMakeScale(videoscale, videoscale),  CGAffineTransformMakeTranslation(topLeft.x, topLeft.y)), orientationTransform);
-            */
-            //
-         
-//            float imagescale = self.scale / image.size.width;
-//            float imageheight = image.size.height * imagescale;
-//            float imagewidth = image.size.width * imagescale;
-//
-            /*
-            UIImageOrientation videoOrientation = [self getVideoOrientationFromAsset:asset];
-            
-            CGAffineTransform t1 = CGAffineTransformIdentity;
-            CGAffineTransform t2 = CGAffineTransformIdentity;
-            
-            switch (videoOrientation) {
-                case UIImageOrientationUp:
-                    t1 = CGAffineTransformMakeTranslation(1080, 1920);
-                    t2 = CGAffineTransformRotate(t1, M_PI_2 );
-                    NSLog(@"UIImageOrientationUp");
-                    break;
-                case UIImageOrientationDown:
-                    t1 = CGAffineTransformMakeTranslation(0.0, cropWidth - cropOffY); // not fixed width is the real height in upside downvideoCompositionTrack                    t2 = CGAffineTransformRotate(t1, - M_PI_2 );
-                    NSLog(@"UIImageOrientationDown");
-                    break;
-                case UIImageOrientationRight:
-                    t1 = CGAffineTransformMakeTranslation(0 - cropOffX, 0 - cropOffY );
-                    t2 = CGAffineTransformRotate(t1, 0 );
-                    break;
-                case UIImageOrientationLeft:
-                    t1 = CGAffineTransformMakeTranslation(cropWidth - cropOffX, cropHeight - cropOffY );
-                    t2 = CGAffineTransformRotate(t1, M_PI  );
-                    break;
-                default:
-                    NSLog(@"no supported orientation has been found in this video");
-                    break;
-            }
-            */
-            
-            CGRect cropRect = CGRectZero;
-            CGSize naturalSize = CGSizeMake(videoCompositionTrack.naturalSize.height, videoCompositionTrack.naturalSize.width);
-            
-            cropRect = CGRectMake(0, 0, naturalSize.width, 1920);
-            
-            CGFloat cropOffX = cropRect.origin.x;
-            CGFloat cropOffY = cropRect.origin.y;
-            CGFloat cropWidth = cropRect.size.width;
-            CGFloat cropHeight = cropRect.size.height;
-            
-            CGAffineTransform t1 = CGAffineTransformIdentity;
-            CGAffineTransform t2 = CGAffineTransformIdentity;
-            
-            UIImageOrientation videoOrientation = [self getVideoOrientationFromAsset:asset];
-
-            switch (videoOrientation) {
-                case UIImageOrientationUp:
-                    t1 = CGAffineTransformMakeTranslation(naturalSize.height, 0 - cropOffY );
-                    t2 = CGAffineTransformRotate(t1, M_PI_2 );
-                    break;
-                case UIImageOrientationDown:
-                    t1 = CGAffineTransformMakeTranslation(0 - cropOffX, naturalSize.height - cropOffY ); // not fixed width is the real height in upside down
-                    t2 = CGAffineTransformRotate(t1, - M_PI_2 );
-                    break;
-                case UIImageOrientationRight:
-                    t1 = CGAffineTransformMakeTranslation(0 - cropOffY, 0 - cropOffX );
-                    t2 = CGAffineTransformRotate(t1, 0 );
-                    break;
-                case UIImageOrientationLeft:
-                    t1 = CGAffineTransformMakeTranslation(naturalSize.width - cropOffX, naturalSize.height - cropOffY );
-                    t2 = CGAffineTransformRotate(t1, M_PI );
-                    break;
-                default:
-                    NSLog(@"no supported orientation has been found in this video");
-                    break;
-            }
-            
-            CGAffineTransform finalTransform = t2;
-          
-            //
-            
-            AVMutableVideoCompositionLayerInstruction *videolayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoAssetTrack];
-            [videolayerInstruction setTransform:finalTransform atTime:kCMTimeZero];
-            
-            AVMutableVideoCompositionInstruction *videoCompositionInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
-            [videoCompositionInstruction setTimeRange:CMTimeRangeMake(videotime, videoAssetTrack.timeRange.duration)];
-            [videoCompositionInstruction setLayerInstructions:@[videolayerInstruction]];
-            
-            videotime = CMTimeAdd(videotime, videoAssetTrack.timeRange.duration);
-            videosize = CGSizeMake(videoresize.size.width, videoresize.size.height);
-            
-            [instructions addObject:videoCompositionInstruction];
-            
-        }
-        
-    }
-    
-    NSString *output = [NSString stringWithFormat:@"%@/%@_export.mov", APP_DOCUMENTS ,story];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:output]) {
-        [[NSFileManager defaultManager] removeItemAtPath:output error:nil];
-        
-    }
-    
-    CATextLayer *watermarktext = [[CATextLayer alloc] init];
-    [watermarktext setFont:@"Avenir-Heavy"];
-    [watermarktext setFontSize:36];
-    [watermarktext setFrame:CGRectMake(0.0, 0.0, videosize.width - 80.0, 70.0)];
-    [watermarktext setString:@"ovatar.io"];
-    [watermarktext setAlignmentMode:kCAAlignmentRight];
-    [watermarktext setForegroundColor:[[UIColor colorWithWhite:1.0 alpha:0.7] CGColor]];
-    [watermarktext setBackgroundColor:[[UIColor clearColor] CGColor]];
-    
-    CALayer *watermarklogo = [CALayer layer];
-    [watermarklogo setContents:(id)[[UIImage imageNamed:@"logo_placeholder"] CGImage]];
-    [watermarklogo setFrame:CGRectMake(videosize.width - (watermarktext.bounds.size.height + 10.0), 20.0, watermarktext.bounds.size.height,  watermarktext.bounds.size.height - 22.0)];
-    [watermarklogo setContentsGravity:kCAGravityResizeAspect];
-    
-    CALayer *watermark = [CALayer layer];
-    [watermark addSublayer:watermarktext];
-    [watermark addSublayer:watermarklogo];
-    [watermark setFrame:CGRectMake(0.0, 0.0, videosize.width, watermarktext.bounds.size.height)];
-    [watermark setBackgroundColor:[UIColor clearColor].CGColor];
-    [watermark setMasksToBounds:true];
-    
-    CALayer *parentLayer = [CALayer layer];
-    CALayer *videoLayer = [CALayer layer];
-    [parentLayer setFrame:CGRectMake(0, 0, videosize.width, videosize.height)];
-    [parentLayer setBackgroundColor:[UIColor clearColor].CGColor];
-    [videoLayer setFrame:CGRectMake(20, 20, videosize.width - 40.0, videosize.height - 40.0)];
-    [videoLayer setBackgroundColor:[UIColor clearColor].CGColor];
-    [parentLayer addSublayer:videoLayer];
-    [parentLayer addSublayer:watermark];
-    
-    AVMutableVideoComposition *mutableVideoComposition = [AVMutableVideoComposition videoComposition];
-    mutableVideoComposition.instructions = instructions;
-    mutableVideoComposition.frameDuration = CMTimeMake(1, 30);
-    mutableVideoComposition.renderSize = videosize;
-    mutableVideoComposition.animationTool = [AVVideoCompositionCoreAnimationTool
-                                             videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
-    AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:mutableComposition presetName:AVAssetExportPresetHighestQuality];
-    exporter.videoComposition = mutableVideoComposition;
-    exporter.outputURL = [[NSURL alloc] initFileURLWithPath:output];
-    exporter.outputFileType = @"com.apple.quicktime-movie";
-    exporter.shouldOptimizeForNetworkUse = true;
-    
-    [exporter exportAsynchronouslyWithCompletionHandler:^{
-        if (exporter.status == AVAssetExportSessionStatusCompleted) {
-            completion(output, [NSError errorWithDomain:@"exported okay" code:200 userInfo:nil]);
-            
-        }
-        else {
-            NSLog(@"exporter.error %@" ,exporter.error);
-            completion(nil, exporter.error);
-            
-        }
-        
-    }];
-    
-}
-
-- (UIImageOrientation)getVideoOrientationFromAsset:(AVAsset *)asset
-{
-    AVAssetTrack *videoTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0];
-    CGSize size = [videoTrack naturalSize];
-    CGAffineTransform txf = [videoTrack preferredTransform];
-    
-    if (size.width == txf.tx && size.height == txf.ty)
-        return UIImageOrientationLeft; //return UIInterfaceOrientationLandscapeLeft;
-    else if (txf.tx == 0 && txf.ty == 0)
-        return UIImageOrientationRight; //return UIInterfaceOrientationLandscapeRight;
-    else if (txf.tx == 0 && txf.ty == size.width)
-        return UIImageOrientationDown; //return UIInterfaceOrientationPortraitUpsideDown;
-    else
-        return UIImageOrientationUp;  //return UIInterfaceOrientationPortrait;
 }
 
 /*
@@ -487,6 +348,16 @@
 }
 */
 
+-(Entry *)storyEntry:(NSString *)key {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,key];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
+    fetch.predicate = predicate;
+    fetch.returnsDistinctResults = true;
+    
+    return [[self.context executeFetchRequest:fetch error:nil] firstObject];
+    
+}
+
 -(void)entryCreate:(NSString *)story completion:(void (^)(NSError *error, NSString *key))completion {
     if ([self storyWithIdentifyer:story] == nil) {
         completion([NSError errorWithDomain:@"Story does not exist" code:404 userInfo:nil], nil);
@@ -496,9 +367,10 @@
         Entry *newentry = [[Entry alloc] initWithEntity:self.entry insertIntoManagedObjectContext:self.context];
         newentry.story = story;
         newentry.key = self.uniquekey;
-        newentry.export = true;
+        newentry.export = @"";
         newentry.updated = [NSDate date];
         newentry.created = [NSDate date];
+        newentry.assetid = @"";
 
         NSError *saveerr;
         if ([self.context save:&saveerr]) {
@@ -511,18 +383,24 @@
     
 }
 
--(void)entryAppendWithImageData:(PHAsset *)asset animated:(BOOL)animated orentation:(NSInteger)orentation entry:(NSString *)entry completion:(void (^)(NSError *error))completion {
+-(void)entryAppendWithImageData:(PHAsset *)asset animated:(BOOL)animated entry:(NSString *)entry completion:(void (^)(NSError *error))completion {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,entry];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
     fetch.predicate = predicate;
     
     if ([self.context countForFetchRequest:fetch error:nil] == 0) {
-        [self.imageobj imageCreateEntryFromAsset:asset animate:animated key:entry completion:^(NSError *error, BOOL animated, NSInteger orentation) {
+        [self.imageobj imageCreateEntryFromAsset:asset animate:animated key:entry completion:^(NSError *error, BOOL animated) {
             if (error.code == 200) {
                 Entry *existing = [[self.context executeFetchRequest:fetch error:nil] firstObject];
                 existing.assetid = asset.localIdentifier;
                 existing.animate = animated;
-                existing.orentation = orentation;
+                existing.latitude = asset.location.coordinate.latitude;
+                existing.longitude = asset.location.coordinate.longitude;
+                existing.captured = asset.creationDate;
+                existing.duration = asset.duration;
+                existing.limitduration = 1.0;
+                existing.audio = false;
+                existing.type = [self entryAssetType:asset];
                 
                 [self.context save:nil];
                 
@@ -536,9 +414,15 @@
     }
     else {
         Entry *existing = [[self.context executeFetchRequest:fetch error:nil] firstObject];
-        existing.assetid = asset.localIdentifier;
+        existing.assetid = asset.localIdentifier==nil?@"":asset.localIdentifier;
         existing.animate = animated;
-        existing.orentation = orentation;
+        existing.latitude = asset.location.coordinate.latitude;
+        existing.longitude = asset.location.coordinate.longitude;
+        existing.captured = asset.creationDate;
+        existing.duration = asset.duration;
+        existing.limitduration = 1.0;
+        existing.audio = false;
+        existing.type = [self entryAssetType:asset];
 
         if ([self.context save:nil]) {
             completion([NSError errorWithDomain:@"Entry updated" code:200 userInfo:nil]);
@@ -551,6 +435,20 @@
         
     }
 
+}
+
+-(NSString *)entryAssetType:(PHAsset *)asset {
+    if (asset != nil) {
+        if (asset.mediaType == PHAssetMediaTypeImage) {
+            if (asset.mediaSubtypes == PHAssetMediaSubtypePhotoLive) return @"livephoto";
+            else return @"image";
+            
+        }
+        else return @"video";
+        
+    }
+    else return @"";
+    
 }
 
 -(NSDictionary *)entryWithKey:(NSString *)key {
@@ -571,7 +469,7 @@
     if (key != nil) fetch.predicate = predicate;
     
     for (Entry *entry in [self.context executeFetchRequest:fetch error:nil]) {
-        [self.context deleteObject:entry];
+        if (entry != nil) [self.context deleteObject:entry];
         
     }
     
@@ -581,6 +479,7 @@
     NSMutableString *output = [NSMutableString stringWithCapacity:20];
     for (int i = 0; i < 20; i++) {
         [output appendFormat:@"%C", (unichar)('a' + arc4random_uniform(26))];
+        
     }
     
     return output;

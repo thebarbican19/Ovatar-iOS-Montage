@@ -13,6 +13,7 @@
 #import "Mixpanel.h"
 #import "ODataObject.h"
 #import "OPaymentObject.h"
+#import "OLoaderView.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
@@ -22,12 +23,17 @@
 @property (strong, nonatomic) Mixpanel *mixpanel;
 @property (strong, nonatomic) ODataObject *model;
 @property (strong, nonatomic) OPaymentObject *payment;
+@property (strong, nonatomic) UIView *splash;
+@property (strong, nonatomic) OLoaderView *loader;
+@property (assign) float padding;
+@property (strong, nonatomic) NSArray *lassets;
+@property (strong, nonatomic) NSString *ltext;
 
 -(int)applicationTimer;
 -(NSString *)applicationTimerFormatted;
--(NSString *)applicationBackgroundUpdated;
 
 -(void)applicationRatePrompt;
+-(void)applicationLoadingScreen:(BOOL)loading;
 
 @end
 

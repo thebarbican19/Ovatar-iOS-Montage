@@ -27,7 +27,6 @@
 
 @optional
 
--(void)viewPresentSubviewWithIndex:(int)index animate:(BOOL)animate;
--(void)viewStorySetup;
+-(void)viewStorySetup:(BOOL)animateview;
 
 @end

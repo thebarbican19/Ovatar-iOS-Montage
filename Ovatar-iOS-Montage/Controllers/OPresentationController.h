@@ -9,17 +9,28 @@
 #import <UIKit/UIKit.h>
 #import <AVKit/AVKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import <AudioToolbox/AudioServices.h>
 
 #import "OLoaderView.h"
 #import "OPaymentObject.h"
+#import "OActionButton.h"
 
-@interface OPresentationController : UIViewController
+#import "SAMLabel.h"
+
+@interface OPresentationController : UIViewController <OActionDelegate>
 
 @property (nonatomic, strong) AVPlayerViewController *viewPlayer;
-@property (nonatomic, strong) UILabel *viewStatus;
-@property (nonatomic, strong) OLoaderView *viewLoader;
+@property (nonatomic, strong) UILabel *viewElapsed;
+@property (nonatomic, strong) SAMLabel *viewStatus;
+@property (nonatomic, strong) UIImageView *viewTick;
+@property (nonatomic, strong) OActionButton *viewShare;
 
--(void)viewPresentLoader:(NSArray *)assets;
+@property (nonatomic, strong) NSURL *exported;
+@property (nonatomic) SystemSoundID complete;
+@property (nonatomic, assign) CGSize videosize;
+
+-(void)viewReset;
 -(void)viewPresentOutput:(NSURL *)file;
+-(void)viewExportSucsessful;
 
 @end

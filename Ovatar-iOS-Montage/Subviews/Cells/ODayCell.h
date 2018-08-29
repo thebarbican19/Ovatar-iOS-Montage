@@ -10,13 +10,19 @@
 #import <AVKit/AVKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import <UIImage+BlurEffects.h>
+#import "BLMultiColorLoader.h"
 
+#import "OImageObject.h"
+
+@protocol ODayCellDelegate;
 @interface ODayCell : UICollectionViewCell
 
+@property (nonatomic, strong) id <ODayCellDelegate> delegate;
 @property (nonatomic, strong) UIImageView *cellImage;
-@property (nonatomic, strong) UIImageView *cellShadow;
+@property (nonatomic, strong) UIView *cellShadow;
 @property (nonatomic, strong) AVPlayerViewController *cellPlayer;
 @property (nonatomic, strong) UIImageView *cellPlaceholder;
+@property (nonatomic, strong) BLMultiColorLoader *cellLoader;
 
 @property (nonatomic, strong) NSDate *timestamp;
 @property (nonatomic, strong) UIImage *image;
@@ -24,7 +30,18 @@
 @property (nonatomic, strong) NSString *filename;
 @property (nonatomic, strong) NSString *key;
 @property (nonatomic, strong) NSString *asset;
+@property (nonatomic, strong) NSDictionary *data;
+@property (nonatomic, strong) NSIndexPath *index;
 
--(void)setup:(NSDictionary *)content;
+@property (nonatomic, strong) OImageObject *imageobj;
+
+-(void)setup:(NSDictionary *)content animated:(BOOL)animated;
 
 @end
+
+@protocol ODayCellDelegate <NSObject>
+
+@optional
+
+@end
+

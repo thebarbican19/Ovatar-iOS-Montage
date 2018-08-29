@@ -22,6 +22,7 @@
 @property (nonatomic, assign) float padding;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) UINotificationFeedbackGenerator *generator;
+@property (nonatomic, strong) NSString *key;
 
 @end
 

@@ -13,7 +13,8 @@ typedef enum {
     OTitleButtonTypeSettings,
     OTitleButtonTypePreview,
     OTitleButtonTypeSelect,
-    
+    OTitleButtonTypeClose
+
 } OTitleButtonType;
 
 @protocol OTitleViewDelegate;

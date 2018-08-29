@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Montage</string>
+	<string>montage</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -44,11 +44,11 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Ovatar requires camera access to allow you to capture short, sweet videos for your montage</string>
+	<string>Montage requires camera access to allow you to capture short, sweet videos for your montage</string>
 	<key>kTCCServiceMediaLibrary</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Ovatar requires acces to your photos to help you build stunning montages! </string>
+	<string>Montage requires acces to your photos to help you build stunning montages! </string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -58,6 +58,7 @@
 			<array>
 				<string>ovatarmontage</string>
 				<string>ovatar</string>
+				<string>instagram</string>
 			</array>
 		</dict>
 	</array>

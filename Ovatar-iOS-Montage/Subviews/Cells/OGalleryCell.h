@@ -13,4 +13,6 @@
 @property (nonatomic ,strong) UIImageView *viewContainer;
 @property (nonatomic ,strong) UIImageView *viewOverlay;
 
+@property (nonatomic ,strong) NSIndexPath *index;
+
 @end

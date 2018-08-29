@@ -25,9 +25,9 @@
     
     if (@available(iOS 11, *)) {
         self.padding = [UIApplication sharedApplication].delegate.window.safeAreaInsets.bottom;
-                        
-    }
         
+    }
+    
     if (self.timer) [self.timer invalidate];
     for (UIView *subview in [UIApplication sharedApplication].delegate.window.subviews){
         if ([subview isKindOfClass:[UIView class]] && subview.tag == 999) self.exists = true;
@@ -36,7 +36,7 @@
     }
     
     if (!self.exists) {
-        container = [[UIView alloc] initWithFrame:CGRectMake(15.0, [UIApplication sharedApplication].delegate.window.bounds.size.height - (self.padding + 68.0), [UIApplication sharedApplication].delegate.window.bounds.size.width - 30.0, 65.0)];
+        container = [[UIView alloc] initWithFrame:CGRectMake(15.0, [UIApplication sharedApplication].delegate.window.bounds.size.height - (self.padding + 78.0), [UIApplication sharedApplication].delegate.window.bounds.size.width - 30.0, 65.0)];
         container.backgroundColor = [UIColor whiteColor];
         container.layer.cornerRadius = 8.0;
         container.clipsToBounds = true;
@@ -140,6 +140,7 @@
         [self removeFromSuperview];
         
     }];
+
 }
 
 -(void)notificationAction:(UIButton *)gesture {

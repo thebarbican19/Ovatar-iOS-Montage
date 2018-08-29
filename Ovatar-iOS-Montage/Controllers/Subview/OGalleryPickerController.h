@@ -17,17 +17,18 @@
 
 @property (nonatomic, strong) id <OGalleryPickerDelegate> delegate;
 @property (nonatomic, strong) OImageObject *imageobj;
+@property (nonatomic, assign) BOOL revealed;
 
 @property (nonatomic, strong) PHAsset *selected;
 @property (nonatomic, strong) NSMutableArray *images;
+
+-(void)collectionViewAnimateVisibleCells:(BOOL)animate;
 
 @end
 
 @protocol OGalleryPickerDelegate <NSObject>
 
 @optional
-
--(void)viewGallerySelectedImage:(PHAsset *)asset;
 
 @end
 

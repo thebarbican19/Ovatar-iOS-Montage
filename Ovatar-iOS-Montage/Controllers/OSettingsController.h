@@ -7,19 +7,46 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <SafariServices/SafariServices.h>
+#import <UIKit/UIKit.h>
+#import <AVKit/AVKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import <AudioToolbox/AudioServices.h>
 
-#import "OLoaderView.h"
+#import "OSettingsHeader.h"
 #import "OImageObject.h"
 #import "OPaymentObject.h"
 
-@interface OSettingsController : UITableViewController <UITableViewDelegate>
+#import "AppDelegate.h"
 
-@property (nonatomic, strong) OLoaderView *viewHeader;
+typedef enum {
+    OSettingsSubviewFeedback,
+    OSettingsSubviewNone
 
-@property (nonatomic, strong) OPaymentObject *payment;
+    
+} OSettingsSubview;
+
+@protocol OSettingsDelegate;
+@interface OSettingsController : UITableViewController <UITableViewDelegate, SFSafariViewControllerDelegate>
+
+@property (nonatomic, strong) id <OSettingsDelegate> delegate;
+@property (nonatomic, strong) OSettingsHeader *viewHeader;
+
 @property (nonatomic, strong) OImageObject *imageobj;
-@property (nonatomic, strong) NSMutableArray *settings;
 
--(void)viewAnimateHeader;
+@property (nonatomic, strong) NSMutableArray *settings;
+@property (nonatomic) SFSafariViewController *safari;
+
+-(void)tableViewContent;
 
 @end
+
+@protocol OSettingsDelegate <NSObject>
+
+@optional
+
+-(void)viewRestorePurchases;
+-(void)viewInsertSubview:(OSettingsSubview)view;
+
+@end
+

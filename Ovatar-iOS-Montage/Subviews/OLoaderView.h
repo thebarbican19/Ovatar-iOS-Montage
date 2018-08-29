@@ -12,9 +12,10 @@
 @interface OLoaderView : UIView
 
 @property (nonatomic, strong) CALayer *viewMask;
-@property (nonatomic, strong) UIImageView *viewContainer;
+@property (nonatomic, strong) UIView *viewContainer;
+@property (nonatomic, strong) UIImageView *viewImages;
 
-@property (nonatomic, assign) int speed;
+@property (nonatomic, assign) float speed;
 @property (nonatomic, assign) float scale;
 @property (nonatomic, assign) float animation;
 @property (nonatomic, strong) NSArray *images;

@@ -9,6 +9,8 @@ target 'Ovatar-iOS-Montage' do
   pod 'TYBlurImage'
   pod 'GBDeviceInfo', '~>4.4.0'
   pod 'Ovatar-iOS'
+  pod 'BLMultiColorLoader'
+  pod 'SAMLabel'
   # use_frameworks!
 
   # Pods for Ovatar-iOS-Montage

@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FF456453C88EC5F189FCCDFD09EA1E6C"
+               BlueprintIdentifier = "CA0935699B0580080BBA67A3D817F3FB"
                BlueprintName = "Pods-Ovatar-iOS-Montage"
                ReferencedContainer = "container:Pods.xcodeproj"
                BuildableName = "libPods-Ovatar-iOS-Montage.a">

@@ -23,8 +23,8 @@
 -(void)imageAuthorization:(BOOL)request completion:(void (^)(PHAuthorizationStatus status))completion;
 -(void)imagesFromAsset:(PHAsset *)asset thumbnail:(BOOL)thumbnail completion:(void (^)(NSDictionary *exifdata, NSData *image))completion;
 -(void)imageReturnFromDay:(NSDate *)day completion:(void (^)(NSArray *images))completion;
--(void)imageCreateEntryFromAsset:(PHAsset *)asset animate:(BOOL)animate key:(NSString *)key completion:(void (^)(NSError* error, BOOL animated, NSInteger orentation))completion;
--(void)imageInformationFromEntry:(NSString *)key completion:(void (^)(NSString *captured, NSString *location))completion;
+-(void)imageCreateEntryFromAsset:(PHAsset *)asset animate:(BOOL)animate key:(NSString *)key completion:(void (^)(NSError* error, BOOL animated))completion;
+-(void)imageExportWithValue:(id)value location:(CLLocation *)location completion:(void (^)(NSError* error, NSString *asseid))completion;
 
 -(void)imagesFromAlbum:(NSString *)album completion:(void (^)(NSArray *images))completion;
 -(void)imagesFromLocationRadius:(CLLocation *)location radius:(float)radius completion:(void (^)(NSArray *images))completion;

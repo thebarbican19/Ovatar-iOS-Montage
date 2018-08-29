@@ -10,11 +10,11 @@
 
 @implementation NSlackObject
 
-#define SLACK_CHANNEL @"CAF0ERTU0" //channel id
-#define SLACK_TOKEN @"xoxp-211226935618-210670597729-355848310117-a9fa937eff29c02c7eda4400e9ea483a"
-#define SLACK_WEBHOOK @"https://hooks.slack.com/services/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"
+#define SLACK_CHANNEL @"CCDSXRN9F" //channel id
+#define SLACK_TOKEN @"xoxp-423820767766-421761432752-421766321824-c8a7d3920282ad1821e460ce541971c2"
+#define SLACK_WEBHOOK @"https://hooks.slack.com/services/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"
 #define SLACK_FILENAME @"slack_screenshot.png"
-#define SLACK_CHANNEL_NAME @"Kollecto"
+#define SLACK_CHANNEL_NAME @"Ovatar"
 
 #define APP_BUNDLE_NAME [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"]
 #define APP_VERSION [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"]
@@ -86,7 +86,7 @@
    
     NSString *title;
     if (type == NFeedbackTypeGeneral) {
-        title = [NSString stringWithFormat:@"*%@* feedback received from" ,APP_BUNDLE_NAME];
+        title = [NSString stringWithFormat:@"*%@* feedback received" ,APP_BUNDLE_NAME];
         
     }
     else {

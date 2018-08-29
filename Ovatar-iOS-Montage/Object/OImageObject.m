@@ -47,7 +47,60 @@
         
     }
     else completion([PHPhotoLibrary authorizationStatus]);
+    
+}
 
+-(void)imageExportWithValue:(id)value location:(CLLocation *)location completion:(void (^)(NSError* error, NSString *asseid))completion {
+    __block PHObjectPlaceholder *placeholder = nil;
+    if ([value isKindOfClass:[NSURL class]]) {
+        [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+            PHAssetChangeRequest *new = [PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:value];
+            new.location = location;
+            new.creationDate = [NSDate date];
+            new.favorite = true;
+            placeholder = new.placeholderForCreatedAsset;
+            
+        } completionHandler:^(BOOL success, NSError *error) {
+            if (success) completion([NSError errorWithDomain:@"Exported" code:200 userInfo:nil], [placeholder localIdentifier]);
+            else completion(error, nil);
+            
+        }];
+        
+    }
+    else {
+        [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+            NSString *identifyer = (NSString *)value;
+            PHFetchResult *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[identifyer] options:nil];
+            if (result.count > 0) {
+                PHAssetChangeRequest *new = [PHAssetChangeRequest changeRequestForAsset:result.firstObject];
+                new.location = location;
+                placeholder = new.placeholderForCreatedAsset;
+
+            }
+            else {
+                completion([NSError errorWithDomain:@"Asset does not exist" code:404 userInfo:nil], nil);
+                
+            }
+
+        } completionHandler:^(BOOL success, NSError * _Nullable error) {
+            if (success) completion([NSError errorWithDomain:@"Exported" code:200 userInfo:nil], [placeholder localIdentifier]);
+            else completion(error, nil);
+            
+        }];
+        
+    }
+    
+}
+
+-(void)imageCreateAlbum {
+//    __block PHObjectPlaceholder *placeholder = nil;
+//    [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+//        PHAssetCollectionChangeRequest *collection = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:@"Montage"];
+//        
+//    } completionHandler:^(BOOL success, NSError * _Nullable error) {
+//        
+//    }];
+     
 }
 
 -(void)imagesFromAsset:(PHAsset *)asset thumbnail:(BOOL)thumbnail completion:(void (^)(NSDictionary *exifdata, NSData *image))completion {
@@ -75,15 +128,10 @@
         }
         else {
             completion([self imageMetadata:UIImageJPEGRepresentation(image, 1.0)], UIImageJPEGRepresentation(image, 1.0));
-
+            
         }
         
     }];
-
-}
-
--(void)imageInformationFromEntry:(NSString *)key completion:(void (^)(NSString *captured, NSString *location))completion {
-    
     
 }
 
@@ -92,28 +140,28 @@
     components.hour = 0;
     components.minute = 0;
     components.second = 0;
-
+    
     NSDate *daystart = [[NSCalendar currentCalendar] dateFromComponents:components];
     
     components.hour = 23;
     components.minute = 59;
     components.second = 59;
-
+    
     NSDate *dayend= [[NSCalendar currentCalendar] dateFromComponents:components];
-
+    
     NSPredicate *predidate = [NSPredicate predicateWithFormat:@"creationDate >= %@ && creationDate <= %@" ,daystart, dayend];
     NSPredicate *mediatype = [NSPredicate predicateWithFormat:@"mediaType = %d", PHAssetMediaTypeImage];
     NSCompoundPredicate *compound = [NSCompoundPredicate andPredicateWithSubpredicates:@[predidate, mediatype]];
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:false]];
     options.predicate = compound;
-
+    
     PHFetchResult *fetch = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:options];
     completion((NSArray *)fetch);
     
 }
 
--(void)imageCreateEntryFromAsset:(PHAsset *)asset animate:(BOOL)animate key:(NSString *)key completion:(void (^)(NSError* error, BOOL animated, NSInteger orentation))completion {
+-(void)imageCreateEntryFromAsset:(PHAsset *)asset animate:(BOOL)animate key:(NSString *)key completion:(void (^)(NSError *error, BOOL animated))completion {
     if ([asset isKindOfClass:[PHAsset class]]){
         NSString *path = [APP_DOCUMENTS stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", key]];
         NSURL *url = [NSURL fileURLWithPath:path];
@@ -150,18 +198,18 @@
                     
                     if (output){
                         [[PHAssetResourceManager defaultManager] writeDataForAssetResource:output toFile:url options:nil completionHandler:^(NSError * _Nullable error) {
-                            completion(error, true, [self imageOrentation:orientation]);
+                            completion(error, true);
                             
                         }];
                     }
                     else {
                         [self imagesFromAsset:asset thumbnail:false completion:^(NSDictionary *exifdata, NSData *image) {
                             [self imageCreateEntryFromStaticPhoto:[UIImage imageWithData:image] key:key completion:^(NSError *error) {
-                                completion(error, false, [self imageOrentation:orientation]);
+                                completion(error, false);
                                 NSLog(@"imageCreateEntryFromStaticPhoto");
                                 
                             }];
-
+                            
                         }];
                         
                     }
@@ -171,8 +219,8 @@
                     [self imagesFromAsset:asset thumbnail:false completion:^(NSDictionary *exifdata, NSData *image) {
                         [self imageCreateEntryFromStaticPhoto:[UIImage imageWithData:image] key:key completion:^(NSError *error) {
                             NSLog(@"imageCreateEntryFromStaticPhoto");
-                            completion(error, false, [self imageOrentation:orientation]);
-
+                            completion(error, false);
+                            
                         }];
                         
                     }];
@@ -184,8 +232,8 @@
         }];
         
     }
-    else completion([NSError errorWithDomain:@"" code:422 userInfo:nil], false, 0);
-
+    else completion([NSError errorWithDomain:@"" code:422 userInfo:nil], false);
+    
 }
 
 -(void)imageCreateEntryFromStaticPhoto:(UIImage *)image key:(NSString *)key completion:(void (^)(NSError* error))completion {
@@ -196,7 +244,7 @@
     AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:url fileType:AVFileTypeQuickTimeMovie error:&error];
     NSDictionary *videoSettings = @{AVVideoCodecKey:AVVideoCodecTypeH264, AVVideoWidthKey:@(image.size.width), AVVideoHeightKey:@(image.size.height)};
     AVAssetWriterInput* writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoSettings];
-
+    
     AVAssetWriterInputPixelBufferAdaptor *adaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:writerInput sourcePixelBufferAttributes:nil];
     
     [videoWriter addInput:writerInput];
@@ -205,7 +253,7 @@
     
     [adaptor appendPixelBuffer:[self pixelBufferFromCGImage:image.CGImage] withPresentationTime:CMTimeMakeWithSeconds(0, 30.0)];
     [adaptor appendPixelBuffer:[self pixelBufferFromCGImage:image.CGImage] withPresentationTime:CMTimeMakeWithSeconds(1, 30.0)];
-
+    
     [writerInput markAsFinished];
     [videoWriter finishWritingWithCompletionHandler:^{
         if (videoWriter.status != AVAssetWriterStatusFailed && videoWriter.status == AVAssetWriterStatusCompleted) {
@@ -214,11 +262,11 @@
         }
         else {
             completion(videoWriter.error);
-
+            
         }
-      
+        
     }];
-
+    
 }
 
 -(CVPixelBufferRef)pixelBufferFromCGImage: (CGImageRef) image {
@@ -238,7 +286,7 @@
     CGColorSpaceRelease(rgbColorSpace);
     CGContextRelease(context);
     CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
-
+    
     return pixelBuffer;
     
 }
@@ -288,6 +336,7 @@
     }];
     
     completion(output);
+    
 }
 
 -(NSDictionary*)imageMetadata:(NSData*)image {
@@ -308,18 +357,6 @@
     }
     
     return nil;
-}
-
--(NSInteger)imageOrentation:(UIImageOrientation)orentation {
-    if (orentation == UIImageOrientationUp) return 1;
-    else if (orentation == UIImageOrientationDown) return 3;
-    else if (orentation == UIImageOrientationLeft) return 8;
-    else if (orentation == UIImageOrientationRight) return 6;
-    else if (orentation == UIImageOrientationUpMirrored) return 2;
-    else if (orentation == UIImageOrientationDownMirrored) return 4;
-    else if (orentation == UIImageOrientationLeftMirrored) return 5;
-    else return 7;
-    
 }
 
 @end
