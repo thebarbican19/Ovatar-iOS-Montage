@@ -29,6 +29,13 @@
         self.viewOverlay.alpha = 0.0;
         [self.viewContainer addSubview:self.viewOverlay];
         
+        self.viewAnimated = [[UIImageView alloc] initWithFrame:CGRectMake(2.0, self.viewContainer.bounds.size.height - 22.0, 20.0, 20.0)];
+        self.viewAnimated.backgroundColor = [UIColor clearColor];
+        self.viewAnimated.contentMode = UIViewContentModeScaleAspectFit;
+        self.viewAnimated.image = [UIImage imageNamed:@"entry_playback"];
+        self.viewAnimated.alpha = 1.0;
+        [self.viewContainer addSubview:self.viewAnimated];
+        
     }
     
     return self;

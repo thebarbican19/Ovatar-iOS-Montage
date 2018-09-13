@@ -64,6 +64,7 @@
         newstory.name = [data objectForKey:@"name"];
         newstory.key = self.uniquekey;
         newstory.assetid = @"";
+        newstory.speed = 0.8;
 
         NSError *saveerr;
         if ([self.context save:&saveerr]) {
@@ -78,7 +79,7 @@
     
 }
 
--(NSDictionary *)storyWithIdentifyer:(NSString *)key {
+-(NSDictionary *)storyWithKey:(NSString *)key {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,key];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
     fetch.predicate = predicate;
@@ -107,7 +108,7 @@
 }
 
 -(NSDictionary *)storyActive {
-    return [self storyWithIdentifyer:self.storyActiveKey];
+    return [self storyWithKey:self.storyActiveKey];
     
 }
 
@@ -178,6 +179,18 @@
             
 }
 
+-(BOOL)storyContainsAssets:(NSString *)key asset:(NSString *)asset {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"story == %@ && assetid == %@" ,key, asset];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
+    fetch.predicate = predicate;
+    fetch.resultType = NSDictionaryResultType;
+    fetch.returnsDistinctResults = true;
+    
+    if ([self.context countForFetchRequest:fetch error:nil] > 0) return true;
+    else return false;
+    
+}
+
 -(NSArray *)storyEntriesPreviews:(NSString *)key {
     NSMutableArray *identifyers = [[NSMutableArray alloc] init];
     NSMutableArray *output = [[NSMutableArray alloc] init];
@@ -207,7 +220,6 @@
 
 -(void)storyExport:(NSString *)story completion:(void (^)(NSError *error))completion {
     CLLocation *location = [self storyCentralLocation:story];
-    NSLog(@"Story Location: %f - %f" ,location.coordinate.latitude ,location.coordinate.longitude);
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,story];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
     fetch.predicate = predicate;
@@ -252,6 +264,24 @@
    
 }
 
+-(void)storyAppendSpeed:(NSString *)story speed:(float)speed completion:(void (^)(NSError *error))completion {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,story];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
+    fetch.predicate = predicate;
+    fetch.returnsDistinctResults = true;
+    
+    Story *astory  =[[self.context executeFetchRequest:fetch error:nil] firstObject];
+    astory.speed = speed;
+    
+    NSError *saveerr;
+    if ([self.context save:&saveerr]) {
+        completion([NSError errorWithDomain:@"Exported" code:200 userInfo:nil]);
+
+    }
+    else completion(saveerr);
+
+}
+
 -(CLLocation *)storyCentralLocation:(NSString *)key {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"story == %@" ,key];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
@@ -283,10 +313,9 @@
 }
 
 -(int)storyExports {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"exported == 1"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"exported != %@", nil];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
     fetch.predicate = predicate;
-    fetch.resultType = NSDictionaryResultType;
     fetch.returnsDistinctResults = true;
     
     return (int)[self.context countForFetchRequest:fetch error:nil];
@@ -358,8 +387,8 @@
     
 }
 
--(void)entryCreate:(NSString *)story completion:(void (^)(NSError *error, NSString *key))completion {
-    if ([self storyWithIdentifyer:story] == nil) {
+-(void)entryCreate:(NSString *)story asset:(PHAsset *)asset completion:(void (^)(NSError *error, NSString *key))completion {
+    if ([self storyWithKey:story] == nil) {
         completion([NSError errorWithDomain:@"Story does not exist" code:404 userInfo:nil], nil);
 
     }
@@ -370,7 +399,19 @@
         newentry.export = @"";
         newentry.updated = [NSDate date];
         newentry.created = [NSDate date];
-        newentry.assetid = @"";
+        if (asset == nil) newentry.assetid = @"";
+        else {
+            newentry.assetid = asset.localIdentifier;
+            newentry.animate = true;
+            newentry.latitude = asset.location.coordinate.latitude;
+            newentry.longitude = asset.location.coordinate.longitude;
+            newentry.captured = asset.creationDate;
+            newentry.duration = asset.duration;
+            newentry.limitduration = ENTRY_LIMIT_DURATION;
+            newentry.audio = false;
+            newentry.type = [self entryAssetType:asset];
+            
+        }
 
         NSError *saveerr;
         if ([self.context save:&saveerr]) {
@@ -398,7 +439,7 @@
                 existing.longitude = asset.location.coordinate.longitude;
                 existing.captured = asset.creationDate;
                 existing.duration = asset.duration;
-                existing.limitduration = 1.0;
+                existing.limitduration = ENTRY_LIMIT_DURATION;
                 existing.audio = false;
                 existing.type = [self entryAssetType:asset];
                 
@@ -420,7 +461,7 @@
         existing.longitude = asset.location.coordinate.longitude;
         existing.captured = asset.creationDate;
         existing.duration = asset.duration;
-        existing.limitduration = 1.0;
+        existing.limitduration = ENTRY_LIMIT_DURATION;
         existing.audio = false;
         existing.type = [self entryAssetType:asset];
 
@@ -435,6 +476,51 @@
         
     }
 
+}
+
+-(void)entryAppendOrderSource:(NSDictionary *)source replace:(NSDictionary *)replace {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,[source objectForKey:@"key"]];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
+    fetch.predicate = predicate;
+    
+    if ([self.context countForFetchRequest:fetch error:nil] > 0) {
+        NSDate *timestamp = [replace objectForKey:@"created"];
+        Entry *existing = [[self.context executeFetchRequest:fetch error:nil] firstObject];
+        existing.created = [timestamp dateByAddingTimeInterval:2];
+        existing.updated = [NSDate date];
+        
+        [self.context save:nil];
+        
+    }
+
+}
+
+-(void)entryAppendAnimation:(NSString *)entry asset:(PHAsset *)asset completion:(void (^)(NSError *error, BOOL enabled))completion {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,entry];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
+    fetch.predicate = predicate;
+    
+    if ([self.context countForFetchRequest:fetch error:nil] > 0) {
+        Entry *existing = [[self.context executeFetchRequest:fetch error:nil] firstObject];
+        [self.imageobj imageCreateEntryFromAsset:asset animate:!existing.animate key:entry completion:^(NSError *error, BOOL animated) {
+            if (error.code == 200 || error == nil) {
+                NSError *saveerror;
+                existing.animate = animated;
+                existing.updated = [NSDate date];
+                
+                if ([self.context save:&saveerror]) {
+                    completion([NSError errorWithDomain:@"Entry updated" code:200 userInfo:nil], animated);
+                    
+                }
+                else completion(saveerror, false);
+                
+            }
+            else completion(error, false);
+            
+        }];
+        
+    }
+    
 }
 
 -(NSString *)entryAssetType:(PHAsset *)asset {

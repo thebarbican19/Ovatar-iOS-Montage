@@ -11,12 +11,15 @@
 #import "OActionButton.h"
 #import "NSlackObject.h"
 #import "SAMLabel.h"
+#import "Mixpanel.h"
 
 @protocol OFeedbackDelegate;
-@interface OFeedbackController : UIViewController <UITextViewDelegate, OActionDelegate>
+@interface OFeedbackController : UIViewController <UITextViewDelegate, UITextFieldDelegate, OActionDelegate>
 
 @property (nonatomic, strong) id <OFeedbackDelegate> delegate;
 @property (nonatomic, strong) UITextView *viewInput;
+@property (nonatomic, strong) UITextField *viewEmail;
+
 @property (nonatomic, strong) OActionButton *viewAction;
 @property (nonatomic, strong) SAMLabel *viewStatus;
 @property (nonatomic, strong) UIImageView *viewTick;
@@ -25,6 +28,8 @@
 @property (nonatomic, assign) CGRect keyboard;
 
 @property (nonatomic, strong) NSlackObject *slack;
+@property (nonatomic, strong) Mixpanel *mixpanel;
+@property (nonatomic, strong) NSUserDefaults *data;
 
 @end
 

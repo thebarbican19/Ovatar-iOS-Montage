@@ -25,8 +25,9 @@
 -(void)imageReturnFromDay:(NSDate *)day completion:(void (^)(NSArray *images))completion;
 -(void)imageCreateEntryFromAsset:(PHAsset *)asset animate:(BOOL)animate key:(NSString *)key completion:(void (^)(NSError* error, BOOL animated))completion;
 -(void)imageExportWithValue:(id)value location:(CLLocation *)location completion:(void (^)(NSError* error, NSString *asseid))completion;
+-(void)imageReturnFromAssetKey:(NSString *)key completion:(void (^)(PHAsset *asset))completion;
 
--(void)imagesFromAlbum:(NSString *)album completion:(void (^)(NSArray *images))completion;
+-(void)imagesFromAlbum:(NSString *)album limit:(int)limit completion:(void (^)(NSArray *images))completion;
 -(void)imagesFromLocationRadius:(CLLocation *)location radius:(float)radius completion:(void (^)(NSArray *images))completion;
 -(void)imagesFromFavorites:(void (^)(NSArray *images))completion;
 

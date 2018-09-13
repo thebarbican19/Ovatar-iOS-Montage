@@ -11,16 +11,19 @@
 #import <AVFoundation/AVFoundation.h>
 
 #import "OImageObject.h"
+#import "ODataObject.h"
 
 @protocol OGalleryPickerDelegate;
 @interface OGalleryPickerController : UICollectionViewController
 
 @property (nonatomic, strong) id <OGalleryPickerDelegate> delegate;
 @property (nonatomic, strong) OImageObject *imageobj;
+@property (nonatomic, strong) ODataObject *dataobj;
 @property (nonatomic, assign) BOOL revealed;
 
-@property (nonatomic, strong) PHAsset *selected;
+@property (nonatomic, strong) NSMutableArray *selected;
 @property (nonatomic, strong) NSMutableArray *images;
+@property (nonatomic, strong) NSIndexPath *lastviewed;
 
 -(void)collectionViewAnimateVisibleCells:(BOOL)animate;
 
@@ -29,6 +32,9 @@
 @protocol OGalleryPickerDelegate <NSObject>
 
 @optional
+
+-(void)viewDidScrollSubview:(float)position;
+-(void)viewPresentError:(NSString *)text;
 
 @end
 

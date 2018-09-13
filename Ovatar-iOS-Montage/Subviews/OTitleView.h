@@ -23,8 +23,9 @@ typedef enum {
 @property (nonatomic, strong) id <OTitleViewDelegate> delegate;
 @property (nonatomic, strong) UILabel *viewTitle;
 @property (nonatomic, strong) UIView *viewContainer;
-@property (nonatomic, strong) CAGradientLayer *viewGradient;
 @property (nonatomic, strong) UIButton *viewBack;
+@property (nonatomic, strong) CAShapeLayer *viewRounded;
+@property (nonatomic, strong) UIView *viewShadow;
 
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, assign) BOOL backbutton;
@@ -32,6 +33,7 @@ typedef enum {
 
 -(void)setup:(NSArray *)actions animate:(BOOL)animate;
 -(void)title:(NSString *)text animate:(BOOL)animate;
+-(void)shadow:(float)scrollpos;
 
 @end
 

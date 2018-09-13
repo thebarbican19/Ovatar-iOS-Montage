@@ -24,6 +24,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>NSGIF.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>Ovatar-iOS.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -40,6 +45,11 @@
 			<false/>
 		</dict>
 		<key>Pods-Ovatar-iOS-MontageUITests.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>RMStore.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

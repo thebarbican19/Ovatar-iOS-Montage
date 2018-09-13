@@ -26,6 +26,12 @@
     self.viewHeader = [[OSettingsHeader alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.bounds.size.width, 280.0)];
     self.viewHeader.backgroundColor = [UIColor clearColor];
     
+    self.viewSheet = [[GDActionSheet alloc] initWithFrame:super.view.bounds];
+    self.viewSheet.viewColour = [UIColor whiteColor];
+    self.viewSheet.delegate = self;
+    self.viewSheet.cancelAction = false;
+    self.viewSheet.presentAction = false;
+    
     [self.tableView setTableHeaderView:self.viewHeader];
     [self.tableView setSeparatorColor:[UIColor clearColor]];
     [self.tableView setBackgroundColor:[UIColor clearColor]];
@@ -39,6 +45,7 @@
     [self.settings addObject:@{@"key":@"ovatar", @"title":NSLocalizedString(@"Settings_Item_Ovatar", nil), @"icon":@"settings_ovatar"}];
     [self.settings addObject:@{@"key":@"purchases", @"title":NSLocalizedString(@"Settings_Item_Purchases", nil), @"icon":@"settings_purchases"}];
     
+    [self.viewHeader.viewLogo.player play];
     [self.tableView reloadData];
 
 }
@@ -111,14 +118,50 @@
     }
     
     if ([key isEqualToString:@"ovatar"]) {
-        if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"instagram://"]]) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"instagram://user?username=%@" ,@"ovatar.io"]] options:@{} completionHandler:^(BOOL success) {
+        [self.viewSheet setKey:@"ovatar"];
+        [self.viewSheet setButtons:@[@{@"key":@"instagram", @"title":NSLocalizedString(@"Settings_ActionSheet_Instagram", nil)},
+                                     @{@"key":@"website", @"title":NSLocalizedString(@"Settings_ActionSheet_Website", nil)}]];
+        [self.viewSheet presentActionAlert];
+            
+    }
+    
+    if ([key isEqualToString:@"purchases"]) {
+        [self.delegate viewRestorePurchases];
+        
+    }
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:true];
+
+}
+
+-(void)actionSheetTappedButton:(GDActionSheet *)action index:(NSInteger)index {
+    if ([action.key isEqualToString:@"ovatar"]) {
+        if ([[[action.buttons objectAtIndex:index] objectForKey:@"key"] isEqualToString:@"instagram"]) {
+            if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"instagram://"]]) {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"instagram://user?username=%@" ,@"ovatar.io"]] options:@{} completionHandler:^(BOOL success) {
+                    
+                }];
                 
-            }];
+            }
+            else {
+                self.safari = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:@"http://instagram.com/ovatar.io/"]];
+                if (@available(iOS 11.0, *)) {
+                    self.safari.dismissButtonStyle = SFSafariViewControllerDismissButtonStyleDone;
+                    
+                }
+                self.safari.view.tintColor = UIColorFromRGB(0x140F26);
+                self.safari.delegate = self;
+                
+                [self presentViewController:self.safari animated:true completion:^{
+                    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:false];
+                    
+                }];
+                
+            }
             
         }
         else {
-            self.safari = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:@"http://instagram.com/ovatar.io/"]];
+            self.safari = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:@"https://ovatar.io/"]];
             if (@available(iOS 11.0, *)) {
                 self.safari.dismissButtonStyle = SFSafariViewControllerDismissButtonStyleDone;
                 
@@ -132,16 +175,14 @@
             }];
             
         }
-            
-    }
-    
-    if ([key isEqualToString:@"purchases"]) {
-        [self.delegate viewRestorePurchases];
         
     }
-    
-    [self.tableView deselectRowAtIndexPath:indexPath animated:true];
 
+}
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    [self.delegate viewDidScrollSubview:scrollView.contentOffset.y];
+    
 }
 
 @end

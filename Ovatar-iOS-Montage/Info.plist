@@ -18,37 +18,6 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
-	<key>CFBundleVersion</key>
-	<string>1</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-	</array>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>NSCameraUsageDescription</key>
-	<string>Montage requires camera access to allow you to capture short, sweet videos for your montage</string>
-	<key>kTCCServiceMediaLibrary</key>
-	<string></string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Montage requires acces to your photos to help you build stunning montages! </string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -62,7 +31,36 @@
 			</array>
 		</dict>
 	</array>
-	<key>UIFileSharingEnabled</key>
+	<key>CFBundleVersion</key>
+	<string>3</string>
+	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Montage requires access to your music library to add DRM free (only) music to your montage</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Montage requires camera access to allow you to capture short, sweet videos for your montage</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Montage requires acces to your photos to help you build stunning montages! </string>
+	<key>UIFileSharingEnabled</key>
+	<false/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
 </dict>
 </plist>

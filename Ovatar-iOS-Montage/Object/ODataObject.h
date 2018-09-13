@@ -29,7 +29,7 @@
 @property (nonatomic, strong) NSMutableArray *importlist;
 
 -(void)storyCreateWithData:(NSDictionary *)data completion:(void (^)(NSString *key, NSError *error))completion;
--(NSDictionary *)storyWithIdentifyer:(NSString *)key;
+-(NSDictionary *)storyWithKey:(NSString *)key;
 -(NSDictionary *)storyLatest;
 -(NSString *)storyLatestKey;
 -(NSDictionary *)storyActive;
@@ -37,16 +37,19 @@
 -(NSURL *)storyDirectory:(NSString *)story;
 -(NSArray *)storyEntries:(NSString *)key;
 -(int)storyEntriesWithAssets:(NSString *)key;
+-(BOOL)storyContainsAssets:(NSString *)key asset:(NSString *)asset;
 -(NSArray *)storyEntriesPreviews:(NSString *)key;
 -(CLLocation *)storyCentralLocation:(NSString *)key;
 -(int)storyExports;
 -(void)storyDestoryWithKey:(NSString *)key;
 -(void)storySetActive:(NSString *)story;
 -(void)storyExport:(NSString *)story completion:(void (^)(NSError *error))completion;
+-(void)storyAppendSpeed:(NSString *)story speed:(float)speed completion:(void (^)(NSError *error))completion;
 
--(void)entryCreate:(NSString *)story completion:(void (^)(NSError *error, NSString *key))completion;
+-(void)entryCreate:(NSString *)story asset:(PHAsset *)asset completion:(void (^)(NSError *error, NSString *key))completion;
 -(void)entryAppendWithImageData:(PHAsset *)asset animated:(BOOL)animated entry:(NSString *)entry completion:(void (^)(NSError *error))completion;
--(void)entryToggleAnimation:(NSString *)entry completion:(void (^)(NSError *error, NSURL *file))completion;
+-(void)entryAppendOrderSource:(NSDictionary *)source replace:(NSDictionary *)replace;
+-(void)entryAppendAnimation:(NSString *)entry asset:(PHAsset *)asset completion:(void (^)(NSError *error, BOOL enabled))completion;
 -(NSDictionary *)entryWithKey:(NSString *)key;
 -(void)entryDestoryWithKey:(NSString *)key;
 

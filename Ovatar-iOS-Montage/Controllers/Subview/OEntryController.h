@@ -24,10 +24,11 @@
 @property (nonatomic, strong) NSMutableArray *items;
 @property (nonatomic, strong) ODayCell *active;
 @property (nonatomic, assign) int page;
-@property (nonatomic, assign) BOOL autoscroll;
+@property (nonatomic, assign) BOOL scrollauto;
+@property (nonatomic, assign) BOOL scrolldragging;
+@property (nonatomic, strong) NSIndexPath *dragging;
 
 @property (nonatomic, strong) OInformationLabel *viewInformation;
-@property (nonatomic, strong) UIButton *viewDelete;
 
 -(void)viewUpdateContent:(NSArray *)content;
 -(void)viewEditorDidScroll:(ODayCell *)selected;
@@ -42,6 +43,7 @@
 
 -(void)viewPresentSubviewWithIndex:(int)index animate:(BOOL)animate;
 -(void)viewPresentGalleryPicker:(ODayCell *)day;
+-(void)viewPresentError:(NSString *)text;
 
 @end
 

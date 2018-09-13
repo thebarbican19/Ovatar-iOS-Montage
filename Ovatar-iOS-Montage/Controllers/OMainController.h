@@ -30,7 +30,7 @@
 #import "AppDelegate.h"
 #import "Mixpanel.h"
 
-@interface OMainController : UIViewController <PHPhotoLibraryChangeObserver ,OTitleViewDelegate, OEntryViewDelegate, OGalleryPickerDelegate, OPermissionsViewDelegate, ODataDelegate, ONotificationDelegate, OPaymentDelegate, OSettingsDelegate, OFeedbackDelegate>
+@interface OMainController : UIViewController <PHPhotoLibraryChangeObserver ,OTitleViewDelegate, OEntryViewDelegate, OGalleryPickerDelegate, OPermissionsViewDelegate, ODataDelegate, ONotificationDelegate, OPaymentDelegate, OSettingsDelegate, OFeedbackDelegate, OPresentationDelegate>
 
 @property (nonatomic, strong) OImageObject *imageobj;
 @property (nonatomic, strong) ODataObject *dataobj;
@@ -47,6 +47,7 @@
 @property (nonatomic, assign) int items;
 @property (nonatomic, assign) ODayCell *selected;
 @property (nonatomic, strong) NSURL *exported;
+@property (nonatomic, assign) BOOL exporting;
 
 @property (nonatomic, strong) OEntryController *viewStory;
 @property (nonatomic, strong) OStoriesLayout *viewStoriesLayout;

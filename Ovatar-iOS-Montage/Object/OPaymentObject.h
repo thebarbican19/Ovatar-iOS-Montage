@@ -37,6 +37,7 @@ typedef NS_ENUM(NSInteger, OPaymentState) {
 -(float)paymentAmount;
 -(NSString *)paymentProductName;
 -(void)paymentSucsessfullyUpgraded:(SKPaymentTransaction *)transaction;
+-(BOOL)paymentPurchasedItemWithIdentifyer:(NSString *)identifyer;
 
 -(void)purchaseApplyPromotionCode:(NSString *)code;
 -(void)purchaseItemWithIdentifyer:(NSString *)identifyer;

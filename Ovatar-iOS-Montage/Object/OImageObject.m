@@ -8,6 +8,7 @@
 
 #import "OImageObject.h"
 #import "OConstants.h"
+#import "OExportObject.h"
 
 @implementation OImageObject
 
@@ -27,7 +28,7 @@
 -(instancetype)init {
     self = [super init];
     if (self) {
-        
+    
     }
     
     return self;
@@ -89,6 +90,17 @@
         }];
         
     }
+    
+}
+
+-(void)imageReturnFromAssetKey:(NSString *)key completion:(void (^)(PHAsset *asset))completion {
+    PHFetchResult *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[key] options:nil];
+    if (result.count > 0) {
+        PHAsset *asset = result.firstObject;
+        completion(asset);
+    
+    }
+    else completion(nil);
     
 }
 
@@ -162,6 +174,9 @@
 }
 
 -(void)imageCreateEntryFromAsset:(PHAsset *)asset animate:(BOOL)animate key:(NSString *)key completion:(void (^)(NSError *error, BOOL animated))completion {
+    OExportObject *exportobj = [[OExportObject alloc] init];
+    exportobj.videoresize = CGSizeMake(1080, 1920);
+    
     if ([asset isKindOfClass:[PHAsset class]]){
         NSString *path = [APP_DOCUMENTS stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", key]];
         NSURL *url = [NSURL fileURLWithPath:path];
@@ -183,28 +198,39 @@
         PHImageManager *manager = [PHImageManager defaultManager];
         [manager requestImageDataForAsset:asset options:imageoptions resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
             [manager requestLivePhotoForAsset:asset targetSize:CGSizeMake(asset.pixelWidth, asset.pixelHeight) contentMode:PHImageContentModeDefault options:liveoptions resultHandler:^(PHLivePhoto * _Nullable livephoto, NSDictionary * _Nullable info) {
-                if (livephoto && animate) {
+                if (livephoto) {
                     NSArray *resorces = [PHAssetResource assetResourcesForLivePhoto:livephoto];
-                    NSLog(@"\n\nresorces: %@" ,resorces);
                     PHAssetResource *output = nil;
                     for (PHAssetResource *resource in resorces) {
-                        if (resource.type == PHAssetResourceTypePairedVideo) {
-                            output = resource;
-                            break;
+                        if (animate) {
+                            if (resource.type == PHAssetResourceTypePairedVideo) {
+                                output = resource;
+                                break;
+                                
+                            }
                             
                         }
                         
                     }
                     
-                    if (output){
+                    if (output.type == PHAssetResourceTypePairedVideo){
                         [[PHAssetResourceManager defaultManager] writeDataForAssetResource:output toFile:url options:nil completionHandler:^(NSError * _Nullable error) {
+//                            if (error.code == 200 || error == nil) {
+//                                [exportobj exportClipWithType:url key:key completion:^(NSError *error) {
+//                                    completion(error, false);
+//
+//                                }];
+//
+//                            }
+//                            else completion(error, true);
                             completion(error, true);
                             
                         }];
+                        
                     }
                     else {
                         [self imagesFromAsset:asset thumbnail:false completion:^(NSDictionary *exifdata, NSData *image) {
-                            [self imageCreateEntryFromStaticPhoto:[UIImage imageWithData:image] key:key completion:^(NSError *error) {
+                            [exportobj exportClipWithType:[UIImage imageWithData:image] key:key completion:^(NSError *error) {
                                 completion(error, false);
                                 NSLog(@"imageCreateEntryFromStaticPhoto");
                                 
@@ -217,7 +243,7 @@
                 }
                 else {
                     [self imagesFromAsset:asset thumbnail:false completion:^(NSDictionary *exifdata, NSData *image) {
-                        [self imageCreateEntryFromStaticPhoto:[UIImage imageWithData:image] key:key completion:^(NSError *error) {
+                        [exportobj exportClipWithType:[UIImage imageWithData:image] key:key completion:^(NSError *error) {
                             NSLog(@"imageCreateEntryFromStaticPhoto");
                             completion(error, false);
                             
@@ -233,39 +259,6 @@
         
     }
     else completion([NSError errorWithDomain:@"" code:422 userInfo:nil], false);
-    
-}
-
--(void)imageCreateEntryFromStaticPhoto:(UIImage *)image key:(NSString *)key completion:(void (^)(NSError* error))completion {
-    NSString *path = [APP_DOCUMENTS stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", key]];
-    NSURL *url = [NSURL fileURLWithPath:path];
-    NSError *error = nil;
-    
-    AVAssetWriter *videoWriter = [[AVAssetWriter alloc] initWithURL:url fileType:AVFileTypeQuickTimeMovie error:&error];
-    NSDictionary *videoSettings = @{AVVideoCodecKey:AVVideoCodecTypeH264, AVVideoWidthKey:@(image.size.width), AVVideoHeightKey:@(image.size.height)};
-    AVAssetWriterInput* writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:videoSettings];
-    
-    AVAssetWriterInputPixelBufferAdaptor *adaptor = [AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:writerInput sourcePixelBufferAttributes:nil];
-    
-    [videoWriter addInput:writerInput];
-    [videoWriter startWriting];
-    [videoWriter startSessionAtSourceTime:kCMTimeZero];
-    
-    [adaptor appendPixelBuffer:[self pixelBufferFromCGImage:image.CGImage] withPresentationTime:CMTimeMakeWithSeconds(0, 30.0)];
-    [adaptor appendPixelBuffer:[self pixelBufferFromCGImage:image.CGImage] withPresentationTime:CMTimeMakeWithSeconds(1, 30.0)];
-    
-    [writerInput markAsFinished];
-    [videoWriter finishWritingWithCompletionHandler:^{
-        if (videoWriter.status != AVAssetWriterStatusFailed && videoWriter.status == AVAssetWriterStatusCompleted) {
-            completion([NSError errorWithDomain:@"video created" code:200 userInfo:nil]);
-            
-        }
-        else {
-            completion(videoWriter.error);
-            
-        }
-        
-    }];
     
 }
 
@@ -291,19 +284,57 @@
     
 }
 
--(void)imagesFromAlbum:(NSString *)album completion:(void (^)(NSArray *images))completion {
-    NSMutableArray *output = [[NSMutableArray alloc] init];
+-(void)imagesFromAlbum:(NSString *)album limit:(int)limit completion:(void (^)(NSArray *images))completion {
+    NSMutableArray *images = [[NSMutableArray alloc] init];
+    NSMutableArray *dates = [[NSMutableArray alloc] init];
+    NSMutableArray *sections = [[NSMutableArray alloc] init];
+
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:false]];
     options.predicate = [NSPredicate predicateWithFormat:@"mediaType == %d || mediaType == %d", PHAssetMediaTypeVideo, PHAssetMediaTypeImage];
     
     PHFetchResult *result = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:options];
     [result enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [output addObject:obj];
+        PHAsset *asset = (PHAsset *)obj;
         
+        /*
+        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+        NSDateComponents *components = [calendar components:NSCalendarUnitYear|NSCalendarUnitWeekOfYear fromDate:asset.creationDate];
+        components.day = 0;
+        components.hour = 0;
+        components.minute = 0;
+        components.second = 0;
+        
+        NSString *datename = [NSString stringWithFormat:@"%d-%d"  ,(int)components.year,(int)components.weekOfYear];
+        
+        if (![dates containsObject:datename]) [dates addObject:datename];
+        */
+            
+        [images addObject:@{@"asset":asset, @"section":@""}];
+
     }];
     
-    completion(output);
+    [sections addObject:@{@"images":images, @"title":@"Camera Roll"}];
+    /*
+    for (NSString *date in dates) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"section == %@" ,date];
+        NSArray *filtered = [images filteredArrayUsingPredicate:predicate];
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        formatter.dateFormat = @"YYYY-ww";
+        
+        NSDateFormatter *formatteroutput = [[NSDateFormatter alloc] init];
+        formatteroutput.dateFormat = @"d MMMM";
+ 
+        NSString *startdate = [formatteroutput stringFromDate:[formatter dateFromString:date]];
+        if ([filtered count] > 0) {
+            [sections addObject:@{@"images":filtered, @"title":startdate}];
+            
+        }
+        
+    }
+    */
+    
+    completion(sections);
     
 }
 
@@ -331,7 +362,8 @@
     
     PHFetchResult *result = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:options];
     [result enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [output addObject:obj];
+        PHAsset *asset = (PHAsset *)obj;
+        [output addObject:asset];
         
     }];
     

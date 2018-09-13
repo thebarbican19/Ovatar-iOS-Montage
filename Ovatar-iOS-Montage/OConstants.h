@@ -17,6 +17,8 @@
 #define UIColorFromRGB(rgbValue) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0]
 #define NSLog(FORMAT, ...) printf("%s\n", [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
 
+#define ENTRY_LIMIT_DURATION 1.0
+
 #define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
 #define IS_IPHONE_X (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 812.0f)
 
@@ -34,4 +36,5 @@
 #define APP_COUNTRY_CODE [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode]
 #define APP_STATUSBAR_HEIGHT [UIApplication sharedApplication].statusBarFrame.size.height
 #define APP_DOCUMENTS [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0]
-#define APP_PREMIUM_IDENTIFYER @"com.ovatar.montage.pro"
+
+#define REGEX_EMAIL @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}"

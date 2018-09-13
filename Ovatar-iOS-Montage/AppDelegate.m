@@ -19,6 +19,7 @@
 -(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.data =  [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
     self.payment = [[OPaymentObject alloc] init];
+    self.mixpanel = [Mixpanel sharedInstance];
 
     [[NSUserDefaults standardUserDefaults] setValue:@(NO) forKey:@"_UIConstraintBasedLayoutLogUnsatisfiable"];
 
@@ -28,13 +29,29 @@
         
     }
     
+    [Mixpanel sharedInstanceWithToken:@"432df9ded107b072fd653eece3749fc0"];
+
     [self.payment paymentRetriveCurrentPricing];
 
     [self applicationVersionCheck];
     [self applicationCheckCrashes];
     [self applicationSetActiveTimer:true];
     
-    [self.data setBool:true forKey:@"app_installed"];
+    
+    if (![self.data boolForKey:@"app_installed"]) {
+        [self.data setBool:true forKey:@"app_installed"];
+        [self.mixpanel track:@"App Installed" properties:nil];
+        if (![self applicationUserData]) {
+            [self.mixpanel identify:self.mixpanel.distinctId];
+            [self.mixpanel.people set:@{@"$first_name":[[self applicationUserData] objectForKey:@"name"],
+                                        @"Gender":[[self applicationUserData] objectForKey:@"sex"]}];
+            
+            NSLog(@"Set Name in Mixpanel %@" ,[self applicationUserData]);
+
+        }
+    
+    }
+    else [self.mixpanel track:@"App Opened" properties:@{@"version":APP_VERSION, @"build":APP_BUILD}];
     
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
     
@@ -79,9 +96,11 @@
 }
 
 -(void)applicationVersionCheck {
+    self.mixpanel = [Mixpanel sharedInstance];
     if ([[self.data objectForKey:@"app_installed"] boolValue] && ([[self.data objectForKey:@"app_version"] floatValue] != APP_VERSION_FLOAT || [[self.data objectForKey:@"app_build"] floatValue] != APP_BUILD_FLOAT || [[self.data objectForKey:@"app_version"] floatValue] == 0)) {
         [self.data setFloat:APP_VERSION_FLOAT forKey:@"app_version"];
         [self.data setFloat:APP_BUILD_FLOAT forKey:@"app_build"];
+        [self.mixpanel track:@"App Updated" properties:@{@"version":APP_VERSION, @"build":APP_BUILD}];
         
     }
     
@@ -125,13 +144,6 @@
 
 }
 
--(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    [self applicationOpenFromURL:url];
-    
-    return true;
-    
-}
-
 -(void)applicationOpenFromURL:(NSURL *)url {
     self.mixpanel = [Mixpanel sharedInstance];
     NSMutableDictionary *parameters = [[NSMutableDictionary alloc] init];
@@ -147,13 +159,11 @@
         [(UINavigationController  *)self.window.rootViewController dismissViewControllerAnimated:false completion:nil];
         
         if ([url.host isEqualToString:@"promo"]) {
-//            SHUpgradeController *viewUpgraded = [[SHUpgradeController alloc] init];
-//            viewUpgraded.view.backgroundColor = [UIColor whiteColor];
-//
 //            [(UINavigationController  *)self.window.rootViewController presentViewController:viewUpgraded animated:false completion:^{
 //                [viewUpgraded purchaseWithPromoCode:[parameters objectForKey:@"code"]];
 //
 //            }];
+            
             
         }
         
@@ -174,6 +184,8 @@
 -(void)applicationDidBecomeActive:(UIApplication *)application {
     self.data =  [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
 
+    [NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(applicationRatePrompt) userInfo:nil repeats:false];
+    
     [self.data setBool:false forKey:@"app_inactive"];
     [self.data synchronize];
     
@@ -220,7 +232,7 @@
 -(void)applicationLoadingScreen:(BOOL)loading {
     if (loading) {
         if (self.lassets.count == 0 || self.lassets == nil) {
-            self.lassets = @[@"splash_loader_0", @"splash_loader_1", @"splash_loader_2", @"splash_loader_3", @"splash_loader_4", @"splash_loader_5", @"splash_loader_6", @"splash_loader_7"];
+            self.lassets = @[@"splash_loader_0", @"splash_loader_1", @"splash_loader_2", @"splash_loader_3", @"splash_loader_4", @"splash_loader_5", @"splash_loader_6"];
             
         }
         
@@ -236,12 +248,20 @@
         self.loader.speed = 0.6;
         [self.splash addSubview:self.loader];
         [self.loader loaderPresentWithImages:self.lassets animated:false];
+        
+        self.ticker = [[OTickerLabel alloc] initWithFrame:CGRectMake(10.0, ((self.splash.bounds.size.height / 4) * 3) - 45.0, self.splash.bounds.size.width - 20.0, 90.0)];
+        self.ticker.backgroundColor = [UIColor clearColor];
+        self.ticker.animate = true;
+        [self.splash addSubview:self.ticker];
+        [self.ticker setup:self.ltext];
 
-        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations: ^{
+        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn|UIViewAnimationOptionBeginFromCurrentState animations: ^{
             [self.splash setAlpha:1.0];
             
         } completion:nil];
         
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUpdateLoaderWithProgress:) name:@"LoaderExportStatus" object:nil];
+
     }
     else {
         [UIView animateWithDuration:0.2 delay:2.0 options:UIViewAnimationOptionCurveEaseIn animations: ^{
@@ -254,16 +274,56 @@
             
         } completion:^(BOOL finished) {
             [self.loader.timer invalidate];
+            [self.loader removeFromSuperview];
+            [self.ticker removeFromSuperview];
             [self.splash removeFromSuperview];
-            
+
             [[UIApplication sharedApplication].delegate.window removeFromSuperview];
             [[UIApplication sharedApplication].delegate.window setWindowLevel:UIWindowLevelNormal];
-
+            
         }];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:@"LoaderExportStatus"];
         
     }
     
 }
 
+- (void)extracted:(float)progress {
+    [self.ticker update:[NSString stringWithFormat:@"%02.0f%%" ,progress]];
+    
+}
+
+-(void)applicationUpdateLoaderWithProgress:(NSNotification *)notification {
+    float progress = [[notification.object objectForKey:@"progress"] floatValue] * 100;
+    if (progress <= 99) [self extracted:progress];
+    
+}
+
+-(NSDictionary *)applicationUserData {
+    self.data =  [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
+
+    NSMutableDictionary *user = [[NSMutableDictionary alloc] init];
+    NSString *device = [UIDevice currentDevice].name;
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"NamesDetect" ofType:@"json"];
+    NSArray *content = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:path] options:0 error:nil];
+    for (NSString *word in [device componentsSeparatedByString:@" "]) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name LIKE[c] %@" ,word.capitalizedString];
+        NSDictionary *output = [[content filteredArrayUsingPredicate:predicate] firstObject];
+        if (output != nil) {
+            [user setObject:[output objectForKey:@"name"] forKey:@"name"];
+            [user setObject:[self.data objectForKey:@"ovatar_email"] forKey:@"email"];
+            if ([[output objectForKey:@"sex"] isEqualToString:@"M"]) [user setObject:@"Male" forKey:@"sex"];
+            else [user setObject:@"Female" forKey:@"sex"];
+            break;
+            
+        }
+        
+    }
+   
+    return user;
+   
+    
+}
 
 @end

@@ -15,27 +15,62 @@
 "Main_Preview_Title" = "Preview";
 "Main_Support_Title" = "Support";
 
-"Settings_About_Title" = "*montage* by ovatar.io";
-"Settings_About_Subtitle" = "Version %@ Build #%@";
+"Export_Watermark_Tabbar" = "watermark";
+"Export_Music_Title" = "music";
+"Export_Speed_Title" = "speed";
+"Export_Size_Title" = "size";
+"Export_Saved_Description" = "Your video has been saved to your *Photo Library*. Would you like to share it?"; //Everything in between ** is BOLD
+"Export_Rendered_Sucsessfully" = "complete";
+"Export_Share_Action" = "Share";
+"Export_Restart_Action" = "Create New";
+"Export_Purchase_Action" = "Remove Watermark";
+
+"Settings_About_Title" = "*montage* by ovatar.io"; //Everything in between ** is BOLD
+"Settings_About_Subtitle" = "Version %@ Build #%@"; //Version 1.0 Build #1
 "Settings_Item_Share" = "Share";
 "Settings_Item_Support" = "Support";
 "Settings_Item_Ovatar" = "Ovatar.io";
-"Settings_Item_Purchases" = "Restore Purchases";
+"Settings_Item_Purchases" = "Restore Subscription";
 "Settings_Share_Text" = "Create a stunning video montages with #montage by ovatar.io";
+"Settings_ActionSheet_Website" = "Website";
+"Settings_ActionSheet_Instagram" = "Instagram";
+"Settings_ActionSheet_Dismiss" = "Dismiss";
+
+"Entry_LocationUnknown_Label" = "Unknown Location";
+"Entry_Deleted_Label" = "Clip Removed";
+"Entry_Animated_Label" = "Live Photo Animation Enabled";
+"Entry_AnimatDisable_Label" = "Live Photo Animation Disabled";
+"Entry_Empty_Label" = "Add a New Clip";
 
 "Permissions_Gallery_Text" = "Montage first requires access to your photo library, because what are Montages without images or videos.";
-"Permissions_Notifications_Text" = "Allow us to notify you when we create montages for you automatically when momories are made.";
+"Permissions_Notifications_Text" = "Allow us to notify you when we create montages for you automatically when memories are made.";
 "Permissions_Allow_Action" = "Allow";
 "Permissions_Update_Action" = "Update Permissions";
 
-"Error_LimitedMedia_Title" = "At-least 2 items required to preview your montage.";
+"Subscription_Loading_Title" = "Connecting to store";
+"Subscription_Plan_Title" = "Montage Pro";
+"Subscription_Disabled_Error" = "Payments are disabled. You may need to sign in with your Apple ID, or update your payment information";
+"Subscription_Restored_Error" = "Your purchase was restored sucsessfully";
+"Subscription_Purchaesed_Error" = "Thank you for upgrading. You can now export videos watermark free!";
+"Subscription_Deferred_Error" = "This payment requires authentication from a third-party which is been processed";
+"Subscription_Music_Item" = "Add your own music!";
+"Subscription_Watermark_Item" = "Add a location or time watermark, or remove it completely.";
+"Subscription_Speed_Item" = "Customise the length of each clip.";
+"Subscription_Filter_Item" = "Overlay stunning custom filters.";
+"Subscription_Transitions_Item" = "Add smooth transitions to your videos.";
+"Subscription_Multiple_Item" = "Create and edit multiple stories.";
+"Subscription_GIF_Item" = "Export as GIF.";
+
+"Error_LimitedMedia_Title" = "At-least *3* clips required to preview your montage.";
 "Error_GallerySelectionEmpty_Title" = "No item was selected.";
-"Error_PaymentRestored_Title" = "Your Subscription/Purchase was restored.";
+"Error_GallerySelectionExists_Title" = "Image was *already added* to Story.";
 "Error_Unknown_Title" = "Unknown Error";
+"Error_MusicDRM_Title" = "*%@* is protected by DRM so you cannot use it."; //[Song name] is protected by DRM so you cannot use it.
 
 "Feedback_Send_Action" = "Send";
 "Feedback_Retry_Action" = "Retry";
 "Feedback_Default_Placeholder" = "Got a question, or just want to say hello? Write it here...";
-"Feedback_Sent_Placeholder" = "Your message was sent!\n\nWe will review this request shortly and will be in-touch if necessary";
+"Feedback_Email_Placeholder" = "Your Email";
+"Feedback_Sent_Placeholder" = "Your message was sent!";
 "Feedback_Sending_Title" = "Sending...";
 

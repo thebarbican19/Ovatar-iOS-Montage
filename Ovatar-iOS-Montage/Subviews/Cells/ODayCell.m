@@ -28,6 +28,7 @@
         self.cellPlayer = [[AVPlayerViewController alloc] init];
         self.cellPlayer.view.frame = self.cellImage.bounds;
         self.cellPlayer.view.backgroundColor = [UIColor clearColor];
+        self.cellPlayer.view.userInteractionEnabled = false;
         self.cellPlayer.showsPlaybackControls = false;
         self.cellPlayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
         self.cellPlayer.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
@@ -51,12 +52,32 @@
         self.cellLoader.colorArray = @[[UIColor whiteColor]];
         self.cellLoader.backgroundColor = [UIColor clearColor];
         [self.cellImage addSubview:self.cellLoader];
+        
+        self.cellDelete = [[UIButton alloc] initWithFrame:CGRectMake(self.cellImage.bounds.size.width - 40.0, self.cellImage.bounds.size.height - 46.0, 46.0, 46.0)];
+        self.cellDelete.backgroundColor = [UIColor clearColor];
+        self.cellDelete.alpha = 0.0;
+        self.cellDelete.transform = CGAffineTransformMakeScale(0.9, 0.9);
+        self.cellDelete.clipsToBounds = true;
+        [self.cellDelete addTarget:self action:@selector(delete:) forControlEvents:UIControlEventTouchUpInside];
+        [self.cellDelete setImage:[UIImage imageNamed:@"entry_delete"] forState:UIControlStateNormal];
+        [self.contentView addSubview:self.cellDelete];
+        
+        self.cellAnimate = [[UIButton alloc] initWithFrame:CGRectMake(18.0, self.cellImage.bounds.size.height - 46.0, 46.0, 46.0)];
+        self.cellAnimate.backgroundColor = [UIColor clearColor];
+        self.cellAnimate.clipsToBounds = true;
+        self.cellAnimate.alpha = 0.0;
+        self.cellAnimate.transform = CGAffineTransformMakeScale(0.9, 0.9);
+        //[self.cellAnimate addTarget:self action:@selector(animate:) forControlEvents:UIControlEventTouchUpInside];
+        [self.cellAnimate setImage:[UIImage imageNamed:@"entry_playback"] forState:UIControlStateNormal];
+        [self.contentView addSubview:self.cellAnimate];
     
     }
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loop:)  name:AVPlayerItemDidPlayToEndTimeNotification object:self.cellPlayer.player.currentItem];
-    
     return self;
+    
+}
+
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:AVPlayerItemDidPlayToEndTimeNotification];
     
 }
 
@@ -73,9 +94,9 @@
     self.video = [NSURL fileURLWithPath:[APP_DOCUMENTS stringByAppendingString:self.filename]];
     self.timestamp = [self.data objectForKey:@"timestamp"];
     self.key = [self.data objectForKey:@"key"];
-    self.asset = [self.data objectForKey:@"assetid"];
+    self.assetid = [self.data objectForKey:@"assetid"];
     
-    if (self.asset.length > 2) {
+    if (self.assetid.length > 2) {
         if (self.video != nil) {
             [self.cellPlayer setPlayer:[AVPlayer playerWithURL:self.video]];
             [self.cellPlayer.player setMuted:true];
@@ -147,16 +168,19 @@
     if (self.cellImage.image.CGImage != NULL && self.cellImage.image.CGImage != nil) {
         CFDataRef pixelData = CGDataProviderCopyData(CGImageGetDataProvider(self.cellImage.image.CGImage));
         const UInt8* data = CFDataGetBytePtr(pixelData);
-        
-        int pixelInfo = ((self.cellImage.bounds.size.width * y) + x ) * 4;
+        int pixelInfo = ((self.cellImage.image.size.width * y) + x) * 4;
 
-        UInt8 red = data[pixelInfo];
-        UInt8 green = data[(pixelInfo + 1)];
-        UInt8 blue = data[pixelInfo + 2];
-        CFRelease(pixelData);
-        
-        UIColor *colour = [UIColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0];
-        if ([self isdark:colour]) return colour;
+        if (self.cellImage.image.size.width > 0 && self.cellImage.image.size.height > 1) {
+            UInt8 red = data[pixelInfo];
+            UInt8 green = data[(pixelInfo + 1)];
+            UInt8 blue = data[pixelInfo + 2];
+            if (pixelData != nil) CFRelease(pixelData);
+            
+            UIColor *colour = [UIColor colorWithRed:red/255.0f green:green/255.0f blue:blue/255.0f alpha:1.0];
+            if ([self isdark:colour]) return colour;
+            else return UIColorFromRGB(0x464655);
+            
+        }
         else return UIColorFromRGB(0x464655);
         
     }
@@ -187,11 +211,18 @@
 }
 
 -(void)delete:(UIButton *)button {
-    NSLog(@"deleted");
-//    if ([self.delegate respondsToSelector:@selector(collectionViewDeleteAsset:)]) {
-//        [self.delegate collectionViewDeleteAsset:self];;
-//
-//    }
+    if ([self.delegate respondsToSelector:@selector(collectionViewDeleteAsset:)]) {
+        [self.delegate collectionViewDeleteAsset:self];;
+
+    }
+    
+}
+
+-(void)animate:(UIButton *)button {
+    if ([self.delegate respondsToSelector:@selector(collectionToggleAnimation:)]) {
+        [self.delegate collectionToggleAnimation:self];;
+        
+    }
     
 }
 

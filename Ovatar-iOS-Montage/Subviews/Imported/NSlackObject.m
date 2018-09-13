@@ -86,11 +86,11 @@
    
     NSString *title;
     if (type == NFeedbackTypeGeneral) {
-        title = [NSString stringWithFormat:@"*%@* feedback received" ,APP_BUNDLE_NAME];
+        title = [NSString stringWithFormat:@"*%@* feedback received from %@" ,APP_BUNDLE_NAME, [[UIDevice currentDevice] name]];
         
     }
     else {
-        title = [NSString stringWithFormat:@"*%@* reported item received from" ,APP_BUNDLE_NAME];
+        title = [NSString stringWithFormat:@"*%@* reported item received from %@" ,APP_BUNDLE_NAME ,[[UIDevice currentDevice] name]];
         
     }
     

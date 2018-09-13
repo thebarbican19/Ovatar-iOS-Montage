@@ -13,16 +13,13 @@
 
 -(void)drawRect:(CGRect)rect {
     if (![self.subviews containsObject:self.viewContainer]) {
+        self.viewRounded = [CAShapeLayer layer];
+        self.viewRounded.path = [UIBezierPath bezierPathWithRoundedRect:self.bounds byRoundingCorners:UIRectCornerBottomLeft| UIRectCornerBottomRight cornerRadii:CGSizeMake(26.0, 26.0)].CGPath;
+
         self.viewContainer = [[UIView alloc] initWithFrame:self.bounds];
-        self.viewContainer.backgroundColor = [UIColor clearColor];
+        self.viewContainer.backgroundColor = UIColorFromRGB(0xF4F6F8);
+        self.viewContainer.layer.mask = self.viewRounded;
         [self addSubview:self.viewContainer];
-        
-        self.viewGradient = [CAGradientLayer layer];
-        self.viewGradient.frame = self.viewContainer.bounds;
-        self.viewGradient.colors = @[(id)[UIColorFromRGB(0xF4F6F8) colorWithAlphaComponent:1.0].CGColor, (id)[UIColorFromRGB(0xF4F6F8) colorWithAlphaComponent:0.0].CGColor];
-        self.viewGradient.startPoint = CGPointMake(0.0, 0.7);
-        self.viewGradient.endPoint = CGPointMake(0.0, 1.0);
-        [self.viewContainer.layer addSublayer:self.viewGradient];
         
         self.viewTitle = [[UILabel alloc] initWithFrame:CGRectMake(36.0, 0.0, self.bounds.size.width - 80.0, self.viewContainer.bounds.size.height)];
         self.viewTitle.font = [UIFont fontWithName:@"Avenir-Heavy" size:28.0];
@@ -51,8 +48,26 @@
             
         }
         
+        self.viewShadow = [[UIView alloc] initWithFrame:CGRectMake(self.viewContainer.frame.origin.x + 6.0, self.viewContainer.frame.origin.y + 20.0, self.viewContainer.bounds.size.width - 12.0, self.viewContainer.bounds.size.height - 22.0)];
+        self.viewShadow.alpha = 0.0;
+        self.viewShadow.backgroundColor = UIColorFromRGB(0xAAAAB8);
+        self.viewShadow.layer.masksToBounds = false;
+        self.viewShadow.layer.shadowOffset = CGSizeMake(0.0, 3.0);
+        self.viewShadow.layer.shadowRadius = 10.0;
+        self.viewShadow.layer.shadowOpacity = 1.0;
+        self.viewShadow.layer.shadowColor = self.viewShadow.backgroundColor.CGColor;
+        self.viewShadow.layer.cornerRadius = self.viewContainer.bounds.size.height / 2;
+        [self addSubview:self.viewShadow];
+        [self sendSubviewToBack:self.viewShadow];
+        
     }
 
+}
+
+-(void)shadow:(float)scrollpos {
+    if (scrollpos > 0) [self.viewShadow setAlpha:0.0 + (fabsf(scrollpos) / 50.0)];
+    else [self.viewShadow setAlpha:0.0];
+    
 }
 
 -(void)setup:(NSArray *)actions animate:(BOOL)animate {

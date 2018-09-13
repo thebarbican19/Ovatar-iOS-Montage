@@ -18,6 +18,7 @@
 -(void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     
+    [self.appdel setLtext:@"montage"];
     [self.appdel setLassets:nil];
     [self.appdel applicationLoadingScreen:true];
     [self.imageobj imageAuthorization:false completion:^(PHAuthorizationStatus status) {
@@ -62,8 +63,10 @@
             if (status == PHAuthorizationStatusAuthorized) {
                 [queue addOperationWithBlock:^{
                     if (self.dataobj.storyLatest == nil) {
-                        [self.dataobj storyCreateWithData:@{@"name":@"my first story"} completion:^(NSString *key, NSError *error) {
-                            [self.dataobj entryCreate:key completion:^(NSError *error, NSString *key) {
+                        NSString *name = [NSString stringWithFormat:@"montage #%d" ,self.dataobj.storyExports + 1];
+                        NSDictionary *data = @{@"name":name};
+                        [self.dataobj storyCreateWithData:data completion:^(NSString *key, NSError *error) {
+                            [self.dataobj entryCreate:key asset:nil completion:^(NSError *error, NSString *key) {
                                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                     [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
                                     [self viewPresentSubviewWithIndex:1 animate:animateview];
@@ -86,7 +89,7 @@
                 }];
                 
                 [queue addOperationWithBlock:^{
-                    [self.imageobj imagesFromAlbum:nil completion:^(NSArray *images) {
+                    [self.imageobj imagesFromAlbum:nil limit:0 completion:^(NSArray *images) {
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                             [self.viewGallery.images removeAllObjects];
                             [self.viewGallery.images addObjectsFromArray:images];
@@ -116,6 +119,12 @@
         [self.viewGallery setSelected:nil];
         [self.viewGallery.collectionView reloadData];
         [self.viewGallery.collectionView setHidden:false];
+        [self.viewGallery.collectionView scrollToItemAtIndexPath:self.viewGallery.lastviewed atScrollPosition:UICollectionViewScrollPositionTop animated:false];
+        if (self.viewGallery.lastviewed.row >= 3) {
+            [self.viewGallery.collectionView scrollRectToVisible:CGRectMake(0.0, self.viewGallery.collectionView.contentOffset.y -28.0, self.viewGallery.collectionView.bounds.size.width, self.viewGallery.collectionView.bounds.size.height) animated:false];
+            [self viewDidScrollSubview:self.viewGallery.collectionView.contentOffset.y];
+            
+        }
 
         [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
             [self.viewContainer setContentOffset:CGPointMake(self.viewContainer.bounds.size.width * self.pageindex, self.viewContainer.bounds.size.height)];
@@ -139,11 +148,10 @@
             [self.viewHeader setTitle:NSLocalizedString(@"Main_Editor_Title", nil)];
             [self.viewHeader setBackbutton:false];
             [self.viewHeader setup:@[@"navigation_settings", @"navigation_preview"] animate:true];
-            
-            [self.viewStory viewCollectionScroll:day.index];
-            [self.viewGallery setSelected:nil];
-            [self.viewGallery.collectionView scrollRectToVisible:CGRectMake(0.0, 0.0, self.viewGallery.view.bounds.size.width, self.viewGallery.view.bounds.size.height) animated:false];
+            [self.viewHeader shadow:0.0];
 
+            [self.viewStory viewCollectionScroll:day.index];
+            
             [self.selected setTransform:CGAffineTransformMakeScale(1.0, 1.0)];
             [self.selected setAlpha:1.0];
             
@@ -211,7 +219,7 @@
     self.viewGalleryLayout = [[UICollectionViewFlowLayout alloc] init];
     self.viewGalleryLayout.minimumLineSpacing = 10.0;
     self.viewGalleryLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
-    self.viewGalleryLayout.sectionInset = UIEdgeInsetsMake(40.0, 20.0, 40.0, 20.0);
+    self.viewGalleryLayout.sectionInset = UIEdgeInsetsMake(10.0, 20.0, 10.0, 20.0);
     self.viewGalleryLayout.itemSize = CGSizeMake((self.view.bounds.size.width / 3) - 45.0, (self.view.bounds.size.width / 3) - 45.0);
     
     self.viewGallery = [[OGalleryPickerController alloc] initWithCollectionViewLayout:self.viewGalleryLayout];
@@ -227,6 +235,7 @@
     self.viewPresentation.view.backgroundColor = [UIColor clearColor];
     self.viewPresentation.view.frame = CGRectMake(self.viewContainer.bounds.size.width * 2, 60.0, self.viewContainer.bounds.size.width, self.viewContainer.bounds.size.height - 60.0);
     self.viewPresentation.view.hidden = true;
+    self.viewPresentation.delegate = self;
     [self addChildViewController:self.viewPresentation];
     [self.viewContainer addSubview:self.viewPresentation.view];
     
@@ -243,7 +252,13 @@
     self.viewHeader.delegate = self;
     self.viewHeader.title = NSLocalizedString(@"Main_GettingStarted_Title", nil);
     [self.view addSubview:self.viewHeader];
+    
+}
 
+-(void)viewPresentError:(NSString *)text {
+    [self.viewNotification notificationPresentWithTitle:text type:ONotificationTypeError];
+    [self.mixpanel track:@"App Error Presented" properties:@{@"Text":[NSString stringWithFormat:@"%@" ,text]}];
+    
 }
 
 -(void)viewPresentLoader:(BOOL)present text:(NSString *)text {
@@ -262,6 +277,7 @@
             self.viewFeeback.view.frame = CGRectMake(self.viewContainer.bounds.size.width * 3, 60.0, self.viewContainer.bounds.size.width, self.viewContainer.bounds.size.height - 60.0);
             [self addChildViewController:self.viewFeeback];
             [self.viewContainer addSubview:self.viewFeeback.view];
+            [self.viewFeeback.viewEmail becomeFirstResponder];
             
         }
         
@@ -325,7 +341,8 @@
         [self.viewHeader setup:@[@"navigation_settings", @"navigation_preview"] animate:true];
         
         [self.viewStory viewEditorDidScroll:self.viewStory.collectionView.visibleCells.firstObject];
-        
+        [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
+
     }
     else if (index == 2) {
         if (self.viewPresentation.view.isHidden) {
@@ -343,6 +360,7 @@
             [self.viewHeader setup:@[] animate:animate];
             
             [self.appdel setLassets:[self.dataobj storyEntriesPreviews:self.dataobj.storyActiveKey]];
+            [self.appdel setLtext:@"00%"];
             [self.appdel applicationLoadingScreen:true];
             
         }
@@ -360,6 +378,7 @@
         
     }
     
+    [self.viewHeader shadow:0.0];
     [self setPageindex:index];
 
 }
@@ -372,13 +391,17 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void) {
         if (!self.viewPresentation.view.hidden) {
             [self.viewPresentation viewReset];
-            [self.exportobj.exporter cancelExport];
             [self.appdel applicationLoadingScreen:false];
 
             [[NSFileManager defaultManager] removeItemAtPath:self.exported.absoluteString error:nil];
         
         }
-
+        
+        if (![self.view.subviews containsObject:self.viewFeeback.view]) {
+            [self.viewFeeback removeFromParentViewController];
+            
+        }
+        
     });
 
 }
@@ -390,43 +413,12 @@
         [self.viewPresentation viewReset];
         if ([self.dataobj storyEntriesWithAssets:self.dataobj.storyActiveKey] > 2) {
             [self viewPresentSubviewWithIndex:2 animate:true];
-            [self.exportobj setWatermark:@"ovatar.io/montage"];
-            [self.exportobj setVideoresize:CGSizeMake(1080, 1920)];
-            //[self.exportobj setVideoresize:CGSizeMake(1080, 1080)];
-            //[self.exportobj setVideoresize:CGSizeMake(1920, 1080)];
+            [self viewExportWithSize:CGSizeMake(1080, 1920)];
+            [self.mixpanel track:@"App Previewed Video" properties:@{@"Items":@([self.dataobj storyEntriesWithAssets:self.dataobj.storyActiveKey])}];
 
-            [self.exportobj exportMontage:self.dataobj.storyActiveKey completion:^(NSString *file, NSError *error) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    if (self.pageindex == 2 && self.viewPresentation.view.hidden == false) {
-                        if (file != nil) {
-                            [self setExported:[NSURL fileURLWithPath:file]];
-                            [self.viewPresentation setVideosize:self.exportobj.videoresize];
-                            [self.viewPresentation viewPresentOutput:self.exported];
-                            [self.viewHeader setup:@[@"navigation_export"] animate:true];
-                            
-                            [self.generator notificationOccurred:UINotificationFeedbackTypeSuccess];
-                            [self.generator prepare];
-
-                        }
-                        else {
-                            [self.viewNotification notificationPresentWithTitle:error.localizedDescription type:ONotificationTypeError];
-                            
-                            [self.generator notificationOccurred:UINotificationFeedbackTypeError];
-                            [self.generator prepare];
-                            
-                        }
-                        
-                        [self.appdel applicationLoadingScreen:false];
-                        
-                    }
-                    
-                }];
-                
-            }];
-            
-            
         }
         else {
+            [self viewPresentSubviewWithIndex:1 animate:true];
             [self.viewNotification notificationPresentWithTitle:NSLocalizedString(@"Error_LimitedMedia_Title", nil) type:ONotificationTypeError];
             
         }
@@ -440,13 +432,15 @@
 
     }
     else if (button == OTitleButtonTypeExport) {
+        [self.mixpanel timeEvent:@"App Exported Video"];
         [self.dataobj storyExport:self.dataobj.storyActiveKey completion:^(NSError *error) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 if (error.code == 200) {
                     [self.viewHeader setup:@[] animate:true];
                     [self.viewPresentation setExported:self.exported];
                     [self.viewPresentation viewExportSucsessful];
-                    
+                    [self.mixpanel track:@"App Exported Video" properties:@{@"Items":@([self.dataobj storyEntriesWithAssets:self.dataobj.storyActiveKey])}];
+
                 }
                 else [self.viewNotification notificationPresentWithTitle:error.domain type:ONotificationTypeError];
 
@@ -456,7 +450,7 @@
         
     }
     else if (button == OTitleButtonTypeSelect) {
-        if (self.viewGallery.selected != nil) {
+        if (self.viewGallery.selected.count > 0) {
             [self viewGallerySelectedImage:self.viewGallery.selected];
             [self viewPresentGalleryPicker:nil];
 
@@ -474,48 +468,143 @@
     
 }
 
--(void)viewGallerySelectedImage:(PHAsset *)asset {
-    [self.viewStory viewUpdateEntry:self.viewStory.active loading:true];
-    [self.imageobj imageCreateEntryFromAsset:asset animate:true key:self.selected.key completion:^(NSError *error, BOOL animated) {
-        if (error == nil || error.code == 200) {
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self.viewStory viewUpdateEntry:self.selected loading:true];
-                
-            }];
+-(void)viewExportWithSize:(CGSize)size {
+    if (!self.exporting) {
+        [self setExporting:true];
+        if ([self.payment paymentPurchasedItemWithIdentifyer:@"watermarkremove"]) {
+            [self.exportobj setWatermark:nil];
+            [self.viewPresentation.viewPurchase setHidden:true];
             
-            dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
-            dispatch_after(delay, dispatch_get_main_queue(), ^(void){
-                [self.dataobj entryAppendWithImageData:asset animated:true entry:self.selected.key completion:^(NSError *error) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self.viewStory viewUpdateEntry:self.selected loading:false];
-                        [self.viewStory viewEditorDidScroll:self.selected];
-                        [self setSelected:nil];
-                        
-                    }];
-
-                }];
-                
-            });
-
         }
         else {
-            [self.viewNotification notificationPresentWithTitle:error.domain type:ONotificationTypeError];
+            [self.exportobj setWatermark:@"ovatar.io/montage"];
+            [self.viewPresentation.viewPurchase setHidden:false];
             
         }
         
-    }];
+        [self.exportobj setVideoframes:29.96];
+        [self.exportobj setVideoseconds:0.9];
+        [self.exportobj setVideoresize:size];
+        [self.exportobj exportMontage:self.dataobj.storyActiveKey completion:^(NSString *file, NSError *error) {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                if (self.pageindex == 2 && self.viewPresentation.view.hidden == false) {
+                    if (file != nil) {
+                        [self setExported:[NSURL fileURLWithPath:file]];
+                        [self.viewPresentation setVideosize:self.exportobj.videoresize];
+                        [self.viewPresentation viewPresentOutput:self.exported];
+                        [self.viewHeader setup:@[@"navigation_export"] animate:true];
+                        
+                        [self.generator notificationOccurred:UINotificationFeedbackTypeSuccess];
+                        [self.generator prepare];
+                        
+                    }
+                    else {
+                        [self.viewNotification notificationPresentWithTitle:error.localizedDescription type:ONotificationTypeError];
+                        
+                        [self.generator notificationOccurred:UINotificationFeedbackTypeError];
+                        [self.generator prepare];
+                        
+                    }
+                    
+                    [self setExporting:false];
+                    [self.appdel applicationLoadingScreen:false];
+                    
+                }
+                
+            }];
+            
+        }];
+        
+    }
+    
     
 }
 
--(void)viewRestorePurchases {
-    [self.payment purchaseRestore];
-    [self.appdel setLassets:nil];
-    [self.appdel applicationLoadingScreen:true];
+-(void)viewGallerySelectedImage:(NSArray *)assets {
+    [self.viewStory viewUpdateEntry:self.viewStory.active loading:true];
+    
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    queue.qualityOfService = NSQualityOfServiceUtility;
+    queue.maxConcurrentOperationCount = 1;
+    
+    for (int i = 0; i < assets.count; i++) {
+        [queue addOperationWithBlock:^{
+            [self.imageobj imageCreateEntryFromAsset:assets.firstObject animate:true key:self.selected.key completion:^(NSError *error, BOOL animated) {
+                if (error == nil || error.code == 200) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [self.viewStory viewUpdateEntry:self.selected loading:true];
+                        
+                    }];
+                    
+                    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
+                    dispatch_after(delay, dispatch_get_main_queue(), ^(void){
+                        [self.dataobj entryAppendWithImageData:assets.firstObject animated:true entry:self.selected.key completion:^(NSError *error) {
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [self.viewStory viewUpdateEntry:self.selected loading:false];
+                                [self.viewStory viewEditorDidScroll:self.selected];
+                                [self setSelected:nil];
+                                
+                            }];
+
+                        }];
+                        
+                    });
+
+                }
+                else {
+                    NSLog(@"error: %@" ,error);
+                    //[self.viewNotification notificationPresentWithTitle:error.domain type:ONotificationTypeError];
+                    
+                }
+                
+            }];
+            
+        }];
+        
+    }
+    
+    if (assets.count > 1) {
+        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+        queue.qualityOfService = NSQualityOfServiceUtility;
+        queue.maxConcurrentOperationCount = 1;
+        
+        for (int i = 1; i < assets.count; i++) {
+            [queue addOperationWithBlock:^{
+                NSLog(@"adding: %@" ,[assets objectAtIndex:i]);
+                [self.dataobj entryCreate:self.dataobj.storyActiveKey asset:[assets objectAtIndex:i] completion:^(NSError *error, NSString *key) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        if (error.code == 200 || error == nil) {
+                            [self.viewStory.collectionView performBatchUpdates:^{
+                                [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
+                                NSLog(@"[self.dataobj entryWithKey:key] %@" ,[self.dataobj entryWithKey:key]);
+                                //[self.viewStory.items addObject:[self.dataobj entryWithKey:key]];
+                                //[self.viewStory.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.viewStory.items.count inSection:0]]];
+                                
+                            } completion:nil];
+                            
+                        }
+                        
+                    }];
+                    
+                }];
+                
+            }];
+
+        }
+        
+        //[self.viewStory.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.viewStory.items.count inSection:0]]];
+        
+    }
+    
+}
+
+-(void)viewDidScrollSubview:(float)position {
+    [self.viewHeader shadow:position];
     
 }
 
 -(void)photoLibraryDidChange:(PHChange *)changeInstance {
-    [self.imageobj imagesFromAlbum:nil completion:^(NSArray *images) {
+    [self.imageobj imagesFromAlbum:nil limit:0 completion:^(NSArray *images) {
         if (self.viewGallery.images.count != images.count) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.viewGallery.images removeAllObjects];
@@ -531,16 +620,48 @@
     
 }
 
+-(void)viewRestorePurchases {
+    [self.payment purchaseRestore];
+    [self.appdel setLtext:NSLocalizedString(@"Subscription_Loading_Title", nil)];
+    [self.appdel setLassets:nil];
+    [self.appdel applicationLoadingScreen:true];
+
+    
+}
+
+-(void)viewPurchaseInitialiseWithIdentifyer:(NSString *)identifyer {
+    [self.payment purchaseItemWithIdentifyer:identifyer];
+    [self.payment paymentRecordInterest];
+
+}
+
 -(void)paymentSucsessfullyUpgradedWithState:(OPaymentState)state {
     if (state == OPaymentStateRestored) {
-        [self.viewNotification notificationPresentWithTitle:NSLocalizedString(@"Error_PaymentRestored_Title", nil) type:ONotificationTypeNotice];
-        
+        if (self.pageindex == 2 && self.viewPresentation.view.hidden == false) {
+            [self viewPresentSubviewWithIndex:2 animate:true];
+            [self viewExportWithSize:CGSizeMake(1080, 1920)];
+
+        }
+        else {
+            [self.viewNotification notificationPresentWithTitle:NSLocalizedString(@"Subscription_Restored_Error", nil) type:ONotificationTypeNotice];
+            
+        }
+
     }
     else if (state == OPaymentStatePurchased) {
-        
+        if (self.pageindex == 2 && self.viewPresentation.view.hidden == false) {
+            [self viewPresentSubviewWithIndex:2 animate:true];
+            [self viewExportWithSize:CGSizeMake(1080, 1920)];
+        }
+        else {
+            [self.viewNotification notificationPresentWithTitle:NSLocalizedString(@"Subscription_Purchaesed_Error", nil) type:ONotificationTypeNotice];
+            
+        }
+
     }
     else {
-        
+        [self.viewNotification notificationPresentWithTitle:NSLocalizedString(@"Subscription_Deferred_Error", nil) type:ONotificationTypeNotice];
+
     }
 
     [self.appdel applicationLoadingScreen:false];

@@ -18,11 +18,15 @@
 @property (nonatomic, strong) UIView *viewShadow;
 @property (nonatomic, strong) UILabel *viewLabel;
 @property (nonatomic, strong) CAGradientLayer *viewGradient;
+@property (nonatomic, strong) UIImageView *viewIcon;
 
 @property (nonatomic, assign) float padding;
+@property (nonatomic, assign) float fontsize;
+@property (nonatomic, assign) BOOL grayscale;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) UINotificationFeedbackGenerator *generator;
 @property (nonatomic, strong) NSString *key;
+@property (nonatomic, strong) UIImage *icon;
 
 @end
 

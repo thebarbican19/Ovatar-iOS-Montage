@@ -24,8 +24,8 @@
 
 -(NSArray *)codes {
     NSMutableArray *codes = [[NSMutableArray alloc] init];
-    [codes addObject:@{@"type":@"unlock", @"code":@"yourthebest"}];
-    [codes addObject:@{@"type":@"discount", @"code":@"alrightgonthen"}];
+    [codes addObject:@{@"type":@"unlock", @"code":@"yourthebest", @"identifyer":@"com.ovatar.watermarkremove_tier_1"}];
+    [codes addObject:@{@"type":@"discount", @"code":@"alrightgoonthen", @"identifyer":@"com.ovatar.watermarkremove_tier_3"}];
     
     return codes;
     
@@ -50,9 +50,9 @@
     if ([self.data objectForKey:@"app_product"] == nil) {
         self.purchase = false;
         if ([SKPaymentQueue canMakePayments]) {
-            SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:APP_PREMIUM_IDENTIFYER]];
-            [request setDelegate:self];
-            [request start];
+//            SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:APP_PREMIUM_IDENTIFYER]];
+//            [request setDelegate:self];
+//            [request start];
             
         }
         
@@ -73,7 +73,7 @@
 }
 
 -(NSString *)paymentProductName {
-    if ([self.data objectForKey:@"app_product"] == nil) return @"Shwifty Unlimited";
+    if ([self.data objectForKey:@"app_product"] == nil) return NSLocalizedString(@"Subscription_Plan_Title", nil);
     else return [[self.data objectForKey:@"app_product"] objectForKey:@"name"];
     
 }
@@ -129,7 +129,7 @@
     else {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ([self.delegate respondsToSelector:@selector(paymentReturnedErrors:)]) {
-                [self.delegate paymentReturnedErrors:[NSError errorWithDomain:@"Payments are disabled. You may need to sign in with your Apple ID, or update your payment information" code:400 userInfo:nil]];
+                [self.delegate paymentReturnedErrors:[NSError errorWithDomain:NSLocalizedString(@"Subscription_Disabled_Error", nil) code:400 userInfo:nil]];
                 
             }
             
@@ -171,7 +171,9 @@
         if (self.product != nil) {
             [self.data setObject:@{@"currency":self.product.priceLocale.currencySymbol,
                                    @"price":[NSNumber numberWithFloat:self.product.price.floatValue],
-                                   @"name":self.product.localizedTitle}
+                                   @"name":self.product.localizedTitle,
+                                   @"identifyer":self.product.localizedTitle
+                                   }
                           forKey:@"app_product"];
             [self.data synchronize];
             
@@ -267,9 +269,9 @@
 -(void)paymentSucsessfullyUpgraded:(SKPaymentTransaction *)transaction {
     if (transaction.transactionState == SKPaymentTransactionStatePurchased) {
         [self.mixpanel.people trackCharge:self.product.price];
-        [self.mixpanel.people set:@{@"Plan":@"Unlimted"}];
-        [self.mixpanel track:@"App Upgraded" properties:@{@"Date":transaction.transactionDate,
-                                                          @"Price":self.product.localizedDescription,
+        [self.mixpanel track:@"App Purchase Sucsessful" properties:
+                                                        @{@"Date":transaction.transactionDate,
+                                                          @"Name":self.product.localizedDescription,
                                                           @"Key":transaction.transactionIdentifier}];
         
         [self paymentSavePurchasedItem:self.product.productIdentifier];
@@ -290,6 +292,17 @@
 -(NSMutableArray *)paymentPurchasedItems {
     if ([[self.data objectForKey:@"ovatar_purchased"] count] == 0) return [[NSMutableArray alloc] init];
     else return [[NSMutableArray alloc] initWithArray:[self.data objectForKey:@"ovatar_purchased"]];
+    
+}
+
+-(BOOL)paymentPurchasedItemWithIdentifyer:(NSString *)identifyer {
+    BOOL exists = false;
+    for (NSString *purchased in [self paymentPurchasedItems]) {
+        if ([purchased containsString:identifyer]) exists = true;
+        
+    }
+
+    return exists;
     
 }
 

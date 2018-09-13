@@ -17,6 +17,8 @@
 #import "OImageObject.h"
 #import "OPaymentObject.h"
 
+#import "GDActionSheet.h"
+
 #import "AppDelegate.h"
 
 typedef enum {
@@ -27,10 +29,11 @@ typedef enum {
 } OSettingsSubview;
 
 @protocol OSettingsDelegate;
-@interface OSettingsController : UITableViewController <UITableViewDelegate, SFSafariViewControllerDelegate>
+@interface OSettingsController : UITableViewController <GDActionSheetDelegate, UITableViewDelegate, SFSafariViewControllerDelegate>
 
 @property (nonatomic, strong) id <OSettingsDelegate> delegate;
 @property (nonatomic, strong) OSettingsHeader *viewHeader;
+@property (nonatomic, retain) GDActionSheet *viewSheet;
 
 @property (nonatomic, strong) OImageObject *imageobj;
 
@@ -47,6 +50,7 @@ typedef enum {
 
 -(void)viewRestorePurchases;
 -(void)viewInsertSubview:(OSettingsSubview)view;
+-(void)viewDidScrollSubview:(float)position;
 
 @end
 

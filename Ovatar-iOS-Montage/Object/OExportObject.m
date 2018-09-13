@@ -19,6 +19,10 @@
         self.imageobj = [[OImageObject alloc] init];
         self.dataobj = [[ODataObject alloc] init];
         
+        self.videoframes = 29.96;
+        self.videoresize = CGSizeMake(1080, 1920);
+        self.videoseconds = 1.0;
+
     }
     
     return self;
@@ -33,26 +37,25 @@
     else {
         AVMutableComposition *mutableComposition = [AVMutableComposition composition];
         AVMutableCompositionTrack *videoCompositionTrack = [mutableComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-
+        
         NSMutableArray *instructions = [[NSMutableArray alloc] init];
-
+        
         CMTime videotime = kCMTimeZero;
         for (NSDictionary *item in [self.dataobj storyEntries:story]) {
             NSString *filename = [NSString stringWithFormat:@"%@/%@.mov", APP_DOCUMENTS ,[item objectForKey:@"key"]];
             AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:filename]];
             BOOL audioenabled = [[item objectForKey:@"audio"] boolValue];
-            float limit = [[item objectForKey:@"limitduration"] floatValue];
-            NSLog(@"duration %f" ,limit);
-
+            //float limit = [[item objectForKey:@"limitduration"] floatValue];
+            
             if ([[asset tracksWithMediaType:AVMediaTypeVideo] count] > 0) {
                 AVAssetTrack *videoAssetTrack = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
                 AVAssetTrack *audioAssetTrack = [[asset tracksWithMediaType:AVMediaTypeAudio] firstObject];;
-      
+                
                 NSError *videoError;
                 [videoCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAssetTrack.timeRange.duration) ofTrack:videoAssetTrack atTime:videotime error:&videoError];
                 
                 if (videoError) completion(nil, videoError);
-    
+                
                 if (audioenabled) {
                     [[mutableComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid] insertTimeRange:CMTimeRangeMake(kCMTimeZero, audioAssetTrack.timeRange.duration) ofTrack:audioAssetTrack atTime:videotime error:nil];
                     
@@ -62,7 +65,10 @@
                 [videolayerInstruction setTransform:[self exportTransform:asset] atTime:kCMTimeZero];
                 
                 CMTime videoduration = kCMTimeZero;
-                if (limit > CMTimeGetSeconds(videoAssetTrack.timeRange.duration)) videoduration = CMTimeMake(limit, 1);
+                if (self.videoseconds > CMTimeGetSeconds(videoAssetTrack.timeRange.duration)) {
+                    videoduration = CMTimeMakeWithSeconds(self.videoseconds, self.videoframes);
+                    
+                }
                 else videoduration = videoAssetTrack.timeRange.duration;
                 
                 AVMutableVideoCompositionInstruction *videoCompositionInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
@@ -76,28 +82,29 @@
             }
             
         }
-
+        
         NSString *output = [NSString stringWithFormat:@"%@/%@_export.mov", APP_DOCUMENTS ,story];
         if ([[NSFileManager defaultManager] fileExistsAtPath:output]) {
             [[NSFileManager defaultManager] removeItemAtPath:output error:nil];
             
         }
-
+        
         AVMutableVideoComposition *mutableVideoComposition = [AVMutableVideoComposition videoComposition];
         mutableVideoComposition.instructions = instructions;
-        mutableVideoComposition.frameDuration = CMTimeMake(1, 29.96);
+        mutableVideoComposition.frameDuration = CMTimeMake(self.videoseconds, self.videoframes);
         mutableVideoComposition.renderSize =  CGSizeMake(self.videoresize.width, self.videoresize.height);;
         if (self.watermark != nil) {
             mutableVideoComposition.animationTool = [self exportWatermark:self.watermark image:[UIImage imageNamed:@"export_watermark"]];
             
         }
         
+        self.exporttimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(exportStatus:) userInfo:nil repeats:true];
         self.exporter = [[AVAssetExportSession alloc] initWithAsset:mutableComposition presetName:AVAssetExportPresetHighestQuality];
         self.exporter.videoComposition = mutableVideoComposition;
         self.exporter.outputURL = [[NSURL alloc] initFileURLWithPath:output];
         self.exporter.outputFileType = @"com.apple.quicktime-movie";
         self.exporter.shouldOptimizeForNetworkUse = true;
-
+        
         [self.exporter exportAsynchronouslyWithCompletionHandler:^{
             if (self.exporter.status != AVAssetExportSessionStatusExporting) {
                 if (self.exporter.status == AVAssetExportSessionStatusCompleted) {
@@ -115,11 +122,16 @@
                 NSLog(@"exporting video: %f" ,self.exporter.progress);
                 
             }
-                
+            
         }];
         
     }
+    
+}
 
+-(void)exportStatus:(NSTimer *)timer {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"LoaderExportStatus" object:@{@"progress":@(self.exporter.progress)}];
+    
 }
 
 -(CGAffineTransform)exportTransform:(AVAsset *)asset {
@@ -159,7 +171,9 @@
 
     renderSize = CGSizeMake(renderSize.width, renderSize.width * naturalSize.height/naturalSize.width);
     
-    CGFloat aspectratio = self.videoresize.height /  track.naturalSize.height;;
+    CGFloat aspectratio;
+    if (self.videoresize.width > self.videoresize.height) aspectratio = self.videoresize.width /  track.naturalSize.width;
+    else aspectratio = self.videoresize.height /  track.naturalSize.height;
     CGAffineTransform scale = CGAffineTransformMakeScale(aspectratio, aspectratio);
 
     if (orientation == UIImageOrientationRight) {
@@ -178,12 +192,24 @@
     if (CGAffineTransformIsIdentity(mixedTransform)) output = CGAffineTransformConcat(track.preferredTransform, scale);
     else output = CGAffineTransformConcat(scale, mixedTransform);
    
-    if (portrait) {
-        if (renderSize.height > ((self.videoresize.width / 4) * 3)) return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(0.0, 0.0));
-        else return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(-((self.videoresize.width / 4) * 3), 0.0));
+    if (self.videoresize.width > self.videoresize.height) {
+        if (portrait) {
+            if (renderSize.height > ((self.videoresize.width / 4) * 3)) return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(0.0, 0.0));
+            else return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(0.0, -(self.videoresize.width / 4) * 3));
+            
+        }
+        else return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(0.0, -(self.videoresize.width / 4) * 3));
         
     }
-    else return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(0.0, 0.0));
+    else {
+        if (portrait) {
+            if (renderSize.height > ((self.videoresize.width / 4) * 3)) return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(0.0, 0.0));
+            else return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(-((self.videoresize.width / 4) * 3), 0.0));
+            
+        }
+        else return CGAffineTransformConcat(output, CGAffineTransformMakeTranslation(0.0, 0.0));
+        
+    }
     
 }
 
@@ -220,6 +246,116 @@
     [parentLayer addSublayer:watermark];
     
     return [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];
+    
+}
+
+-(void)exportClipWithType:(id)type key:(NSString *)key completion:(void (^)(NSError* error))completion {
+    NSString *videofilename;
+    AVAsset *videoasset;
+    BOOL videoslideshow = false;
+    if ([type isKindOfClass:[UIImage class]]) {
+        videofilename = [[NSBundle mainBundle]  pathForResource:@"Montage-Template" ofType:@"mov"];
+        videoasset = [AVAsset assetWithURL:[NSURL fileURLWithPath:videofilename]];
+        videoslideshow = true;
+
+    }
+    else if ([type isKindOfClass:[NSURL class]]) {
+        videoasset = [AVAsset assetWithURL:type];
+        videoslideshow = false;
+        
+    }
+    
+    AVAssetTrack *videotrack = [[videoasset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    CMTime videotime = CMTimeMakeWithSeconds(self.videoseconds, self.videoframes);
+    AVMutableComposition *videocomposition = [AVMutableComposition composition];
+    
+    AVMutableCompositionTrack *videoCompositionTrack = [videocomposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    [videoCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videotime) ofTrack:videotrack atTime: kCMTimeZero error:nil];
+    
+    AVMutableVideoCompositionLayerInstruction *videolayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videotrack];
+    
+    AVMutableVideoCompositionInstruction *videoCompositionInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    [videoCompositionInstruction setTimeRange:CMTimeRangeMake(kCMTimeZero, videotime)];
+    [videoCompositionInstruction setLayerInstructions:@[videolayerInstruction]];
+
+    CALayer *imagelayer = [CALayer layer];
+    if (videoslideshow) {
+        int random = (arc4random() % 30) + 1;
+        UIImage *slide = (UIImage *)type;
+        [imagelayer setContents:(id)slide.CGImage];
+        [imagelayer setFrame:CGRectMake(0.0, 0.0, self.videoresize.width, self.videoresize.height)];
+        [imagelayer setOpacity:1.0];
+        [imagelayer setContentsGravity:kCAGravityResizeAspectFill];
+        [imagelayer setBackgroundColor:[UIColor blackColor].CGColor];
+        [imagelayer setMasksToBounds:true];
+
+        CABasicAnimation* panning = [CABasicAnimation animationWithKeyPath:@"position"];
+        panning.fromValue = [NSValue valueWithCGPoint:CGPointMake(-20, 0.0)];
+        panning.toValue = [NSValue valueWithCGPoint:CGPointMake(0.0, 0.0)];
+        panning.additive = true;
+        
+        CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+        scale.additive = true;
+        if (random % 5 == 0) {
+            scale.fromValue = [NSNumber numberWithFloat:0.03];
+            scale.toValue = [NSNumber numberWithFloat:0.0];
+        
+        }
+        else {
+            scale.fromValue = [NSNumber numberWithFloat:0.0];
+            scale.toValue = [NSNumber numberWithFloat:0.03];
+            
+        }
+    
+        CAAnimationGroup *group = [CAAnimationGroup animation];
+        group.animations = @[panning ,scale];
+        group.duration = CMTimeGetSeconds(videotime);
+        group.removedOnCompletion = false;
+        group.beginTime = 1e-100;
+        group.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+        [imagelayer addAnimation:group forKey:nil];
+        
+    }
+    
+    CALayer *parentLayer = [CALayer layer];
+    CALayer *videoLayer = [CALayer layer];
+    [parentLayer setFrame:CGRectMake(0, 0, self.videoresize.width, self.videoresize.height)];
+    [parentLayer setBackgroundColor:[UIColor clearColor].CGColor];
+    [videoLayer setFrame:parentLayer.bounds];
+    [videoLayer setBackgroundColor:[UIColor orangeColor].CGColor];
+    [parentLayer addSublayer:videoLayer];
+    [parentLayer addSublayer:imagelayer];
+    
+    
+
+    NSLog(@"\n\nvideotime %f\n\n" ,(float)videotime.value);
+    
+    NSString *output = [APP_DOCUMENTS stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", key]];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:output]) {
+        [[NSFileManager defaultManager] removeItemAtPath:output error:nil];
+        
+    }
+    
+    AVMutableVideoComposition *mutableVideoComposition = [AVMutableVideoComposition videoComposition];
+    mutableVideoComposition.instructions = @[videoCompositionInstruction];
+    mutableVideoComposition.frameDuration = CMTimeMake(self.videoseconds, self.videoframes);;
+    mutableVideoComposition.renderSize = CGSizeMake(self.videoresize.width, self.videoresize.height);
+    mutableVideoComposition.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];;
+    
+    AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:videocomposition presetName:AVAssetExportPreset1920x1080];
+    exporter.videoComposition = mutableVideoComposition;
+    exporter.outputURL = [[NSURL alloc] initFileURLWithPath:output];
+    exporter.outputFileType = AVFileTypeMPEG4;
+    exporter.shouldOptimizeForNetworkUse = true;
+    
+    [exporter exportAsynchronouslyWithCompletionHandler:^{
+        if (exporter.status == AVAssetExportSessionStatusCompleted) {
+            completion([NSError errorWithDomain:@"video created" code:200 userInfo:nil]);
+            
+        }
+        else if (exporter.status == AVAssetExportSessionStatusFailed) completion(exporter.error);
+        
+    }];
     
 }
 

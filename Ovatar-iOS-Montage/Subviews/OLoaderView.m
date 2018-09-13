@@ -14,7 +14,7 @@
 -(void)drawRect:(CGRect)rect {
     if (self.animation == 0) self.animation = 3.0;
     if (self.speed == 0) self.speed = 0.5;
-    if (self.scale == 0) self.scale = 65.0;
+    if (self.scale == 0) self.scale = 150.0;
     
     self.imageobj = [[OImageObject alloc] init];
     
@@ -36,6 +36,7 @@
     self.viewImages = [[UIImageView alloc] initWithFrame:CGRectMake(self.viewMask.frame.origin.x - 5.0, self.viewMask.frame.origin.y - 5.0, self.viewMask.bounds.size.width + 5.0, self.viewMask.bounds.size.height + 5.0)];
     self.viewImages.contentMode = UIViewContentModeScaleAspectFill;
     self.viewImages.image = nil;
+    self.viewImages.alpha = 0.9;
     [self.viewContainer addSubview:self.viewImages];
     
 }

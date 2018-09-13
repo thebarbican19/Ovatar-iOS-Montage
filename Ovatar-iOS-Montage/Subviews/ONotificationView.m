@@ -70,7 +70,7 @@
         }
         
         label = [[UILabel alloc] initWithFrame:CGRectMake(28.0, 2.0, container.bounds.size.width - 56.0, container.bounds.size.height - 4.0)];
-        label.textColor = [UIColor whiteColor];
+        label.textColor = [UIColor colorWithWhite:1.0 alpha:0.8];
         label.font = [UIFont fontWithName:@"Avenir-Heavy" size:13.0];
         label.backgroundColor = [UIColor clearColor];
         label.userInteractionEnabled = false;
@@ -162,9 +162,9 @@
         NSRegularExpression *formatRegex = [NSRegularExpression regularExpressionWithPattern:@"\\*[^\\*]+\\*" options:0 error:nil];
         NSArray *formatMatches = [formatRegex matchesInString:content options:0 range:NSMakeRange(0, content.length)];
         for (NSTextCheckingResult *match in formatMatches) {
-            //[formatContent addAttribute:NSFontAttributeName value:[UIFont fontWithName:MAIN_FONT_MEDIUM size:label.font.pointSize] range:NSMakeRange(match.range.location, match.range.length)];
-            [formatContent addAttribute:NSForegroundColorAttributeName value:UIColorFromRGB(0x202123) range:NSMakeRange(match.range.location, match.range.length)];
-            
+            [formatContent addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Avenir-Black" size:label.font.pointSize] range:NSMakeRange(match.range.location, match.range.length)];
+            [formatContent addAttribute:NSForegroundColorAttributeName value:[UIColor colorWithWhite:1.0 alpha:1.0] range:NSMakeRange(match.range.location, match.range.length)];
+
         }
         
         [formatContent.mutableString replaceOccurrencesOfString:@"*" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0, formatContent.string.length)];
@@ -173,7 +173,7 @@
         return formatContent;
         
     }
-    else return nil;
+    else return [[NSMutableAttributedString alloc] initWithString:NSLocalizedString(@"Error_Unknown_Title", nil)];
     
 }
 

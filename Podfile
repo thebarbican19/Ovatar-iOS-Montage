@@ -11,6 +11,8 @@ target 'Ovatar-iOS-Montage' do
   pod 'Ovatar-iOS'
   pod 'BLMultiColorLoader'
   pod 'SAMLabel'
+  pod 'RMStore'
+  pod 'NSGIF'
   # use_frameworks!
 
   # Pods for Ovatar-iOS-Montage

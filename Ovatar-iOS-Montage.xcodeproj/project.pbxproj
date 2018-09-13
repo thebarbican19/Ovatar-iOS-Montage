@@ -9,11 +9,17 @@
 /* Begin PBXBuildFile section */
 		5B17ADA53467D5E0B826B806 /* libPods-Ovatar-iOS-MontageTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 281F72D5B37504CCC52B79DD /* libPods-Ovatar-iOS-MontageTests.a */; };
 		771C4A5F212D116E0099EBC9 /* complete_sfx.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 771C4A5E212D116E0099EBC9 /* complete_sfx.mp3 */; };
+		772B1472214691870081959D /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772B1471214691870081959D /* AuthenticationServices.framework */; };
+		772B1475214815F30081959D /* OGalleryReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 772B1474214815F30081959D /* OGalleryReusableView.m */; };
 		772E2480213527130025DD85 /* OFeedbackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E247F213527130025DD85 /* OFeedbackController.m */; };
 		772E2483213528060025DD85 /* UITextView+Placeholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E2482213528060025DD85 /* UITextView+Placeholder.m */; };
-		772E248E2136B0BF0025DD85 /* NSTimer+Block.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E248C2136B0BE0025DD85 /* NSTimer+Block.m */; };
 		772E24922136C8070025DD85 /* Montage-App-Loop.mov in Resources */ = {isa = PBXBuildFile; fileRef = 772E24912136C8070025DD85 /* Montage-App-Loop.mov */; };
 		772E24952136C8DE0025DD85 /* OTickerLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E24942136C8DE0025DD85 /* OTickerLabel.m */; };
+		772E46D3213812C300B14596 /* OTabbarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E46D2213812C300B14596 /* OTabbarView.m */; };
+		772E46D6213BB95000B14596 /* NamesDetect.json in Resources */ = {isa = PBXBuildFile; fileRef = 772E46D5213BB95000B14596 /* NamesDetect.json */; };
+		772E46D9213CD32500B14596 /* GDActionSheet.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E46D8213CD32500B14596 /* GDActionSheet.m */; };
+		77357EF0213E775D00F3A6E0 /* Montage-Template.mov in Resources */ = {isa = PBXBuildFile; fileRef = 77357EEF213E775C00F3A6E0 /* Montage-Template.mov */; };
+		77357EF32144F37500F3A6E0 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77357EF22144F37500F3A6E0 /* StoreKit.framework */; };
 		77465C3D2122974300EAF97E /* NSlackObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C3B2122974300EAF97E /* NSlackObject.m */; };
 		77465C4321229DCE00EAF97E /* OSettingsHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C4221229DCE00EAF97E /* OSettingsHeader.m */; };
 		77465C462124078300EAF97E /* OExportObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C452124078300EAF97E /* OExportObject.m */; };
@@ -77,15 +83,24 @@
 		4FC9D68DF616759529730870 /* Pods-Ovatar-iOS-MontageTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Ovatar-iOS-MontageTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Ovatar-iOS-MontageTests/Pods-Ovatar-iOS-MontageTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5AFFEFC2AA1DB7624801A4AB /* libPods-Ovatar-iOS-MontageUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Ovatar-iOS-MontageUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		771C4A5E212D116E0099EBC9 /* complete_sfx.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = complete_sfx.mp3; sourceTree = "<group>"; };
+		772B1471214691870081959D /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
+		772B1473214815F30081959D /* OGalleryReusableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OGalleryReusableView.h; sourceTree = "<group>"; };
+		772B1474214815F30081959D /* OGalleryReusableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OGalleryReusableView.m; sourceTree = "<group>"; };
 		772E247E213527130025DD85 /* OFeedbackController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OFeedbackController.h; sourceTree = "<group>"; };
 		772E247F213527130025DD85 /* OFeedbackController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OFeedbackController.m; sourceTree = "<group>"; };
 		772E2481213528050025DD85 /* UITextView+Placeholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextView+Placeholder.h"; sourceTree = "<group>"; };
 		772E2482213528060025DD85 /* UITextView+Placeholder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITextView+Placeholder.m"; sourceTree = "<group>"; };
-		772E248C2136B0BE0025DD85 /* NSTimer+Block.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSTimer+Block.m"; sourceTree = "<group>"; };
-		772E248D2136B0BF0025DD85 /* NSTimer+Block.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSTimer+Block.h"; sourceTree = "<group>"; };
 		772E24912136C8070025DD85 /* Montage-App-Loop.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "Montage-App-Loop.mov"; sourceTree = "<group>"; };
 		772E24932136C8DE0025DD85 /* OTickerLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OTickerLabel.h; sourceTree = "<group>"; };
 		772E24942136C8DE0025DD85 /* OTickerLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OTickerLabel.m; sourceTree = "<group>"; };
+		772E46D1213812C300B14596 /* OTabbarView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OTabbarView.h; sourceTree = "<group>"; };
+		772E46D2213812C300B14596 /* OTabbarView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OTabbarView.m; sourceTree = "<group>"; };
+		772E46D5213BB95000B14596 /* NamesDetect.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = NamesDetect.json; sourceTree = "<group>"; };
+		772E46D7213CD32500B14596 /* GDActionSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDActionSheet.h; sourceTree = "<group>"; };
+		772E46D8213CD32500B14596 /* GDActionSheet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDActionSheet.m; sourceTree = "<group>"; };
+		77357EEF213E775C00F3A6E0 /* Montage-Template.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "Montage-Template.mov"; sourceTree = "<group>"; };
+		77357EF12144F35900F3A6E0 /* Ovatar-iOS-Montage.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Ovatar-iOS-Montage.entitlements"; sourceTree = "<group>"; };
+		77357EF22144F37500F3A6E0 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		77465C3B2122974300EAF97E /* NSlackObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSlackObject.m; sourceTree = "<group>"; };
 		77465C3C2122974300EAF97E /* NSlackObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSlackObject.h; sourceTree = "<group>"; };
 		77465C4121229DCE00EAF97E /* OSettingsHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OSettingsHeader.h; sourceTree = "<group>"; };
@@ -164,7 +179,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				772B1472214691870081959D /* AuthenticationServices.framework in Frameworks */,
 				E9BF044E69E635045C507491 /* libPods-Ovatar-iOS-Montage.a in Frameworks */,
+				77357EF32144F37500F3A6E0 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -190,6 +207,8 @@
 		4222E5C29D7C959E38D4062D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				772B1471214691870081959D /* AuthenticationServices.framework */,
+				77357EF22144F37500F3A6E0 /* StoreKit.framework */,
 				E0FAC231F6935BCB6E990D3D /* libPods-Ovatar-iOS-Montage.a */,
 				281F72D5B37504CCC52B79DD /* libPods-Ovatar-iOS-MontageTests.a */,
 				5AFFEFC2AA1DB7624801A4AB /* libPods-Ovatar-iOS-MontageUITests.a */,
@@ -208,9 +227,18 @@
 		772E2486213560490025DD85 /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				77357EEF213E775C00F3A6E0 /* Montage-Template.mov */,
 				772E24912136C8070025DD85 /* Montage-App-Loop.mov */,
 			);
 			path = Video;
+			sourceTree = "<group>";
+		};
+		772E46D4213BB8FC00B14596 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				772E46D5213BB95000B14596 /* NamesDetect.json */,
+			);
+			path = Data;
 			sourceTree = "<group>";
 		};
 		77DF609C211DBA4D00073439 = {
@@ -238,6 +266,7 @@
 		77DF60A7211DBA4D00073439 /* Ovatar-iOS-Montage */ = {
 			isa = PBXGroup;
 			children = (
+				77357EF12144F35900F3A6E0 /* Ovatar-iOS-Montage.entitlements */,
 				77DF60E0211DBAA200073439 /* Assets */,
 				77DF6108211DBAAE00073439 /* Object */,
 				77DF60EC211DBAAE00073439 /* Subviews */,
@@ -277,6 +306,7 @@
 		77DF60E0211DBAA200073439 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				772E46D4213BB8FC00B14596 /* Data */,
 				772E2486213560490025DD85 /* Video */,
 				771C4A5D212D11630099EBC9 /* SFX */,
 				77DF60E1211DBAA200073439 /* Fonts */,
@@ -317,6 +347,10 @@
 				77465CAE2125B8CC00EAF97E /* OInformationLabel.m */,
 				772E24932136C8DE0025DD85 /* OTickerLabel.h */,
 				772E24942136C8DE0025DD85 /* OTickerLabel.m */,
+				772E46D1213812C300B14596 /* OTabbarView.h */,
+				772E46D2213812C300B14596 /* OTabbarView.m */,
+				772B1473214815F30081959D /* OGalleryReusableView.h */,
+				772B1474214815F30081959D /* OGalleryReusableView.m */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -381,14 +415,14 @@
 		77DF613221201C3B00073439 /* Imported */ = {
 			isa = PBXGroup;
 			children = (
+				772E46D7213CD32500B14596 /* GDActionSheet.h */,
+				772E46D8213CD32500B14596 /* GDActionSheet.m */,
 				772E2481213528050025DD85 /* UITextView+Placeholder.h */,
 				772E2482213528060025DD85 /* UITextView+Placeholder.m */,
 				77465CAB2125B7CA00EAF97E /* PHAsset+Utility.h */,
 				77465CAA2125B7CA00EAF97E /* PHAsset+Utility.m */,
 				77465C3C2122974300EAF97E /* NSlackObject.h */,
 				77465C3B2122974300EAF97E /* NSlackObject.m */,
-				772E248D2136B0BF0025DD85 /* NSTimer+Block.h */,
-				772E248C2136B0BE0025DD85 /* NSTimer+Block.m */,
 			);
 			path = Imported;
 			sourceTree = "<group>";
@@ -478,6 +512,26 @@
 					77DF60A4211DBA4D00073439 = {
 						CreatedOnToolsVersion = 9.4;
 						LastSwiftMigration = 0940;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+							com.apple.AutoFillCredentialProvider = {
+								enabled = 1;
+							};
+							com.apple.InAppPurchase = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.SafariKeychain = {
+								enabled = 1;
+							};
+							com.apple.Siri = {
+								enabled = 1;
+							};
+						};
 					};
 					77DF60BC211DBA5200073439 = {
 						CreatedOnToolsVersion = 9.4;
@@ -514,11 +568,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				77357EF0213E775D00F3A6E0 /* Montage-Template.mov in Resources */,
 				772E24922136C8070025DD85 /* Montage-App-Loop.mov in Resources */,
 				77DF60E9211DBAA200073439 /* Muli-SemiBold.ttf in Resources */,
 				77DF60B5211DBA5200073439 /* LaunchScreen.storyboard in Resources */,
 				77DF60EB211DBAA200073439 /* Muli-Regular.ttf in Resources */,
 				77DF60E8211DBAA200073439 /* Muli-Bold.ttf in Resources */,
+				772E46D6213BB95000B14596 /* NamesDetect.json in Resources */,
 				77DF6120211DBAD300073439 /* Localizable.strings in Resources */,
 				77DF60B2211DBA5200073439 /* Assets.xcassets in Resources */,
 				77DF60B0211DBA4D00073439 /* Main.storyboard in Resources */,
@@ -660,7 +716,7 @@
 			files = (
 				77DF6114211DBAAE00073439 /* OSettingsController.m in Sources */,
 				77DF610F211DBAAE00073439 /* OGalleryCell.m in Sources */,
-				772E248E2136B0BF0025DD85 /* NSTimer+Block.m in Sources */,
+				772B1475214815F30081959D /* OGalleryReusableView.m in Sources */,
 				77DF6116211DBAAE00073439 /* OEntryController.m in Sources */,
 				77DF611D211DBAAE00073439 /* OPaymentObject.m in Sources */,
 				77DF6115211DBAAE00073439 /* OMainController.m in Sources */,
@@ -673,6 +729,7 @@
 				77DF6112211DBAAE00073439 /* OTitleView.m in Sources */,
 				77465C3D2122974300EAF97E /* NSlackObject.m in Sources */,
 				77DF60B8211DBA5200073439 /* main.m in Sources */,
+				772E46D9213CD32500B14596 /* GDActionSheet.m in Sources */,
 				77465C462124078300EAF97E /* OExportObject.m in Sources */,
 				77465CAF2125B8CC00EAF97E /* OInformationLabel.m in Sources */,
 				77DF6110211DBAAE00073439 /* ODayCell.m in Sources */,
@@ -684,6 +741,7 @@
 				772E2480213527130025DD85 /* OFeedbackController.m in Sources */,
 				77465CAC2125B7CA00EAF97E /* PHAsset+Utility.m in Sources */,
 				77DF612E21200A9A00073439 /* OLoaderView.m in Sources */,
+				772E46D3213812C300B14596 /* OTabbarView.m in Sources */,
 				77465C4321229DCE00EAF97E /* OSettingsHeader.m in Sources */,
 				77DF612B211EB76F00073439 /* ONotificationView.m in Sources */,
 				77DF6117211DBAAE00073439 /* OGalleryPickerController.m in Sources */,
@@ -867,9 +925,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Ovatar-iOS-Montage/Ovatar-iOS-Montage.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = 2TG3C5JT66;
+				DEVELOPMENT_TEAM = NV488MSHMX;
 				INFOPLIST_FILE = "Ovatar-iOS-Montage/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -880,7 +939,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -890,9 +949,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = "Ovatar-iOS-Montage/Ovatar-iOS-Montage.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = 2TG3C5JT66;
+				DEVELOPMENT_TEAM = NV488MSHMX;
 				INFOPLIST_FILE = "Ovatar-iOS-Montage/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -902,7 +962,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ovatar.montage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

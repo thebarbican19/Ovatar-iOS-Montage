@@ -24,7 +24,6 @@
         self.viewLogo.allowsPictureInPicturePlayback = false;
         self.viewLogo.view.userInteractionEnabled = false;
         [self addSubview:self.viewLogo.view];
-        [self.viewLogo.player play];
         
         self.viewLabel = [[UILabel alloc] initWithFrame:CGRectMake(30.0, 190.0, self.bounds.size.width - 60.0, self.bounds.size.height - 190.0)];
         self.viewLabel.textAlignment = NSTextAlignmentCenter;

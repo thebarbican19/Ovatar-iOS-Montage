@@ -13,6 +13,7 @@
 @property (nonatomic, strong) UILabel *labelTimestamp;
 @property (nonatomic, strong) UILabel *labelLocation;
 
--(void)content:(NSString *)timestamp location:(NSString *)location;
+-(void)timestamp:(NSString *)timestamp;
+-(void)location:(NSString *)location;
 
 @end
