@@ -21,7 +21,7 @@
         
         self.videoframes = 29.96;
         self.videoresize = CGSizeMake(1080, 1920);
-        self.videoseconds = 1.0;
+        self.videoseconds = 1.5;
 
     }
     
@@ -91,7 +91,7 @@
         
         AVMutableVideoComposition *mutableVideoComposition = [AVMutableVideoComposition videoComposition];
         mutableVideoComposition.instructions = instructions;
-        mutableVideoComposition.frameDuration = CMTimeMake(self.videoseconds, self.videoframes);
+        mutableVideoComposition.frameDuration = CMTimeMake(1.0, self.videoframes);
         mutableVideoComposition.renderSize =  CGSizeMake(self.videoresize.width, self.videoresize.height);;
         if (self.watermark != nil) {
             mutableVideoComposition.animationTool = [self exportWatermark:self.watermark image:[UIImage imageNamed:@"export_watermark"]];
@@ -266,6 +266,7 @@
     }
     
     AVAssetTrack *videotrack = [[videoasset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    NSLog(@"self.videoseconds %f/%f frames %f" ,self.videoseconds ,CMTimeGetSeconds(videotrack.timeRange.duration) ,self.videoframes);
     CMTime videotime = CMTimeMakeWithSeconds(self.videoseconds, self.videoframes);
     AVMutableComposition *videocomposition = [AVMutableComposition composition];
     
@@ -280,7 +281,7 @@
 
     CALayer *imagelayer = [CALayer layer];
     if (videoslideshow) {
-        int random = (arc4random() % 30) + 1;
+        int random = (arc4random() % 2);
         UIImage *slide = (UIImage *)type;
         [imagelayer setContents:(id)slide.CGImage];
         [imagelayer setFrame:CGRectMake(0.0, 0.0, self.videoresize.width, self.videoresize.height)];
@@ -296,7 +297,7 @@
         
         CABasicAnimation *scale = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
         scale.additive = true;
-        if (random % 5 == 0) {
+        if (random == 0) {
             scale.fromValue = [NSNumber numberWithFloat:0.03];
             scale.toValue = [NSNumber numberWithFloat:0.0];
         
@@ -325,8 +326,6 @@
     [videoLayer setBackgroundColor:[UIColor orangeColor].CGColor];
     [parentLayer addSublayer:videoLayer];
     [parentLayer addSublayer:imagelayer];
-    
-    
 
     NSLog(@"\n\nvideotime %f\n\n" ,(float)videotime.value);
     
@@ -338,7 +337,7 @@
     
     AVMutableVideoComposition *mutableVideoComposition = [AVMutableVideoComposition videoComposition];
     mutableVideoComposition.instructions = @[videoCompositionInstruction];
-    mutableVideoComposition.frameDuration = CMTimeMake(self.videoseconds, self.videoframes);;
+    mutableVideoComposition.frameDuration = CMTimeMake(1.0, self.videoframes);;
     mutableVideoComposition.renderSize = CGSizeMake(self.videoresize.width, self.videoresize.height);
     mutableVideoComposition.animationTool = [AVVideoCompositionCoreAnimationTool videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer:videoLayer inLayer:parentLayer];;
     

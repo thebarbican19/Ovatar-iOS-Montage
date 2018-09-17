@@ -11,6 +11,7 @@
 		771C4A5F212D116E0099EBC9 /* complete_sfx.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 771C4A5E212D116E0099EBC9 /* complete_sfx.mp3 */; };
 		772B1472214691870081959D /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772B1471214691870081959D /* AuthenticationServices.framework */; };
 		772B1475214815F30081959D /* OGalleryReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 772B1474214815F30081959D /* OGalleryReusableView.m */; };
+		772B1477214A2F3C0081959D /* Locations.json in Resources */ = {isa = PBXBuildFile; fileRef = 772B1476214A2F3C0081959D /* Locations.json */; };
 		772E2480213527130025DD85 /* OFeedbackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E247F213527130025DD85 /* OFeedbackController.m */; };
 		772E2483213528060025DD85 /* UITextView+Placeholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E2482213528060025DD85 /* UITextView+Placeholder.m */; };
 		772E24922136C8070025DD85 /* Montage-App-Loop.mov in Resources */ = {isa = PBXBuildFile; fileRef = 772E24912136C8070025DD85 /* Montage-App-Loop.mov */; };
@@ -86,6 +87,7 @@
 		772B1471214691870081959D /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		772B1473214815F30081959D /* OGalleryReusableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OGalleryReusableView.h; sourceTree = "<group>"; };
 		772B1474214815F30081959D /* OGalleryReusableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OGalleryReusableView.m; sourceTree = "<group>"; };
+		772B1476214A2F3C0081959D /* Locations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Locations.json; sourceTree = "<group>"; };
 		772E247E213527130025DD85 /* OFeedbackController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OFeedbackController.h; sourceTree = "<group>"; };
 		772E247F213527130025DD85 /* OFeedbackController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OFeedbackController.m; sourceTree = "<group>"; };
 		772E2481213528050025DD85 /* UITextView+Placeholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextView+Placeholder.h"; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				772E46D5213BB95000B14596 /* NamesDetect.json */,
+				772B1476214A2F3C0081959D /* Locations.json */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -579,6 +582,7 @@
 				77DF60B2211DBA5200073439 /* Assets.xcassets in Resources */,
 				77DF60B0211DBA4D00073439 /* Main.storyboard in Resources */,
 				77DF60E7211DBAA200073439 /* Muli-Black.ttf in Resources */,
+				772B1477214A2F3C0081959D /* Locations.json in Resources */,
 				77DF60EA211DBAA200073439 /* Muli-Light.ttf in Resources */,
 				771C4A5F212D116E0099EBC9 /* complete_sfx.mp3 in Resources */,
 			);

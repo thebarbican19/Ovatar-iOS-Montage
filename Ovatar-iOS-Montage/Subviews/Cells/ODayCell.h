@@ -29,6 +29,7 @@
 @property (nonatomic, strong) NSDate *timestamp;
 @property (nonatomic, strong) UIImage *image;
 @property (nonatomic, strong) NSURL *video;
+@property (nonatomic, strong) AVPlayer *player;
 @property (nonatomic, strong) NSString *filename;
 @property (nonatomic, strong) NSString *key;
 @property (nonatomic, strong) NSString *assetid;

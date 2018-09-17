@@ -1,0 +1,111 @@
+[
+    {
+        "index": 0,
+        "name": "Hong Kong",
+        "latitude": 22.31920109999999,
+        "longitude": 114.1696121
+    },
+    {
+        "index": 0,
+        "name": "London",
+        "latitude": 51.5073509,
+        "longitude": -0.127758
+    },
+    {
+        "index": 0,
+        "name": "Abu Dhabi",
+        "latitude": 24.453884,
+        "longitude": 54.377344
+    },
+    {
+        "index": 0,
+        "name": "Dubai",
+        "latitude": 25.204849,
+        "longitude": 55.270783
+    },
+    {
+        "index": 0,
+        "name": "New York",
+        "latitude": 40.7830603,
+        "longitude": -73.97124880000001
+    },
+    {
+        "index": 0,
+        "name": "Zurich",
+        "latitude": 47.376888,
+        "longitude": 8.541694
+    },
+    {
+        "index": 0,
+        "name": "Hamptons",
+        "latitude": 40.933050,
+        "longitude": -72.317220
+    },
+    {
+        "index": 0,
+        "name": "Malibu",
+        "latitude": 34.025921,
+        "longitude": -118.779755
+    },
+    {
+        "index": 0,
+        "name": "Hamptons",
+        "latitude": 40.933050,
+        "longitude": -72.317220
+    },
+    {
+        "index": 0,
+        "name": "Paris",
+        "latitude": 48.856613,
+        "longitude": 2.352222
+    },
+    {
+        "index": 0,
+        "name": "Singapore",
+        "latitude": 1.352083,
+        "longitude": 103.819839
+    },
+    {
+        "index": 0,
+        "name": "Oslo",
+        "latitude": 59.913868,
+        "longitude": 10.752245
+    },
+    {
+        "index": 0,
+        "name": "Geneva",
+        "latitude": 46.204391,
+        "longitude": 6.143158
+    },
+    {
+        "index": 0,
+        "name": "Copenhagen",
+        "latitude": 55.676098,
+        "longitude": 12.568337
+    },
+    {
+        "index": 0,
+        "name": "Tel Aviv",
+        "latitude": 32.085300,
+        "longitude": 34.781769
+    },
+    {
+        "index": 0,
+        "name": "Ascot",
+        "latitude": 41.413605,
+        "longitude": -95.898346
+    },
+    {
+        "index": 0,
+        "name": "Bray",
+        "latitude": 53.200905,
+        "longitude": -6.111074
+    },
+    {
+        "index": 0,
+        "name": "Monaco",
+        "latitude": 43.738419,
+        "longitude": 7.424616
+    }
+    
+]

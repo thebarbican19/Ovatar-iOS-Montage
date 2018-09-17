@@ -26,6 +26,8 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
 
+    self.imageobj = [OImageObject sharedInstance];
+
     self.dataobj = [[ODataObject alloc] init];
     self.dataobj.delegate = self;
     //self.cloudServiceController = [SKCloudServiceController new];
@@ -281,19 +283,45 @@
         
     }
     else if ([action.key isEqualToString:@"purchase"]) {
-        //NSDictionary *dictionary = [[NSFileManager defaultManager] attributesOfFileSystemForPath:APP_DOCUMENTS error:nil];
-        //double storagesize = [[dictionary objectForKey:NSFileSystemFreeSize] doubleValue];
-        //NSLog(@"purchase with key : %f" ,storagesize);;
-
-        //if (IS_IPHONE_X)
-        [self.delegate viewPurchaseInitialiseWithIdentifyer:@"com.ovatar.watermarkremove_tier_1"];
+        BOOL __block someoneisdoingwell = false;
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"Locations" ofType:@"json"];
+        NSArray *content = [NSJSONSerialization JSONObjectWithData:[NSData dataWithContentsOfFile:path] options:0 error:nil];
+        
+        [self.imageobj imagesFromAlbum:nil limit:25 completion:^(NSArray *images) {
+            for (NSDictionary *item in [images.firstObject objectForKey:@"images"]) {
+                PHAsset *asset = [item objectForKey:@"asset"];
+                for (NSDictionary *place in content) {
+                    float latitude = [[place objectForKey:@"latitude"] floatValue];
+                    float longitude = [[place objectForKey:@"longitude"] floatValue];
+                    CLLocation *location = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
+                    CLLocationDistance distance = [asset.location distanceFromLocation:location];
+                    float miles = (distance / 1609.344);
+                    if (miles <= 1.3) {
+                        someoneisdoingwell = true;
+                        break;
+                        
+                    }
+                    
+                    NSLog(@"\nPlace: %@ distance : %fm" ,[place objectForKey:@"name"] ,(distance / 1609.344));
+                    
+                }
+                
+            }
+            
+        }];
+       
+        NSString *identifyer = nil;
+        if (someoneisdoingwell) identifyer = @"com.ovatar.watermarkremove_tier_2";
+        else identifyer = @"com.ovatar.watermarkremove_tier_1";
+        
+        [self.delegate viewPurchaseInitialiseWithIdentifyer:identifyer];
         
     }
     else {
         NSString *name = [NSString stringWithFormat:@"montage #%d" ,self.dataobj.storyExports + 1];
         NSDictionary *data = @{@"name":name};
         [self.dataobj storyCreateWithData:data completion:^(NSString *key, NSError *error) {
-            [self.dataobj entryCreate:key asset:nil completion:^(NSError *error, NSString *key) {
+            [self.dataobj entryCreate:key assets:nil completion:^(NSError *error, NSArray *keys) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.delegate viewPresentSubviewWithIndex:1 animate:true];
                     

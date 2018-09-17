@@ -92,20 +92,25 @@
     self.image = [UIImage imageWithData:[self.data objectForKey:@"image"]];
     self.filename = [NSString stringWithFormat:@"/%@.mov" ,[self.data objectForKey:@"key"]];
     self.video = [NSURL fileURLWithPath:[APP_DOCUMENTS stringByAppendingString:self.filename]];
+    self.player = [AVPlayer playerWithURL:self.video];
     self.timestamp = [self.data objectForKey:@"timestamp"];
     self.key = [self.data objectForKey:@"key"];
     self.assetid = [self.data objectForKey:@"assetid"];
     
     if (self.assetid.length > 2) {
-        if (self.video != nil) {
-            [self.cellPlayer setPlayer:[AVPlayer playerWithURL:self.video]];
+        if (self.player.error == nil) {
+            [self.cellPlayer setPlayer:self.player];
             [self.cellPlayer.player setMuted:true];
+            [self.cellPlayer.view setHidden:false];
+            [self.cellLoader stopAnimation];
 
         }
         else {
             [self.cellPlayer setPlayer:nil];
             [self.cellPlayer.player pause];
-
+            [self.cellPlayer.view setHidden:true];
+            [self.cellLoader startAnimation];
+            
         }
         
         if (animated) {

@@ -46,7 +46,7 @@
 -(void)storyExport:(NSString *)story completion:(void (^)(NSError *error))completion;
 -(void)storyAppendSpeed:(NSString *)story speed:(float)speed completion:(void (^)(NSError *error))completion;
 
--(void)entryCreate:(NSString *)story asset:(PHAsset *)asset completion:(void (^)(NSError *error, NSString *key))completion;
+-(void)entryCreate:(NSString *)story assets:(NSArray *)assets completion:(void (^)(NSError *error, NSArray *keys))completion;
 -(void)entryAppendWithImageData:(PHAsset *)asset animated:(BOOL)animated entry:(NSString *)entry completion:(void (^)(NSError *error))completion;
 -(void)entryAppendOrderSource:(NSDictionary *)source replace:(NSDictionary *)replace;
 -(void)entryAppendAnimation:(NSString *)entry asset:(PHAsset *)asset completion:(void (^)(NSError *error, BOOL enabled))completion;

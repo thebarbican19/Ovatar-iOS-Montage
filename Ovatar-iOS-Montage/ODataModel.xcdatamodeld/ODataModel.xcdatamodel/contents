@@ -8,12 +8,12 @@
         <attribute name="created" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="duration" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="export" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="filedirectory" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="key" attributeType="String" syncable="YES"/>
         <attribute name="latitude" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="limitduration" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Float" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="order" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="source" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="story" attributeType="String" syncable="YES"/>
         <attribute name="type" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="updated" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>

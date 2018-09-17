@@ -62,41 +62,15 @@
             [cell.cellImage setImage:nil];
             [cell.cellImage setBackgroundColor:UIColorFromRGB(0x464655)];
             [cell.cellLoader startAnimation];
+            [cell.cellPlayer.view setHidden:true];
             
         }
-        else {
+        else if ([self.dataobj entryWithKey:cell.key] != nil) {
             [self.items replaceObjectAtIndex:cell.index.row withObject:[self.dataobj entryWithKey:cell.key]];
             [cell setup:[self.items objectAtIndex:cell.index.row] animated:true];
             [cell.cellLoader stopAnimation];
             [cell.cellPlayer.player play];
-            
-            if ([cell.index row] >= ([self.items count] - 1)) {
-                if (cell.assetid.length > 2) {
-                    [self.dataobj entryCreate:self.dataobj.storyActiveKey asset:nil completion:^(NSError *error, NSString *key) {
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [self.collectionView performBatchUpdates:^{
-                                [self.items addObject:[self.dataobj entryWithKey:key]];
-                                [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:cell.index.row + 1 inSection:cell.index.section]]];
-                                
-                            } completion:nil];
-                            
-                        }];
-                        
-//                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-//                            ODayCell *lastcell = (ODayCell *)self.collectionView.visibleCells.lastObject;
-//                            [self viewCollectionScroll:lastcell.index];
-//
-//                        }];
-                        
-                    }];
-                    
-                }
-        
-            }
-            else {
-                NSLog(@"dont insert new item");
-
-            }
+            [cell.cellPlayer.view setHidden:false];
 
         }
         
@@ -233,7 +207,10 @@
                 [self.items removeObjectAtIndex:self.active.index.row];
                 [self.collectionView deleteItemsAtIndexPaths:@[day.index]];
                 
-            } completion:nil];
+            } completion:^(BOOL finished) {
+                [self scrollViewDidScroll:self.collectionView];
+                
+            }];
 
         }];
         
@@ -243,7 +220,6 @@
 
 -(void)collectionToggleAnimation:(ODayCell *)day {
     [self.imageobj imageReturnFromAssetKey:day.assetid completion:^(PHAsset *asset) {
-        NSLog(@"asset: %@" ,asset);
         [self.dataobj entryAppendAnimation:day.key asset:asset completion:^(NSError *error, BOOL enabled) {
             if (error.code == 200) {
                 if (enabled) {

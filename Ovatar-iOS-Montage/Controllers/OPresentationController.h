@@ -37,6 +37,7 @@
 @property (nonatomic, strong) OTabbarView *viewTabbar;
 
 @property (nonatomic, strong) ODataObject *dataobj;
+@property (nonatomic, strong) OImageObject *imageobj;
 @property (nonatomic, strong) MPMediaItem *song;
 @property (nonatomic, strong) AVURLAsset *soundtrack;
 

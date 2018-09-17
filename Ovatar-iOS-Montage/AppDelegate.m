@@ -41,7 +41,7 @@
     if (![self.data boolForKey:@"app_installed"]) {
         [self.data setBool:true forKey:@"app_installed"];
         [self.mixpanel track:@"App Installed" properties:nil];
-        if (![self applicationUserData]) {
+        if ([self applicationUserData]) {
             [self.mixpanel identify:self.mixpanel.distinctId];
             [self.mixpanel.people set:@{@"$first_name":[[self applicationUserData] objectForKey:@"name"],
                                         @"Gender":[[self applicationUserData] objectForKey:@"sex"]}];
@@ -311,8 +311,22 @@
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name LIKE[c] %@" ,word.capitalizedString];
         NSDictionary *output = [[content filteredArrayUsingPredicate:predicate] firstObject];
         if (output != nil) {
-            [user setObject:[output objectForKey:@"name"] forKey:@"name"];
-            [user setObject:[self.data objectForKey:@"ovatar_email"] forKey:@"email"];
+            if ([output objectForKey:@"name"] != nil) {
+                [user setObject:[output objectForKey:@"name"] forKey:@"name"];
+                
+            }
+            if ([self.data objectForKey:@"ovatar_email"] != nil) {
+                [user setObject:[self.data objectForKey:@"ovatar_email"] forKey:@"email"];
+
+            }
+            if ([self.data objectForKey:@"ovatar_town"] != nil) {
+                [user setObject:[self.data objectForKey:@"ovatar_town"] forKey:@"city"];
+                
+            }
+            if ([self.data objectForKey:@"ovatar_country"] != nil) {
+                [user setObject:[self.data objectForKey:@"ovatar_country"] forKey:@"country"];
+            
+            }
             if ([[output objectForKey:@"sex"] isEqualToString:@"M"]) [user setObject:@"Male" forKey:@"sex"];
             else [user setObject:@"Female" forKey:@"sex"];
             break;

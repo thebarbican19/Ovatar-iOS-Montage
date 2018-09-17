@@ -34,10 +34,12 @@
 
 @property (nonatomic, strong) OImageObject *imageobj;
 @property (nonatomic, strong) ODataObject *dataobj;
+@property (nonatomic, strong) NSUserDefaults *data;
 @property (nonatomic, strong) OExportObject *exportobj;
 @property (nonatomic, strong) NSOperationQueue *queue;
 @property (nonatomic, strong) AppDelegate *appdel;
 @property (nonatomic, strong) OPaymentObject *payment;
+@property (nonatomic, strong) CLGeocoder *geocoder;
 @property (nonatomic, strong) Mixpanel *mixpanel;
 @property (nonatomic, strong) UINotificationFeedbackGenerator *generator;
 

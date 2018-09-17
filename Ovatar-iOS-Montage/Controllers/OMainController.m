@@ -41,12 +41,16 @@
         self.paddingbottom = self.view.safeAreaInsets.bottom;
         
     }
-        
+    
+    float videoscale = (self.viewContainer.bounds.size.width - 60.0) / self.exportobj.videoresize.width;
+    float videoheight = self.exportobj.videoresize.height * videoscale;
+    float videowidth = self.exportobj.videoresize.width * videoscale;
+    
     self.viewContainer.frame = CGRectMake(0.0, self.paddingtop, self.view.bounds.size.width, self.view.bounds.size.height - self.paddingtop);
     self.viewContainer.contentSize = CGSizeMake(self.view.bounds.size.width * 3, self.viewContainer.bounds.size.height);
     self.viewPermissions.view.frame = CGRectMake(self.viewContainer.bounds.size.width * 0, 0.0, self.viewContainer.bounds.size.width, self.viewContainer.bounds.size.height - self.paddingbottom);
-    self.viewStory.view.frame = CGRectMake(self.viewContainer.bounds.size.width * 1, self.viewContainer.frame.origin.y, self.viewContainer.bounds.size.width, self.viewContainer.bounds.size.height - 64.0);
-    self.viewStoriesLayout.itemSize = CGSizeMake(self.viewContainer.bounds.size.width - 70.0, self.viewStory.collectionView.bounds.size.height - 120.0);
+    self.viewStory.view.frame = CGRectMake(self.viewContainer.bounds.size.width * 1, self.viewContainer.frame.origin.y - 14.0, self.viewContainer.bounds.size.width, videoheight + 60.0);
+    self.viewStoriesLayout.itemSize = CGSizeMake(videowidth, videoheight);
     self.viewHeader.frame = CGRectMake(0.0, self.viewContainer.frame.origin.y, self.view.bounds.size.width, 64.0);
     self.viewPresentation.view.frame = CGRectMake(self.viewContainer.bounds.size.width * 2, 64.0, self.viewContainer.bounds.size.width, self.viewContainer.bounds.size.height - (60.0 + self.paddingbottom));
     self.viewSettings.view.frame = CGRectMake(self.viewContainer.bounds.size.width * 2, self.viewContainer.frame.origin.y, self.viewContainer.bounds.size.width, self.viewContainer.bounds.size.height - 64.0);
@@ -66,10 +70,9 @@
                         NSString *name = [NSString stringWithFormat:@"montage #%d" ,self.dataobj.storyExports + 1];
                         NSDictionary *data = @{@"name":name};
                         [self.dataobj storyCreateWithData:data completion:^(NSString *key, NSError *error) {
-                            [self.dataobj entryCreate:key asset:nil completion:^(NSError *error, NSString *key) {
+                            [self.dataobj entryCreate:key assets:nil completion:^(NSError *error, NSArray *keys) {
                                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                     [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
-                                    [self viewPresentSubviewWithIndex:1 animate:animateview];
                                     
                                 }];
                                 
@@ -96,6 +99,38 @@
                             [self.viewGallery.collectionView reloadData];
                             
                             [PHPhotoLibrary.sharedPhotoLibrary registerChangeObserver:self];
+                            
+                            [self viewPresentSubviewWithIndex:1 animate:animateview];
+
+                        }];
+                        
+                        [queue addOperationWithBlock:^{
+                            for (NSDictionary *item in [images.firstObject objectForKey:@"images"]) {
+                                PHAsset *asset = [item objectForKey:@"asset"];
+                                if (asset.location != nil) {
+                                    [self.geocoder reverseGeocodeLocation:asset.location completionHandler:^(NSArray *placemarks, NSError *error) {
+                                        CLPlacemark *placemark = placemarks.lastObject;
+                                        NSString *placentown = @"";
+                                        NSString *placencountry = @"";
+                                        
+                                        if (placemark.subLocality != nil) placentown = placemark.subLocality;
+                                        else if (placemark.locality != nil) placentown = placemark.locality;
+                                        if (placemark.country != nil) placencountry = placemark.country;
+                                        
+                                        [self.data setObject:placentown forKey:@"ovatar_town"];
+                                        [self.data setObject:placencountry forKey:@"ovatar_country"];
+                                        [self.data synchronize];
+                                        
+                                        [self.mixpanel.people set:@{@"$city":placentown}];
+                                        NSLog(@"User Location Updated: %@, %@" ,placentown ,placencountry);
+                                        
+                                    }];
+                                    
+                                    break;
+                                    
+                                }
+                                
+                            }
                             
                         }];
 
@@ -166,6 +201,10 @@
     
     self.view.backgroundColor = UIColorFromRGB(0xF4F6F8);
     
+    self.data = [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
+
+    self.geocoder = [[CLGeocoder alloc] init];
+
     self.generator = [[UINotificationFeedbackGenerator alloc] init];
 
     self.appdel = (AppDelegate*) [[UIApplication sharedApplication] delegate];
@@ -206,7 +245,7 @@
     self.viewStoriesLayout = [[OStoriesLayout alloc] init];
     self.viewStoriesLayout.minimumLineSpacing = 0.0;
     self.viewStoriesLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    self.viewStoriesLayout.sectionInset = UIEdgeInsetsMake(40.0, 20.0, 80.0, 20.0);
+    self.viewStoriesLayout.sectionInset = UIEdgeInsetsMake(60.0, 20.0, 20.0, 20.0);
     
     self.viewStory = [[OEntryController alloc] initWithCollectionViewLayout:self.viewStoriesLayout];
     self.viewStory.delegate = self;
@@ -371,8 +410,7 @@
             [self.viewHeader setTitle:NSLocalizedString(@"Main_Support_Title", nil)];
             [self.viewHeader setBackbutton:true];
             [self.viewHeader setup:@[] animate:animate];
-            
-            [self.viewFeeback.viewInput becomeFirstResponder];
+            [self.viewFeeback.viewEmail becomeFirstResponder];
             
         }
         
@@ -483,7 +521,7 @@
         }
         
         [self.exportobj setVideoframes:29.96];
-        [self.exportobj setVideoseconds:0.9];
+        [self.exportobj setVideoseconds:1.3];
         [self.exportobj setVideoresize:size];
         [self.exportobj exportMontage:self.dataobj.storyActiveKey completion:^(NSString *file, NSError *error) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -521,78 +559,78 @@
 }
 
 -(void)viewGallerySelectedImage:(NSArray *)assets {
-    [self.viewStory viewUpdateEntry:self.viewStory.active loading:true];
+    int originalcount = (int)[[self.dataobj storyEntries:self.dataobj.storyActiveKey] count];
+    NSMutableArray *append = [[NSMutableArray alloc] initWithArray:assets];
     
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    queue.qualityOfService = NSQualityOfServiceUtility;
-    queue.maxConcurrentOperationCount = 1;
-    
-    for (int i = 0; i < assets.count; i++) {
-        [queue addOperationWithBlock:^{
-            [self.imageobj imageCreateEntryFromAsset:assets.firstObject animate:true key:self.selected.key completion:^(NSError *error, BOOL animated) {
-                if (error == nil || error.code == 200) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self.viewStory viewUpdateEntry:self.selected loading:true];
+    NSLog(@"first item %@" ,assets);
+    [self.viewStory viewUpdateEntry:self.selected loading:true];
+    if (self.selected != nil) {
+        PHAsset *asset = append.firstObject;
+        NSString *key = self.selected.key;
+        [self.dataobj entryAppendWithImageData:asset animated:true entry:key completion:^(NSError *error) {
+            [self.imageobj imageCreateEntryFromAsset:asset animate:true key:key completion:^(NSError *error, BOOL animated) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    if (error.code == 200 || error == nil) {
+                        NSLog(@"create story in selected : %@ in cell %@" ,error ,self.selected.key);
+                        [self.viewStory viewUpdateEntry:self.selected loading:false];
+                        [self.viewStory viewEditorDidScroll:self.selected];
+                        [self.viewStory setActive:self.selected];
+                        [self setSelected:nil];
                         
-                    }];
-                    
-                    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
-                    dispatch_after(delay, dispatch_get_main_queue(), ^(void){
-                        [self.dataobj entryAppendWithImageData:assets.firstObject animated:true entry:self.selected.key completion:^(NSError *error) {
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                [self.viewStory viewUpdateEntry:self.selected loading:false];
-                                [self.viewStory viewEditorDidScroll:self.selected];
-                                [self setSelected:nil];
-                                
-                            }];
+                        dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC));
+                        dispatch_after(delay, dispatch_get_main_queue(), ^(void) {
+                            [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
+                            
+                        });
 
-                        }];
+                    }
+                    else {
+                        [self viewPresentError:error.localizedDescription];
+                        [self.viewStory viewUpdateEntry:self.selected loading:false];
                         
-                    });
-
-                }
-                else {
-                    NSLog(@"error: %@" ,error);
-                    //[self.viewNotification notificationPresentWithTitle:error.domain type:ONotificationTypeError];
+                    }
                     
-                }
-                
+                }];
+            
             }];
             
         }];
         
+        [append removeObjectAtIndex:0];
+    
     }
     
-    if (assets.count > 1) {
-        NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-        queue.qualityOfService = NSQualityOfServiceUtility;
-        queue.maxConcurrentOperationCount = 1;
-        
-        for (int i = 1; i < assets.count; i++) {
-            [queue addOperationWithBlock:^{
-                NSLog(@"adding: %@" ,[assets objectAtIndex:i]);
-                [self.dataobj entryCreate:self.dataobj.storyActiveKey asset:[assets objectAtIndex:i] completion:^(NSError *error, NSString *key) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        if (error.code == 200 || error == nil) {
-                            [self.viewStory.collectionView performBatchUpdates:^{
-                                [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
-                                NSLog(@"[self.dataobj entryWithKey:key] %@" ,[self.dataobj entryWithKey:key]);
-                                //[self.viewStory.items addObject:[self.dataobj entryWithKey:key]];
-                                //[self.viewStory.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.viewStory.items.count inSection:0]]];
+    if (append.count > 0) {
+        [self.dataobj entryCreate:self.dataobj.storyActiveKey assets:append completion:^(NSError *error, NSArray *keys) {
+            for (int i = 0; i < keys.count; i++) {
+                NSString *key = [keys objectAtIndex:i];
+                NSDictionary *entry = [self.dataobj entryWithKey:key];
+                [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
+                [self.imageobj imageReturnFromAssetKey:[entry objectForKey:@"assetid"] completion:^(PHAsset *asset) {
+                    if (asset != nil) {
+                        [self.imageobj imageCreateEntryFromAsset:asset animate:true key:key completion:^(NSError *error, BOOL animated) {
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                NSIndexPath *index = [NSIndexPath indexPathForRow:originalcount + i inSection:0];
+                                ODayCell *day = (ODayCell *)[self.viewStory.collectionView cellForItemAtIndexPath:index];
                                 
-                            } completion:nil];
+                                [self.viewStory viewUpdateEntry:day loading:true];
+                                [self.dataobj entryAppendWithImageData:asset animated:true entry:key completion:^(NSError *error) {
+                                    [self.viewStory viewUpdateEntry:day loading:false];
+                                    
+                                }];
+                                
+                            }];
                             
-                        }
+                        }];
                         
-                    }];
+                    }
+                    else NSLog(@"no asset found");
                     
                 }];
-                
-            }];
-
-        }
-        
-        //[self.viewStory.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.viewStory.items.count inSection:0]]];
+            
+            }
+            
+        }];
         
     }
     

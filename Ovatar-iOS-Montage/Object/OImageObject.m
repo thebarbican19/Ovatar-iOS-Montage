@@ -262,31 +262,9 @@
     
 }
 
--(CVPixelBufferRef)pixelBufferFromCGImage: (CGImageRef) image {
-    CGSize frameSize = CGSizeMake(CGImageGetWidth(image), CGImageGetHeight(image));
-    CVPixelBufferRef pixelBuffer = NULL;
-    CVReturn status = CVPixelBufferCreate(kCFAllocatorDefault, frameSize.width, frameSize.height, kCVPixelFormatType_32BGRA, nil, &pixelBuffer);
-    if (status != kCVReturnSuccess) {
-        return NULL;
-    }
-    
-    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
-    void *data = CVPixelBufferGetBaseAddress(pixelBuffer);
-    CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(data, frameSize.width, frameSize.height, 8, CVPixelBufferGetBytesPerRow(pixelBuffer), rgbColorSpace, (CGBitmapInfo) kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-    CGContextDrawImage(context, CGRectMake(0, 0, CGImageGetWidth(image), CGImageGetHeight(image)), image);
-    
-    CGColorSpaceRelease(rgbColorSpace);
-    CGContextRelease(context);
-    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
-    
-    return pixelBuffer;
-    
-}
-
 -(void)imagesFromAlbum:(NSString *)album limit:(int)limit completion:(void (^)(NSArray *images))completion {
     NSMutableArray *images = [[NSMutableArray alloc] init];
-    NSMutableArray *dates = [[NSMutableArray alloc] init];
+    //NSMutableArray *dates = [[NSMutableArray alloc] init];
     NSMutableArray *sections = [[NSMutableArray alloc] init];
 
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
@@ -296,43 +274,14 @@
     PHFetchResult *result = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:options];
     [result enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         PHAsset *asset = (PHAsset *)obj;
+        if (limit == 0 || limit > images.count) {
+            [images addObject:@{@"asset":asset, @"section":@""}];
         
-        /*
-        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-        NSDateComponents *components = [calendar components:NSCalendarUnitYear|NSCalendarUnitWeekOfYear fromDate:asset.creationDate];
-        components.day = 0;
-        components.hour = 0;
-        components.minute = 0;
-        components.second = 0;
-        
-        NSString *datename = [NSString stringWithFormat:@"%d-%d"  ,(int)components.year,(int)components.weekOfYear];
-        
-        if (![dates containsObject:datename]) [dates addObject:datename];
-        */
-            
-        [images addObject:@{@"asset":asset, @"section":@""}];
+        }
 
     }];
     
     [sections addObject:@{@"images":images, @"title":@"Camera Roll"}];
-    /*
-    for (NSString *date in dates) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"section == %@" ,date];
-        NSArray *filtered = [images filteredArrayUsingPredicate:predicate];
-        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-        formatter.dateFormat = @"YYYY-ww";
-        
-        NSDateFormatter *formatteroutput = [[NSDateFormatter alloc] init];
-        formatteroutput.dateFormat = @"d MMMM";
- 
-        NSString *startdate = [formatteroutput stringFromDate:[formatter dateFromString:date]];
-        if ([filtered count] > 0) {
-            [sections addObject:@{@"images":filtered, @"title":startdate}];
-            
-        }
-        
-    }
-    */
     
     completion(sections);
     

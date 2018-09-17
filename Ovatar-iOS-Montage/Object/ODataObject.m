@@ -164,6 +164,14 @@
         
     }
     
+    if ([[entrys.lastObject objectForKey:@"assetid"] length] > 0) {
+        [self entryCreate:self.storyActiveKey assets:nil completion:^(NSError *error, NSArray *keys) {
+            [output addObject:[self entryWithKey:keys.firstObject]];
+            
+        }];
+        
+    }
+    
     return output;
     
 }
@@ -387,35 +395,55 @@
     
 }
 
--(void)entryCreate:(NSString *)story asset:(PHAsset *)asset completion:(void (^)(NSError *error, NSString *key))completion {
+-(void)entryCreate:(NSString *)story assets:(NSArray *)assets completion:(void (^)(NSError *error, NSArray *keys))completion {
+    NSMutableArray *added = [[NSMutableArray alloc] init];
+    int created = 0.0;
     if ([self storyWithKey:story] == nil) {
         completion([NSError errorWithDomain:@"Story does not exist" code:404 userInfo:nil], nil);
 
     }
     else {
-        Entry *newentry = [[Entry alloc] initWithEntity:self.entry insertIntoManagedObjectContext:self.context];
-        newentry.story = story;
-        newentry.key = self.uniquekey;
-        newentry.export = @"";
-        newentry.updated = [NSDate date];
-        newentry.created = [NSDate date];
-        if (asset == nil) newentry.assetid = @"";
-        else {
-            newentry.assetid = asset.localIdentifier;
-            newentry.animate = true;
-            newentry.latitude = asset.location.coordinate.latitude;
-            newentry.longitude = asset.location.coordinate.longitude;
-            newentry.captured = asset.creationDate;
-            newentry.duration = asset.duration;
-            newentry.limitduration = ENTRY_LIMIT_DURATION;
-            newentry.audio = false;
-            newentry.type = [self entryAssetType:asset];
+        if (assets != nil) {
+            for (PHAsset *asset in assets) {
+                created += 1;
+                Entry *newentry = [[Entry alloc] initWithEntity:self.entry insertIntoManagedObjectContext:self.context];
+                newentry.story = story;
+                newentry.key = self.uniquekey;
+                newentry.export = @"";
+                newentry.updated = [NSDate date];
+                newentry.created = [NSDate dateWithTimeIntervalSinceNow:10 * created];
+                newentry.assetid = asset.localIdentifier;
+                newentry.animate = true;
+                newentry.latitude = asset.location.coordinate.latitude;
+                newentry.longitude = asset.location.coordinate.longitude;
+                newentry.captured = asset.creationDate;
+                newentry.duration = asset.duration;
+                newentry.limitduration = ENTRY_LIMIT_DURATION;
+                newentry.audio = false;
+                newentry.filedirectory = @"";
+                newentry.type = [self entryAssetType:asset];
+
+                [added addObject:newentry.key];
+                
+            }
             
         }
+        else {
+            Entry *newentry = [[Entry alloc] initWithEntity:self.entry insertIntoManagedObjectContext:self.context];
+            newentry.story = story;
+            newentry.key = self.uniquekey;
+            newentry.export = @"";
+            newentry.updated = [NSDate date];
+            newentry.created = [NSDate dateWithTimeIntervalSinceNow:10 * created];
+            newentry.assetid = @"";
+            
+            [added addObject:newentry.key];
 
+        }
+        
         NSError *saveerr;
         if ([self.context save:&saveerr]) {
-            completion([NSError errorWithDomain:@"Entry saved" code:200 userInfo:nil], [newentry key]);
+            completion([NSError errorWithDomain:@"Entry saved" code:200 userInfo:nil], added);
             
         }
         else completion(saveerr, nil);
@@ -442,7 +470,8 @@
                 existing.limitduration = ENTRY_LIMIT_DURATION;
                 existing.audio = false;
                 existing.type = [self entryAssetType:asset];
-                
+                existing.filedirectory = @"";
+
                 [self.context save:nil];
                 
                 completion([NSError errorWithDomain:@"Entry updated" code:200 userInfo:nil]);
