@@ -14,9 +14,8 @@
 #import "ODataObject.h"
 #import "OPaymentObject.h"
 #import "OLoaderView.h"
-#import "OTickerLabel.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UNUserNotificationCenterDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) NSUserDefaults *data;
@@ -25,18 +24,13 @@
 @property (strong, nonatomic) ODataObject *model;
 @property (strong, nonatomic) OPaymentObject *payment;
 @property (strong, nonatomic) UIView *splash;
-@property (strong, nonatomic) OLoaderView *loader;
 @property (assign) float padding;
-@property (strong, nonatomic) NSArray *lassets;
-@property (strong, nonatomic) NSString *ltext;
-@property (strong, nonatomic) OTickerLabel *ticker;
 
 -(int)applicationTimer;
 -(NSString *)applicationTimerFormatted;
 -(NSDictionary *)applicationUserData;
 
 -(void)applicationRatePrompt;
--(void)applicationLoadingScreen:(BOOL)loading;
 
 @end
 

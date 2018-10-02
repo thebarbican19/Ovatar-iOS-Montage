@@ -30,16 +30,19 @@
 }
 
 -(void)exportMontage:(NSString *)story completion:(void (^)(NSString *file, NSError *error))completion {
+    self.story = story;
     if (CGSizeEqualToSize(CGSizeZero, self.videoresize)) {
         completion(nil, [NSError errorWithDomain:@"no size specifyed" code:402 userInfo:nil]);
         
     }
     else {
+        NSMutableDictionary *storydata = [[NSMutableDictionary alloc] init];
+        [storydata addEntriesFromDictionary:[self.dataobj storyWithKey:story]];
+
         AVMutableComposition *mutableComposition = [AVMutableComposition composition];
         AVMutableCompositionTrack *videoCompositionTrack = [mutableComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
         
         NSMutableArray *instructions = [[NSMutableArray alloc] init];
-        
         CMTime videotime = kCMTimeZero;
         for (NSDictionary *item in [self.dataobj storyEntries:story]) {
             NSString *filename = [NSString stringWithFormat:@"%@/%@.mov", APP_DOCUMENTS ,[item objectForKey:@"key"]];
@@ -63,7 +66,7 @@
                 
                 AVMutableVideoCompositionLayerInstruction *videolayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoAssetTrack];
                 [videolayerInstruction setTransform:[self exportTransform:asset] atTime:kCMTimeZero];
-                
+
                 CMTime videoduration = kCMTimeZero;
                 if (self.videoseconds > CMTimeGetSeconds(videoAssetTrack.timeRange.duration)) {
                     videoduration = CMTimeMakeWithSeconds(self.videoseconds, self.videoframes);
@@ -83,6 +86,30 @@
             
         }
         
+        if ([self.dataobj musicActive] != nil) {
+            NSLog(@"music %@" ,self.dataobj.musicActive);
+            if ([[self.dataobj.musicActive objectForKey:@"type"] isEqualToString:@"bundle"]) {
+                NSString *soundtrack = [[NSBundle mainBundle] pathForResource:[self.dataobj.musicActive objectForKey:@"file"] ofType:@"mp3"];
+                AVMutableCompositionTrack *soundtrackCompositionTrack = [mutableComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+                AVAsset *soundtrackAsset = [AVAsset assetWithURL:[NSURL fileURLWithPath:soundtrack]];
+                AVAssetTrack *soundtrackAssetTrack = [[soundtrackAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
+
+                [soundtrackCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videotime) ofTrack:soundtrackAssetTrack atTime:kCMTimeZero error:nil];
+                
+            }
+            else {
+                NSString *soundtrack = [self.dataobj.musicActive objectForKey:@"file"];
+                AVMutableCompositionTrack *soundtrackCompositionTrack = [mutableComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+                AVURLAsset *soundtrackAsset = [AVURLAsset URLAssetWithURL:[NSURL URLWithString:soundtrack] options:nil];
+                AVAssetTrack *soundtrackAssetTrack = [[soundtrackAsset tracksWithMediaType:AVMediaTypeAudio] firstObject];
+
+                [soundtrackCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videotime) ofTrack:soundtrackAssetTrack atTime:kCMTimeZero error:nil];
+                
+            }
+            
+        }
+        
+        
         NSString *output = [NSString stringWithFormat:@"%@/%@_export.mov", APP_DOCUMENTS ,story];
         if ([[NSFileManager defaultManager] fileExistsAtPath:output]) {
             [[NSFileManager defaultManager] removeItemAtPath:output error:nil];
@@ -93,10 +120,7 @@
         mutableVideoComposition.instructions = instructions;
         mutableVideoComposition.frameDuration = CMTimeMake(1.0, self.videoframes);
         mutableVideoComposition.renderSize =  CGSizeMake(self.videoresize.width, self.videoresize.height);;
-        if (self.watermark != nil) {
-            mutableVideoComposition.animationTool = [self exportWatermark:self.watermark image:[UIImage imageNamed:@"export_watermark"]];
-            
-        }
+        mutableVideoComposition.animationTool = [self exportWatermark:storydata];
         
         self.exporttimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(exportStatus:) userInfo:nil repeats:true];
         self.exporter = [[AVAssetExportSession alloc] initWithAsset:mutableComposition presetName:AVAssetExportPresetHighestQuality];
@@ -124,6 +148,21 @@
             }
             
         }];
+        
+    }
+    
+}
+
+-(void)exportTerminate {
+    NSString *output = [NSString stringWithFormat:@"%@/%@_export.mov", APP_DOCUMENTS ,self.story];
+    if (self.story != nil) {
+        [self.exporter cancelExport];
+        [self setStory:nil];
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath:output]) {
+            [[NSFileManager defaultManager] removeItemAtPath:output error:nil];
+            
+        }
         
     }
     
@@ -213,18 +252,32 @@
     
 }
 
--(AVVideoCompositionCoreAnimationTool *)exportWatermark:(NSString *)text image:(UIImage *)image {
+-(AVVideoCompositionCoreAnimationTool *)exportWatermark:(NSDictionary *)data {
+    UIImage *wimage = nil;
+    NSString *wtext = @"";
+    if ([[data objectForKey:@"watermark"] isEqualToString:@"watermark_default"]) {
+        wimage = [UIImage imageNamed:@"watermark_default"];
+        wtext = @"ovatar.io/montage";
+        
+    }
+    else if ([[data objectForKey:@"watermark"] isEqualToString:@"watermark_title"]) {
+        wimage = nil;
+        wtext = [data objectForKey:@"name"];
+        
+    }
+    
     CATextLayer *watermarktext = [[CATextLayer alloc] init];
-    [watermarktext setFont:@"Avenir-Medium"];
+    [watermarktext setFont:@"Avenir-Black"];
     [watermarktext setFontSize:36];
-    [watermarktext setFrame:CGRectMake(70.0, 0.0, self.videoresize.width, 70.0)];
-    [watermarktext setString:text];
+    if (wimage == nil) [watermarktext setFrame:CGRectMake(30.0, 0.0, self.videoresize.width, 70.0)];
+    else [watermarktext setFrame:CGRectMake(70.0, 0.0, self.videoresize.width, 70.0)];
+    [watermarktext setString:wtext];
     [watermarktext setAlignmentMode:kCAAlignmentLeft];
     [watermarktext setForegroundColor:[[UIColor colorWithWhite:1.0 alpha:0.7] CGColor]];
     [watermarktext setBackgroundColor:[[UIColor clearColor] CGColor]];
     
     CALayer *watermarklogo = [CALayer layer];
-    [watermarklogo setContents:(id)[image CGImage]];
+    [watermarklogo setContents:(id)wimage.CGImage];
     [watermarklogo setFrame:CGRectMake(20.0, 24.0, 40.0, 40.0)];
     [watermarklogo setOpacity:0.8];
     [watermarklogo setContentsGravity:kCAGravityResizeAspect];
@@ -291,7 +344,7 @@
         [imagelayer setMasksToBounds:true];
 
         CABasicAnimation* panning = [CABasicAnimation animationWithKeyPath:@"position"];
-        panning.fromValue = [NSValue valueWithCGPoint:CGPointMake(-20, 0.0)];
+        panning.fromValue = [NSValue valueWithCGPoint:CGPointMake(10, 0.0)];
         panning.toValue = [NSValue valueWithCGPoint:CGPointMake(0.0, 0.0)];
         panning.additive = true;
         

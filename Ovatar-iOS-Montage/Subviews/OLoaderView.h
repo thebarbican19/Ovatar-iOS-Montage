@@ -14,6 +14,7 @@
 @property (nonatomic, strong) CALayer *viewMask;
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) UIImageView *viewImages;
+@property (nonatomic, strong) UILabel *viewPercent;
 
 @property (nonatomic, assign) float speed;
 @property (nonatomic, assign) float scale;
@@ -24,5 +25,6 @@
 @property (nonatomic, strong) OImageObject *imageobj;
 
 -(void)loaderPresentWithImages:(NSArray *)images animated:(BOOL)animated;
+-(void)loaderTerminate;
 
 @end

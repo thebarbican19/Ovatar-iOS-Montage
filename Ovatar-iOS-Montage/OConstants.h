@@ -21,6 +21,15 @@
 
 #define IS_IPHONE (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone)
 #define IS_IPHONE_X (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 812.0f)
+#define IS_IPHONE_XS_MAX (IS_IPHONE && [[UIScreen mainScreen] bounds].size.height == 896.0f)
+
+#define MAIN_CORNER_EDGES 26.0
+#define MAIN_HEADER_HEIGHT 64.0
+#define MAIN_HEADER_MODAL_HEIGHT MAIN_HEADER_HEIGHT + 18.0
+#define MAIN_PLAYBACK_CONTROLS_HEIGHT 90.0
+#define MAIN_PLAYBACK_NAVIGATION_HEIGHT 60.0
+#define MAIN_MODAL_BACKGROUND [UIColorFromRGB(0x464655) colorWithAlphaComponent:0.6]
+#define MAIN_PLAYER_BACKGROUND [UIColorFromRGB(0x202021) colorWithAlphaComponent:0.98]
 
 #define APP_BUNDLE_NAME [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"]
 #define APP_STORE_ID @"1177562048"

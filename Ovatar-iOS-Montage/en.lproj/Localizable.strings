@@ -6,66 +6,94 @@
 //  Copyright © 2018 Ovatar. All rights reserved.
 //
 
+"Onboarding_Title" = "Tell Your Story";
+"Onboarding_Subtitle" = "*montage* by ovatar.io";
+
+"Extension_Shortcut_Capture" = "Capture New";
+"Extension_Shortcut_Todays" = "Add Todays Images";
+
+"Default_Project_Name" = "My Montage #%d";
 
 "Main_Settings_Title" = "Settings";
-"Main_Editor_Title" = "Editor";
 "Main_ImageSelect_Title" = "Select Media";
-"Main_GettingStarted_Title" = "Getting Started";
 "Main_Permissions_Title" = "Permissions";
 "Main_Preview_Title" = "Preview";
-"Main_Support_Title" = "Support";
+"Main_Support_Title" = "Feedback & Support";
+"Main_Music_Title" = "Select Music";
+"Main_Watermark_Title" = "Video Watermark";
 
-"Export_Watermark_Tabbar" = "watermark";
-"Export_Music_Title" = "music";
-"Export_Speed_Title" = "speed";
-"Export_Size_Title" = "size";
 "Export_Saved_Description" = "Your video has been saved to your *Photo Library*. Would you like to share it?"; //Everything in between ** is BOLD
 "Export_Rendered_Sucsessfully" = "complete";
 "Export_Share_Action" = "Share";
 "Export_Restart_Action" = "Create New";
-"Export_Purchase_Action" = "Remove Watermark";
+"Export_Stop_Action" = "Cancel";
+"Export_Rendering_Title" = "Creating Montage...";
+"Export_Rendering_Description" = "*%@*";
 
 "Settings_About_Title" = "*montage* by ovatar.io"; //Everything in between ** is BOLD
 "Settings_About_Subtitle" = "Version %@ Build #%@"; //Version 1.0 Build #1
 "Settings_Item_Share" = "Share";
-"Settings_Item_Support" = "Support";
-"Settings_Item_Ovatar" = "Ovatar.io";
+"Settings_Item_Support" = "Feedback & Support";
+"Settings_Item_Ovatar" = "About Us";
 "Settings_Item_Purchases" = "Restore Subscription";
-"Settings_Share_Text" = "Create a stunning video montages with #montage by ovatar.io";
+"Settings_Subtitle_Title" = "Tap to edit montage name";
+"Settings_Share_Text" = "Tell your story with with #montage by ovatar.io";
 "Settings_ActionSheet_Website" = "Website";
 "Settings_ActionSheet_Instagram" = "Instagram";
 "Settings_ActionSheet_Dismiss" = "Dismiss";
+"Settings_Watermark_None" = "None";
+"Settings_Watermark_Title" = "Montage Name";
+"Settings_Watermark_Default" = "Default";
+"Settings_Music_None" = "No Music";
+"Settings_Music_Custom" = "Add from your Music Library";
+"Settings_Music_Custom_Description" = "DRM Free music from your personal library";
+"Settings_Music_Country" = "Country";
+"Settings_Music_Epic" = "Epic";
+"Settings_Music_Dance" = "Dance";
+"Settings_Music_HipHop" = "Hip Hop";
+"Settings_Music_Artist" = "By %@";
 
-"Entry_LocationUnknown_Label" = "Unknown Location";
-"Entry_Deleted_Label" = "Clip Removed";
-"Entry_Animated_Label" = "Live Photo Animation Enabled";
-"Entry_AnimatDisable_Label" = "Live Photo Animation Disabled";
-"Entry_Empty_Label" = "Add a New Clip";
-
-"Permissions_Gallery_Text" = "Montage first requires access to your photo library, because what are Montages without images or videos.";
-"Permissions_Notifications_Text" = "Allow us to notify you when we create montages for you automatically when memories are made.";
-"Permissions_Allow_Action" = "Allow";
-"Permissions_Update_Action" = "Update Permissions";
+"Permissions_Title_Notifications" = "Create Your Daily Journal";
+"Permissions_Description_Notifications" = "Allow us to remind you to add new moments to your montage everyday, and tell the epic story of the life you lead...";
+"Permissions_Action_Begin" = "Create my first Montage!";
+"Permissions_Action_Allow" = "Allow";
+"Permissions_Action_Update" = "Update Permissions";
+"Permissions_Action_Skip" = "Not Now";
 
 "Subscription_Loading_Title" = "Connecting to store";
+"Subscription_Loading_Description" = "Please wait...";
+"Subscription_PurchaseMonthly_Action" = "%@%.2f Monthly";
 "Subscription_Plan_Title" = "Montage Pro";
+"Subscription_Complete_Title_1" = "Hurrah!";
+"Subscription_Complete_Title_2" = "Noice!";
+"Subscription_Complete_Title_3" = "Wunderbar!";
 "Subscription_Disabled_Error" = "Payments are disabled. You may need to sign in with your Apple ID, or update your payment information";
-"Subscription_Restored_Error" = "Your purchase was restored sucsessfully";
-"Subscription_Purchaesed_Error" = "Thank you for upgrading. You can now export videos watermark free!";
-"Subscription_Deferred_Error" = "This payment requires authentication from a third-party which is been processed";
-"Subscription_Music_Item" = "Add your own music!";
-"Subscription_Watermark_Item" = "Add a location or time watermark, or remove it completely.";
+"Subscription_Sucsess_Title" = "You've gone Pro!";
+"Subscription_Restored_Error" = "Your subscription was restored sucsessfully";
+"Subscription_Purchaesed_Error" = "Thank you for upgrading to *montage pro*. You now have access to *all pro features*";
+"Subscription_Cheapass_Error" = "You now have access to *montage pro*. We only ask you share montage in return for this wonderful gift...";
+"Subscription_Deferred_Error" = "This payment requires authentication from a third-party which is been processed...";
+"Subscription_Promo_Error" = "The promo code is invalid. Sorry, no upgrade for you today.";
+"Subscription_Music_Item" = "Add DRM free music from your personal library";
+"Subscription_Watermark_Item" = "Add custom watermarks, or remove the watermark completely.";
 "Subscription_Speed_Item" = "Customise the length of each clip.";
 "Subscription_Filter_Item" = "Overlay stunning custom filters.";
-"Subscription_Transitions_Item" = "Add smooth transitions to your videos.";
 "Subscription_Multiple_Item" = "Create and edit multiple stories.";
 "Subscription_GIF_Item" = "Export as GIF.";
 
-"Error_LimitedMedia_Title" = "At-least *3* clips required to preview your montage.";
-"Error_GallerySelectionEmpty_Title" = "No item was selected.";
-"Error_GallerySelectionExists_Title" = "Image was *already added* to Story.";
-"Error_Unknown_Title" = "Unknown Error";
-"Error_MusicDRM_Title" = "*%@* is protected by DRM so you cannot use it."; //[Song name] is protected by DRM so you cannot use it.
+"Error_Title_1" = "Whoops!";
+"Error_Title_2" = "Oh No!";
+"Error_Title_3" = "Yikes!";
+"Error_Description_Unknown" = "We are not entirely sure what happened here...";
+"Error_Description_IncompleteStory" = "At-least *3 clips* required to preview your montage.";
+"Error_Button_AddMore" = "Add More";
+"Error_Description_MusicUnauthorized" = "It appears you have disabled music access, would you like to change this?";
+"Error_Description_MusicCloud" = "*@%* must be downloaded first before you can use it in Montage.";
+
+"Document_StoryName_Title" = "Story Title";
+"Document_Speed_Title" = "Clip Speed";
+"Document_Music_Title" = "Music";
+"Document_Watermark_Title" = "Watermark";
 
 "Feedback_Send_Action" = "Send";
 "Feedback_Retry_Action" = "Retry";
@@ -73,4 +101,7 @@
 "Feedback_Email_Placeholder" = "Your Email";
 "Feedback_Sent_Placeholder" = "Your message was sent!";
 "Feedback_Sending_Title" = "Sending...";
+
+"Notification_Title_Reminder" = "Tell todays story...";
+"Notification_Body_Reminder" = "Add your photos and videos to your story now!";
 

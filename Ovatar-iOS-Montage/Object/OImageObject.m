@@ -105,14 +105,13 @@
 }
 
 -(void)imageCreateAlbum {
-//    __block PHObjectPlaceholder *placeholder = nil;
-//    [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
-//        PHAssetCollectionChangeRequest *collection = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:@"Montage"];
-//        
-//    } completionHandler:^(BOOL success, NSError * _Nullable error) {
-//        
-//    }];
-     
+    [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+        PHAssetCollectionChangeRequest *collection = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:@"Montage"];
+        
+    } completionHandler:^(BOOL success, NSError * _Nullable error) {
+        
+    }];
+    
 }
 
 -(void)imagesFromAsset:(PHAsset *)asset thumbnail:(BOOL)thumbnail completion:(void (^)(NSDictionary *exifdata, NSData *image))completion {

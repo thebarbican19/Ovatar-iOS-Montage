@@ -22,11 +22,6 @@
     if (!self.buttonHeight) self.buttonHeight = 50;
     if (!self.cancelColour) self.cancelColour = [UIColor whiteColor];
     if (!self.cancelText) self.cancelText = NSLocalizedString(@"Settings_ActionSheet_Dismiss", nil);
-    
-    if (@available(iOS 11.0, *)) {
-        self.safearea = [UIApplication sharedApplication].keyWindow.window.safeAreaInsets.bottom;
-    }
-    else self.safearea = 0.0;
   
     self.buttonHeight = 66;
     self.height = (int)self.buttons.count + 1;
@@ -51,7 +46,7 @@
     [self.mainBackground.layer addSublayer:self.mainGradient];
     
     self.mainHairline = [[UIView alloc] initWithFrame:CGRectMake(0.0, self.mainHeader.bounds.size.height - 0.5, self.mainView.bounds.size.width, 0.5)];
-    self.mainHairline.backgroundColor = [UIColor purpleColor];
+    self.mainHairline.backgroundColor = [UIColor clearColor];
     self.mainHairline.hidden = self.header?false:true;
     [self.mainView addSubview:self.mainHairline];
     
@@ -130,7 +125,7 @@
     [UIView animateWithDuration:0.3 animations:^{
         self.mainBackground.backgroundColor = [UIColor clearColor];
         self.mainView.alpha = 1.0;
-        self.mainView.frame = mainFrame;
+        self.mainView.frame = self->mainFrame;
         
     } completion:nil];
     

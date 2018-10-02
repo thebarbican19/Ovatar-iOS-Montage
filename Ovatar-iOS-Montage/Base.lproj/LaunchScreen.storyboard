@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina4_7" orientation="portrait">
+    <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -18,28 +18,37 @@
                         <viewControllerLayoutGuide type="bottom" id="RIm-kh-5Tc"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash_background" translatesAutoresizingMaskIntoConstraints="NO" id="oBu-86-36w">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                            </imageView>
                             <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash_icon" translatesAutoresizingMaskIntoConstraints="NO" id="YqL-Br-5qz">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="YqL-Br-5qz" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="22Y-PM-jrU"/>
-                            <constraint firstItem="YqL-Br-5qz" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="BR2-OE-aKU"/>
-                            <constraint firstAttribute="trailing" secondItem="YqL-Br-5qz" secondAttribute="trailing" id="gJu-Va-X1t"/>
-                            <constraint firstItem="YqL-Br-5qz" firstAttribute="bottom" secondItem="RIm-kh-5Tc" secondAttribute="top" id="vsj-tj-l0g"/>
+                            <constraint firstItem="YqL-Br-5qz" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="0c6-Td-Qvi"/>
+                            <constraint firstItem="YqL-Br-5qz" firstAttribute="top" secondItem="oBu-86-36w" secondAttribute="top" id="BPc-OF-CHS"/>
+                            <constraint firstAttribute="trailing" secondItem="YqL-Br-5qz" secondAttribute="trailing" id="BVi-ys-zLQ"/>
+                            <constraint firstItem="YqL-Br-5qz" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="YWv-8C-Olx"/>
+                            <constraint firstItem="YqL-Br-5qz" firstAttribute="leading" secondItem="oBu-86-36w" secondAttribute="leading" id="edO-iF-W9u"/>
+                            <constraint firstItem="YqL-Br-5qz" firstAttribute="bottom" secondItem="oBu-86-36w" secondAttribute="bottom" id="f7e-5U-wNm"/>
+                            <constraint firstAttribute="bottom" secondItem="oBu-86-36w" secondAttribute="bottom" id="hxC-BW-F0f"/>
+                            <constraint firstItem="YqL-Br-5qz" firstAttribute="trailing" secondItem="oBu-86-36w" secondAttribute="trailing" id="rfh-qD-Dyo"/>
                         </constraints>
                     </view>
+                    <extendedEdge key="edgesForExtendedLayout"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="52" y="374.66266866566718"/>
+            <point key="canvasLocation" x="52" y="374.6305418719212"/>
         </scene>
     </scenes>
     <resources>
-        <image name="splash_icon" width="180" height="180"/>
+        <image name="splash_background" width="1080" height="1920"/>
+        <image name="splash_icon" width="58" height="74"/>
     </resources>
 </document>

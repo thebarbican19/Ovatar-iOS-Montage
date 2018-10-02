@@ -18,7 +18,7 @@ typedef enum {
 } OTitleButtonType;
 
 @protocol OTitleViewDelegate;
-@interface OTitleView : UIView
+@interface OTitleView : UIView <UIGestureRecognizerDelegate>
 
 @property (nonatomic, strong) id <OTitleViewDelegate> delegate;
 @property (nonatomic, strong) UILabel *viewTitle;
@@ -26,9 +26,13 @@ typedef enum {
 @property (nonatomic, strong) UIButton *viewBack;
 @property (nonatomic, strong) CAShapeLayer *viewRounded;
 @property (nonatomic, strong) UIView *viewShadow;
+@property (nonatomic, strong) UITapGestureRecognizer *viewGesture;
 
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, assign) BOOL backbutton;
+@property (nonatomic, assign) BOOL headergeature;
+@property (nonatomic, assign) BOOL rounded;
+@property (nonatomic, assign) BOOL dark;
 @property (nonatomic, strong) NSMutableArray *buttons;
 
 -(void)setup:(NSArray *)actions animate:(BOOL)animate;
@@ -43,6 +47,7 @@ typedef enum {
 
 -(void)titleNavigationBackTapped:(UIButton *)button;
 -(void)titleNavigationButtonTapped:(OTitleButtonType)button;
+-(void)titleNavigationHeaderTapped:(OTitleView *)view;
 
 @end
 

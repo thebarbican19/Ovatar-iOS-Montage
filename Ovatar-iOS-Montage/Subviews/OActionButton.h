@@ -20,11 +20,15 @@
 @property (nonatomic, strong) CAGradientLayer *viewGradient;
 @property (nonatomic, strong) UIImageView *viewIcon;
 
+@property (nonatomic, assign) int countdown;
 @property (nonatomic, assign) float padding;
 @property (nonatomic, assign) float fontsize;
 @property (nonatomic, assign) BOOL grayscale;
+@property (nonatomic, assign) BOOL modaldismiss;
+@property (nonatomic, assign) BOOL disabled;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) UINotificationFeedbackGenerator *generator;
+@property (nonatomic, strong) NSTimer *timer;
 @property (nonatomic, strong) NSString *key;
 @property (nonatomic, strong) UIImage *icon;
 
@@ -35,5 +39,6 @@
 @optional
 
 -(void)viewActionTapped:(OActionButton *)action;
+-(void)viewActionCountdownComplete:(OActionButton *)action;
 
 @end

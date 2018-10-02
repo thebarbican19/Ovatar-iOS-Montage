@@ -10,6 +10,7 @@
 #import <StoreKit/StoreKit.h>
 
 #import "Mixpanel.h"
+#import "NSlackObject.h"
 
 typedef NS_ENUM(NSInteger, OPaymentState) {
     OPaymentStatePurchased,
@@ -24,6 +25,7 @@ typedef NS_ENUM(NSInteger, OPaymentState) {
 @property (nonatomic, strong) id <OPaymentDelegate> delegate;
 @property (nonatomic, strong) NSUserDefaults *data;
 @property (nonatomic, strong) Mixpanel *mixpanel;
+@property (nonatomic, strong) NSlackObject *slack;
 
 @property (nonatomic, strong) SKPayment *payment;
 @property (nonatomic, strong) SKProduct *product;
@@ -36,11 +38,13 @@ typedef NS_ENUM(NSInteger, OPaymentState) {
 -(NSString *)paymentCurrency;
 -(float)paymentAmount;
 -(NSString *)paymentProductName;
+-(NSString *)paymentProductIdentifyer;
 -(void)paymentSucsessfullyUpgraded:(SKPaymentTransaction *)transaction;
--(BOOL)paymentPurchasedItemWithIdentifyer:(NSString *)identifyer;
+-(BOOL)paymentPurchasedItemWithProducts:(NSArray *)products;
+-(NSArray *)productsFromIdentifyer:(NSString *)identifyer;
 
+-(void)purchaseSubscription;
 -(void)purchaseApplyPromotionCode:(NSString *)code;
--(void)purchaseItemWithIdentifyer:(NSString *)identifyer;
 -(void)purchaseRestore;
 
 @end

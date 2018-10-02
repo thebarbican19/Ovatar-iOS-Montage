@@ -25,7 +25,8 @@
         self.context = self.persistancecont.viewContext;
         self.stories = [NSEntityDescription entityForName:@"Story" inManagedObjectContext:self.context];
         self.entry = [NSEntityDescription entityForName:@"Entry" inManagedObjectContext:self.context];
-        
+        self.music = [NSEntityDescription entityForName:@"Music" inManagedObjectContext:self.context];
+
     }
     
     return self;
@@ -59,18 +60,19 @@
         
     }
     else {
+        NSString *newkey = self.uniquekey;
         Story *newstory = [[Story alloc] initWithEntity:self.stories insertIntoManagedObjectContext:self.context];
         newstory.created = [NSDate date];
         newstory.name = [data objectForKey:@"name"];
-        newstory.key = self.uniquekey;
+        newstory.key = newkey;
         newstory.assetid = @"";
         newstory.speed = 0.8;
+        newstory.watermark = @"watermark_default";
 
         NSError *saveerr;
         if ([self.context save:&saveerr]) {
-            [self storySetActive:newstory.key];
-            
-            completion(newstory.key, [NSError errorWithDomain:@"Story saved" code:200 userInfo:nil]);
+            [self storySetActive:newkey];
+            completion(newkey, [NSError errorWithDomain:@"Story saved" code:200 userInfo:nil]);
 
         }
         else completion(nil, saveerr);
@@ -105,10 +107,17 @@
 
 -(NSString *)storyLatestKey {
     return [self.storyLatest objectForKey:@"key"];
+    
 }
 
 -(NSDictionary *)storyActive {
     return [self storyWithKey:self.storyActiveKey];
+    
+}
+
+-(NSString *)storyActiveName {
+    if ([self.storyActive objectForKey:@"name"] != nil) return [self.storyActive objectForKey:@"name"];
+    else return [NSString stringWithFormat:NSLocalizedString(@"Default_Project_Name", nil), 1];
     
 }
 
@@ -233,7 +242,7 @@
     fetch.predicate = predicate;
     fetch.returnsDistinctResults = true;
     
-    Story *astory  =[[self.context executeFetchRequest:fetch error:nil] firstObject];
+    Story *astory = [[self.context executeFetchRequest:fetch error:nil] firstObject];
     id value = nil;
     if (astory.assetid.length == 0) value = [self storyDirectory:self.storyActiveKey];
     else value = astory.assetid;
@@ -278,7 +287,7 @@
     fetch.predicate = predicate;
     fetch.returnsDistinctResults = true;
     
-    Story *astory  =[[self.context executeFetchRequest:fetch error:nil] firstObject];
+    Story *astory = [[self.context executeFetchRequest:fetch error:nil] firstObject];
     astory.speed = speed;
     
     NSError *saveerr;
@@ -288,6 +297,72 @@
     }
     else completion(saveerr);
 
+}
+
+-(void)storyAppendName:(NSString *)story name:(NSString *)name completion:(void (^)(NSError *error))completion {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@ || name != %@" ,story ,name];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
+    fetch.predicate = predicate;
+    fetch.returnsDistinctResults = true;
+    
+    if ([self.context countForFetchRequest:fetch error:nil] > 0) {
+        Story *astory = [[self.context executeFetchRequest:fetch error:nil] firstObject];
+        astory.name = name;
+    
+        NSError *saveerr;
+        if ([self.context save:&saveerr]) {
+            completion([NSError errorWithDomain:@"Updated" code:200 userInfo:nil]);
+            
+        }
+        else completion(saveerr);
+        
+    }
+    else completion([NSError errorWithDomain:@"story does not exits" code:404 userInfo:nil]);
+   
+}
+
+-(void)storyAppendWatermark:(NSString *)story watermark:(NSString *)watermark completion:(void (^)(NSError *error))completion {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,story];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
+    fetch.predicate = predicate;
+    fetch.returnsDistinctResults = true;
+    
+    if ([self.context countForFetchRequest:fetch error:nil] > 0) {
+        Story *astory = [[self.context executeFetchRequest:fetch error:nil] firstObject];
+        astory.watermark = watermark;
+        
+        NSError *saveerr;
+        if ([self.context save:&saveerr]) {
+            completion([NSError errorWithDomain:@"Updated" code:200 userInfo:nil]);
+            
+        }
+        else completion(saveerr);
+        
+    }
+    else completion([NSError errorWithDomain:@"story does not exits" code:404 userInfo:nil]);
+    
+}
+
+-(void)storyAppendMusic:(NSString *)story music:(NSString *)music completion:(void (^)(NSError *error))completion {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,story];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
+    fetch.predicate = predicate;
+    fetch.returnsDistinctResults = true;
+    
+    if ([self.context countForFetchRequest:fetch error:nil] > 0) {
+        Story *astory = [[self.context executeFetchRequest:fetch error:nil] firstObject];
+        astory.music = music;
+        
+        NSError *saveerr;
+        if ([self.context save:&saveerr]) {
+            completion([NSError errorWithDomain:@"Updated" code:200 userInfo:nil]);
+            
+        }
+        else completion(saveerr);
+        
+    }
+    else completion([NSError errorWithDomain:@"story does not exits" code:404 userInfo:nil]);
+    
 }
 
 -(CLLocation *)storyCentralLocation:(NSString *)key {
@@ -395,6 +470,87 @@
     
 }
 
+-(void)musicCreate:(NSString *)story music:(NSDictionary *)music type:(ODataMusicType)type completion:(void (^)(NSError *error))completion {
+    NSString *file = [NSString stringWithFormat:@"%@" ,[music objectForKey:@"file"]];
+    NSString *key = self.uniquekey;
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"file == %@ && type == %@" ,file ,[self musicType:type]];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Music"];
+    fetch.predicate = predicate;
+    fetch.returnsDistinctResults = true;
+
+    if ([self storyWithKey:story] != nil && music != nil) {
+        if ([[self.context executeFetchRequest:fetch error:nil] count] > 0) {
+            Music *newmusic = [[self.context executeFetchRequest:fetch error:nil] firstObject];
+            newmusic.added = [NSDate date];
+            newmusic.bpm = [[music objectForKey:@"bpm"] intValue];
+            newmusic.name = [music objectForKey:@"title"];
+            newmusic.artist = [music objectForKey:@"artist"];
+            
+            key = newmusic.key;
+
+        }
+        else {
+            Music *newmusic = [[Music alloc] initWithEntity:self.music insertIntoManagedObjectContext:self.context];
+            newmusic.key = key;
+            newmusic.added = [NSDate date];
+            newmusic.type = [self musicType:type];
+            newmusic.file = file;;
+            newmusic.name = [music objectForKey:@"title"];
+            newmusic.artist = [music objectForKey:@"artist"];
+            newmusic.bpm = [[music objectForKey:@"bpm"] intValue];
+            
+            NSLog(@"music type: %@" ,newmusic);
+        }
+        
+        NSError *saveerr;
+        if ([self.context save:&saveerr]) {
+            [self storyAppendMusic:self.storyActiveKey music:key completion:^(NSError *error) {
+                completion(error);
+
+            }];
+            
+        }
+        else completion(saveerr);
+        
+    }
+    else completion([NSError errorWithDomain:@"Story does not exist" code:404 userInfo:nil]);
+    
+}
+
+-(NSString *)musicType:(ODataMusicType)type {
+    if (type == ODataMusicTypeIPod) return @"ipod";
+    else if (type == ODataMusicTypeBundle) return @"bundle";
+    else if (type == ODataMusicTypeFiles) return @"files";
+    else return nil;
+}
+
+-(NSDictionary *)musicActive {
+    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"added" ascending:true];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,[self.storyActive objectForKey:@"music"]];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Music"];
+    fetch.resultType = NSDictionaryResultType;
+    fetch.sortDescriptors = @[sort];
+    fetch.returnsDistinctResults = true;
+    fetch.predicate = predicate;
+    fetch.fetchLimit = 1;
+
+    return [[self.context executeFetchRequest:fetch error:nil] firstObject];
+
+}
+
+-(NSArray *)musicImported {
+    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"added" ascending:true];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type != %@" ,[self musicType:ODataMusicTypeBundle]];
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Music"];
+    fetch.resultType = NSDictionaryResultType;
+    fetch.sortDescriptors = @[sort];
+    fetch.returnsDistinctResults = true;
+    fetch.predicate = predicate;
+    
+    return [self.context executeFetchRequest:fetch error:nil];
+    
+}
+
 -(void)entryCreate:(NSString *)story assets:(NSArray *)assets completion:(void (^)(NSError *error, NSArray *keys))completion {
     NSMutableArray *added = [[NSMutableArray alloc] init];
     int created = 0.0;
@@ -422,6 +578,7 @@
                 newentry.audio = false;
                 newentry.filedirectory = @"";
                 newentry.type = [self entryAssetType:asset];
+                newentry.order = [[self storyEntries:self.storyActiveKey] count] + 1;
 
                 [added addObject:newentry.key];
                 

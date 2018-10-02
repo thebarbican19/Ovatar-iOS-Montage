@@ -14,30 +14,38 @@
 -(void)drawRect:(CGRect)rect {
     if (self.animation == 0) self.animation = 3.0;
     if (self.speed == 0) self.speed = 0.5;
-    if (self.scale == 0) self.scale = 150.0;
+    if (self.scale == 0) self.scale = 60.0;
     
     self.imageobj = [[OImageObject alloc] init];
     
-    UIImage *image = [UIImage imageNamed:@"splash_icon"];
+    UIImage *image = [UIImage imageNamed:@"splash-mask_icon"];
     float imagescale = self.scale / image.size.width;
     float imageheight = image.size.height * imagescale;
     float imagewidth = image.size.width * imagescale;
     
     self.viewMask = [CALayer layer];
-    self.viewMask.contents = (id)[[UIImage imageNamed:@"splash_icon"] CGImage];
+    self.viewMask.contents = (id)[[UIImage imageNamed:@"splash-mask_icon"] CGImage];
     self.viewMask.frame = CGRectMake((self.bounds.size.width / 2) - (imagewidth / 2), (self.bounds.size.height / 2) - (imageheight / 2), imagewidth, imageheight);
     
     self.viewContainer = [[UIImageView alloc] initWithFrame:self.bounds];
     self.viewContainer.backgroundColor = UIColorFromRGB(0x7490FD);
     self.viewContainer.layer.mask = self.viewMask;
     self.viewContainer.layer.masksToBounds = true;
+    self.viewContainer.layer.cornerRadius = self.bounds.size.height / 2;
     [self addSubview:self.viewContainer];
     
     self.viewImages = [[UIImageView alloc] initWithFrame:CGRectMake(self.viewMask.frame.origin.x - 5.0, self.viewMask.frame.origin.y - 5.0, self.viewMask.bounds.size.width + 5.0, self.viewMask.bounds.size.height + 5.0)];
     self.viewImages.contentMode = UIViewContentModeScaleAspectFill;
     self.viewImages.image = nil;
-    self.viewImages.alpha = 0.9;
+    self.viewImages.alpha = 0.5;
     [self.viewContainer addSubview:self.viewImages];
+    
+    self.viewPercent = [[UILabel alloc] initWithFrame:CGRectMake(4.0, 4.0, self.viewContainer.bounds.size.width - 8.0, self.viewContainer.bounds.size.height - 8.0)];
+    self.viewPercent.textAlignment = NSTextAlignmentCenter;
+    self.viewPercent.text = nil;
+    self.viewPercent.textColor = [UIColor whiteColor];
+    self.viewPercent.font = [UIFont fontWithName:@"Avenir-Black" size:21];
+    [self.viewContainer addSubview:self.viewPercent];
     
 }
 
@@ -58,6 +66,8 @@
     if (self.timer.valid == false) self.timer = [NSTimer scheduledTimerWithTimeInterval:self.speed target:self selector:@selector(loaderChangeImage) userInfo:nil repeats:true];
 
     [self loaderChangeImage];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(loaderPercentageChange:) name:@"LoaderExportStatus" object:nil];
 
 }
 
@@ -89,6 +99,33 @@
         }];
 
     }
+    
+}
+
+-(void)loaderPercentageChange:(NSNotification *)notification {
+    float progress = [[notification.object objectForKey:@"progress"] floatValue] * 100;
+    if (progress > 0 && progress < 100) {
+        self.viewContainer.layer.mask = nil;
+        self.viewContainer.layer.masksToBounds = false;
+        self.viewPercent.text = [NSString stringWithFormat:@"%.0f%%" ,progress];
+
+    }
+    else {
+        self.viewContainer.layer.mask = self.viewMask;
+        self.viewContainer.layer.masksToBounds = true;
+        self.viewPercent.text = nil;
+        
+    }
+    
+}
+
+-(void)loaderTerminate {
+    [self.viewPercent setText:nil];
+    [self.timer invalidate];
+    [self setImages:nil];
+    [self setIndex:0];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:@"LoaderExportStatus"];
     
 }
 

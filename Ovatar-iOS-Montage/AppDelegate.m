@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "OConstants.h"
+#import "OOnboardingController.h"
 
 @interface AppDelegate ()
 
@@ -32,11 +33,11 @@
     [Mixpanel sharedInstanceWithToken:@"432df9ded107b072fd653eece3749fc0"];
 
     [self.payment paymentRetriveCurrentPricing];
-
+    
+    [self applicationSetupShortcuts];
     [self applicationVersionCheck];
     [self applicationCheckCrashes];
     [self applicationSetActiveTimer:true];
-    
     
     if (![self.data boolForKey:@"app_installed"]) {
         [self.data setBool:true forKey:@"app_installed"];
@@ -44,7 +45,9 @@
         if ([self applicationUserData]) {
             [self.mixpanel identify:self.mixpanel.distinctId];
             [self.mixpanel.people set:@{@"$first_name":[[self applicationUserData] objectForKey:@"name"],
-                                        @"Gender":[[self applicationUserData] objectForKey:@"sex"]}];
+                                        @"Gender":[[self applicationUserData] objectForKey:@"sex"],
+                                        @"Installed On":[NSDate date],
+                                        @"Installed Version":APP_VERSION}];
             
             NSLog(@"Set Name in Mixpanel %@" ,[self applicationUserData]);
 
@@ -128,9 +131,7 @@
             
             [self.data setObject:@(true) forKey:@"app_rated"];
             [self.mixpanel track:@"App Rated"];
-        }
-        else {
-            // Fallback on earlier versions
+            
         }
         
     }
@@ -155,17 +156,30 @@
     if (parameters) {
         [self.mixpanel track:@"App Opened from URL" properties:@{@"URL":[NSString stringWithFormat:@"%@" ,url]}];
         
-        [(UINavigationController  *)self.window.rootViewController popToRootViewControllerAnimated:false];
-        [(UINavigationController  *)self.window.rootViewController dismissViewControllerAnimated:false completion:nil];
-        
         if ([url.host isEqualToString:@"promo"]) {
-//            [(UINavigationController  *)self.window.rootViewController presentViewController:viewUpgraded animated:false completion:^{
-//                [viewUpgraded purchaseWithPromoCode:[parameters objectForKey:@"code"]];
-//
-//            }];
-            
-            
+            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+            OOnboardingController *viewMain = (OOnboardingController *)window.rootViewController;
+            [viewMain viewAppDelegateCalled:[parameters objectForKey:@"code"]];
+
         }
+        
+    }
+    
+    if ([parameters objectForKey:@"email"] != nil) {
+        [self.mixpanel identify:self.mixpanel.distinctId];
+        [self.mixpanel.people set:@{@"$email":[parameters objectForKey:@"email"]}];
+                                    
+        [self.data setObject:[parameters objectForKey:@"email"] forKey:@"ovatar_email"];
+        [self.data synchronize];
+        
+    }
+    
+    if ([parameters objectForKey:@"name"] != nil) {
+        [self.mixpanel identify:self.mixpanel.distinctId];
+        [self.mixpanel.people set:@{@"$name":[parameters objectForKey:@"name"]}];
+        
+        [self.data setObject:[parameters objectForKey:@"name"] forKey:@"ovatar_name"];
+        [self.data synchronize];
         
     }
     
@@ -194,12 +208,67 @@
 }
 
 -(void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    self.mixpanel = [Mixpanel sharedInstance];
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    center.delegate = self;
     
-    [self.mixpanel.people addPushDeviceToken:deviceToken];
+    for (int i = 0; i < 300; i++) {
+        UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+        content.title = NSLocalizedString(@"Notification_Title_Reminder", nil);
+        content.body = NSLocalizedString(@"Notification_Body_Reminder", nil);
+        content.sound = [UNNotificationSound soundNamed:@"complete_sfx"];
+        content.badge = 0;
+        
+        NSDate *date = [NSDate dateWithTimeIntervalSinceNow:60*60*24*i];
+        NSCalendar *calendar = [NSCalendar currentCalendar];
+        NSDateComponents *triggerdate = [calendar components:NSCalendarUnitYear +
+                                         NSCalendarUnitMonth + NSCalendarUnitDay +
+                                         NSCalendarUnitHour + NSCalendarUnitMinute +
+                                         NSCalendarUnitSecond fromDate:date];
+        triggerdate.hour = 19;
+        triggerdate.minute = 30;
+        triggerdate.second = 0;
+        UNCalendarNotificationTrigger *trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:triggerdate repeats:false];
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"reminder_notification"
+                                                                              content:content
+                                                                              trigger:trigger];
+        [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+            if (!error) {
+                NSLog(@"\nAdded Recent Notification '%@' on %@" ,date ,content.title);
+                
+            }
+            
+        }];
+        
+    }
+    
+    [[Mixpanel sharedInstance].people addPushDeviceToken:deviceToken];
+
     
 }
 
+-(void)applicationSetupShortcuts {
+    NSMutableArray *shortcuts = [[NSMutableArray alloc] init];
+    UIApplicationShortcutItem *shortcut = [[UIApplicationShortcutItem alloc]
+                                           initWithType:@"com.ovatar.montage.quickaction.capture"
+                                           localizedTitle:NSLocalizedString(@"Extension_Shortcut_Capture", nil)
+                                           localizedSubtitle:nil
+                                           icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeCaptureVideo]
+                                           userInfo:nil];
+    
+    [shortcuts addObject:shortcut];
+    
+    //[[UIApplication sharedApplication] setShortcutItems:shortcuts];
+    
+    
+}
+
+-(void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
+    if ([shortcutItem.type isEqualToString:@"com.ovatar.montage.quickaction.capture"]) {
+
+        
+    }
+    
+}
 
 -(void)applicationWillResignActive:(UIApplication *)application {
     self.data =  [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
@@ -227,77 +296,6 @@
     
     [self.timer invalidate];
         
-}
-
--(void)applicationLoadingScreen:(BOOL)loading {
-    if (loading) {
-        if (self.lassets.count == 0 || self.lassets == nil) {
-            self.lassets = @[@"splash_loader_0", @"splash_loader_1", @"splash_loader_2", @"splash_loader_3", @"splash_loader_4", @"splash_loader_5", @"splash_loader_6"];
-            
-        }
-        
-        self.splash = [[UIView alloc] initWithFrame:self.window.bounds];
-        self.splash.backgroundColor = [UIColor whiteColor];
-        self.splash.alpha = 0.0;
-
-        [[UIApplication sharedApplication].delegate.window setWindowLevel:UIWindowLevelNormal];
-        [[UIApplication sharedApplication].delegate.window addSubview:self.splash];
-        
-        self.loader = [[OLoaderView alloc] initWithFrame:CGRectMake(self.splash.bounds.size.width * 0.5 - 80.0, (self.splash.bounds.size.height * 0.5 - 80.0) - 17.0, 160.0, 160.0)];
-        self.loader.backgroundColor = [UIColor clearColor];
-        self.loader.speed = 0.6;
-        [self.splash addSubview:self.loader];
-        [self.loader loaderPresentWithImages:self.lassets animated:false];
-        
-        self.ticker = [[OTickerLabel alloc] initWithFrame:CGRectMake(10.0, ((self.splash.bounds.size.height / 4) * 3) - 45.0, self.splash.bounds.size.width - 20.0, 90.0)];
-        self.ticker.backgroundColor = [UIColor clearColor];
-        self.ticker.animate = true;
-        [self.splash addSubview:self.ticker];
-        [self.ticker setup:self.ltext];
-
-        [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn|UIViewAnimationOptionBeginFromCurrentState animations: ^{
-            [self.splash setAlpha:1.0];
-            
-        } completion:nil];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationUpdateLoaderWithProgress:) name:@"LoaderExportStatus" object:nil];
-
-    }
-    else {
-        [UIView animateWithDuration:0.2 delay:2.0 options:UIViewAnimationOptionCurveEaseIn animations: ^{
-            [self.loader setTransform:CGAffineTransformMakeScale(0.7, 0.7)];
-            
-        } completion:nil];
-        
-        [UIView animateWithDuration:0.4 delay:1.0 options:UIViewAnimationOptionCurveEaseOut animations: ^{
-            [self.splash setAlpha:0.0];
-            
-        } completion:^(BOOL finished) {
-            [self.loader.timer invalidate];
-            [self.loader removeFromSuperview];
-            [self.ticker removeFromSuperview];
-            [self.splash removeFromSuperview];
-
-            [[UIApplication sharedApplication].delegate.window removeFromSuperview];
-            [[UIApplication sharedApplication].delegate.window setWindowLevel:UIWindowLevelNormal];
-            
-        }];
-        
-        [[NSNotificationCenter defaultCenter] removeObserver:@"LoaderExportStatus"];
-        
-    }
-    
-}
-
-- (void)extracted:(float)progress {
-    [self.ticker update:[NSString stringWithFormat:@"%02.0f%%" ,progress]];
-    
-}
-
--(void)applicationUpdateLoaderWithProgress:(NSNotification *)notification {
-    float progress = [[notification.object objectForKey:@"progress"] floatValue] * 100;
-    if (progress <= 99) [self extracted:progress];
-    
 }
 
 -(NSDictionary *)applicationUserData {

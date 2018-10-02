@@ -16,6 +16,12 @@
     if (self.padding == 0) self.padding = 16.0;
     if (self.fontsize == 0) self.fontsize = 11.0;
     if (self.title == nil) self.title = @"Button Text";
+    if (self.title == nil) self.title = @"Button Text";
+    if (self.countdown > 0) {
+        self.disabled = true;
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(countdown:) userInfo:nil repeats:true];
+        
+    }
 
     if (![self.subviews containsObject:self.viewButton]) {
         self.viewButton = [[UIButton alloc] initWithFrame:CGRectMake(self.padding, self.padding, self.bounds.size.width - (self.padding * 2), self.bounds.size.height - (self.padding * 2))];
@@ -43,7 +49,8 @@
         [self.viewButton.layer addSublayer:self.viewGradient];
         
         self.viewLabel = [[UILabel alloc] initWithFrame:CGRectMake(self.padding + (self.icon==nil?0.0:(self.viewIcon.bounds.size.width / 2)), 0.0, self.viewButton.bounds.size.width - (self.padding * 2), self.viewButton.bounds.size.height)];
-        self.viewLabel.attributedText = self.format;
+        if (self.countdown > 0) self.viewLabel.attributedText = [self format:[NSString stringWithFormat:@"%@ (%d)" ,self.title ,self.countdown]];
+        else self.viewLabel.attributedText = [self format:self.title];
         self.viewLabel.numberOfLines = 2;
         self.viewLabel.textAlignment = NSTextAlignmentCenter;
         self.viewLabel.textColor = self.grayscale?UIColorFromRGB(0x757585):[UIColor whiteColor];
@@ -68,12 +75,32 @@
     
 }
 
--(NSMutableAttributedString *)format {
-    NSMutableAttributedString *attributed = [[NSMutableAttributedString alloc] initWithString:self.title.uppercaseString];
-    [attributed addAttribute:NSKernAttributeName value:@1.2 range:NSMakeRange(0, self.title.length)];
+-(NSMutableAttributedString *)format:(NSString *)title {
+    NSMutableAttributedString *attributed = [[NSMutableAttributedString alloc] initWithString:title.uppercaseString];
+    [attributed addAttribute:NSKernAttributeName value:@1.2 range:NSMakeRange(0, title.length)];
     
     return attributed;
     
+}
+                      
+-(void)countdown:(NSTimer *)timer {
+    if (self.countdown > 1) {
+        self.disabled = true;
+        self.countdown -= 1;
+        self.viewLabel.attributedText = [self format:[NSString stringWithFormat:@"%@ (%d)" ,self.title ,self.countdown]];
+
+    }
+    else {
+        self.disabled = false;
+        self.viewLabel.attributedText = [self format:self.title];
+
+        if ([self.delegate respondsToSelector:@selector(viewActionCountdownComplete:)]) {
+            [self.delegate viewActionCountdownComplete:self];
+            
+        }
+        
+    }
+
 }
 
 -(void)action:(UIButton *)button {
