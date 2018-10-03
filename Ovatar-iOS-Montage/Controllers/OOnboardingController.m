@@ -175,8 +175,30 @@
     
 }
 
--(void)viewAppDelegateCalled:(NSString *)promocode {
-    [self.viewMain paymentApplyPromoCode:promocode];
+-(void)viewAppDelegateCallback:(OOOnboardingControllerCallbackType)type data:(id)data {
+    if (type == OOOnboardingControllerCallbackTypePromo) {
+        [self.viewMain paymentApplyPromoCode:(NSString *)data];
+        
+    }
+    else if (type == OOOnboardingControllerCallbackTypeShortcut) {
+        NSString *error = nil;
+        NSArray *import = (NSArray *)data;
+        if ([import count] > 0) {
+            error = [NSString stringWithFormat:NSLocalizedString(@"Error_Description_AddedCapturesToday", nil), import.count];
+
+            [self.viewMain viewGallerySelectedImage:import];
+            [self.viewMain viewPresentError:[NSError errorWithDomain:error code:200 userInfo:nil] key:@"noimages"];
+            
+        }
+        else {
+            error = NSLocalizedString(@"Error_Description_NoCapturesToday", nil);
+
+            [self.viewMain viewPresentError:[NSError errorWithDomain:error code:404 userInfo:nil] key:@"noimages"];
+            
+        }
+    
+
+    }
     
 }
 

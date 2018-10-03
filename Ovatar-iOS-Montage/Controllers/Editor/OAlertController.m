@@ -123,7 +123,7 @@
         
         }
         
-        self.viewButtons = [[UIView alloc] initWithFrame:CGRectMake(14.0 + ((self.viewPages.bounds.size.width / 2) - (bwidth / 2)), self.viewPages.bounds.size.height - 15.0, bwidth - 28.0, MODAL_BUTTON_HEIGHT)];
+        self.viewButtons = [[UIView alloc] initWithFrame:CGRectMake(14.0 + ((self.viewPages.bounds.size.width / 2) - (bwidth / 2)), self.viewPages.bounds.size.height, bwidth - 28.0, MODAL_BUTTON_HEIGHT)];
         self.viewButtons.backgroundColor = [UIColor clearColor];
         [self.viewContainer addSubview:self.viewButtons];
         
@@ -159,6 +159,7 @@
             [self.viewButtons setFrame:CGRectMake(14.0 + ((self.viewOverlay.bounds.size.width / 2) - (bwidth / 2)), self.viewContainer.bounds.size.height - (MODAL_BUTTON_HEIGHT + self.padding), bwidth - 28.0, MODAL_BUTTON_HEIGHT)];
             [self.viewPlaceholder setAlpha:self.type==OAlertControllerTypeSubscribe?0.0:1.0];
             [self.viewPages setAlpha:self.type==OAlertControllerTypeSubscribe?1.0:0.0];
+            [self.viewPaging setAlpha:self.type==OAlertControllerTypeSubscribe?0.2:0.0];
             [self.viewButtons setAlpha:self.type==OAlertControllerTypeLoading?0.0:1.0];
 
         } completion:^(BOOL finished) {

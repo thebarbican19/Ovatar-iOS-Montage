@@ -9,8 +9,8 @@
 "Onboarding_Title" = "Tell Your Story";
 "Onboarding_Subtitle" = "*montage* by ovatar.io";
 
-"Extension_Shortcut_Capture" = "Capture New";
-"Extension_Shortcut_Todays" = "Add Todays Images";
+"Extension_Shortcut_Capture" = "Capture";
+"Extension_Shortcut_Todays" = "Add Todays Photos";
 
 "Default_Project_Name" = "My Montage #%d";
 
@@ -89,6 +89,9 @@
 "Error_Button_AddMore" = "Add More";
 "Error_Description_MusicUnauthorized" = "It appears you have disabled music access, would you like to change this?";
 "Error_Description_MusicCloud" = "*@%* must be downloaded first before you can use it in Montage.";
+"Error_Description_NoCapturesToday" = "You have not captured any images or videos today, so there is nothing to add. ";
+"Error_Description_AddedCapturesToday" = "Added *%d images* to your story";
+
 
 "Document_StoryName_Title" = "Story Title";
 "Document_Speed_Title" = "Clip Speed";

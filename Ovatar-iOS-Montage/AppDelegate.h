@@ -21,8 +21,9 @@
 @property (strong, nonatomic) NSUserDefaults *data;
 @property (strong, nonatomic) NSTimer *timer;
 @property (strong, nonatomic) Mixpanel *mixpanel;
-@property (strong, nonatomic) ODataObject *model;
+@property (strong, nonatomic) ODataObject *dataobj;
 @property (strong, nonatomic) OPaymentObject *payment;
+@property (strong, nonatomic) OImageObject *imageobj;
 @property (strong, nonatomic) UIView *splash;
 @property (assign) float padding;
 

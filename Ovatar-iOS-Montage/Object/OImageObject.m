@@ -147,6 +147,7 @@
 }
 
 -(void)imageReturnFromDay:(NSDate *)day completion:(void (^)(NSArray *images))completion {
+    NSMutableArray *output = [[NSMutableArray alloc] init];
     NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay|NSCalendarUnitHour|NSCalendarUnitMinute|NSCalendarUnitSecond fromDate:day];
     components.hour = 0;
     components.minute = 0;
@@ -167,8 +168,14 @@
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:false]];
     options.predicate = compound;
     
-    PHFetchResult *fetch = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:options];
-    completion((NSArray *)fetch);
+    PHFetchResult *result = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:options];
+    [result enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        PHAsset *asset = (PHAsset *)obj;
+        [output addObject:asset];
+        
+    }];
+    
+    completion(output);
     
 }
 
@@ -294,7 +301,8 @@
     
     PHFetchResult *result = [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:options];
     [result enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        [output addObject:obj];
+        PHAsset *asset = (PHAsset *)obj;
+        [output addObject:asset];
         
     }];
     

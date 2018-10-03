@@ -124,8 +124,8 @@
 -(void)applicationRatePrompt {
     self.data =  [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
     self.mixpanel = [Mixpanel sharedInstance];
-    self.model = [[ODataObject alloc] init];
-    if (self.applicationTimer > 60 * 3 && self.applicationRated == false && self.model.storyExports > 0) {
+    self.dataobj = [[ODataObject alloc] init];
+    if (self.applicationTimer > 60 * 3 && self.applicationRated == false && self.dataobj.storyExports > 0) {
         if (@available(iOS 10.3, *)) {
             [SKStoreReviewController requestReview];
             
@@ -159,7 +159,7 @@
         if ([url.host isEqualToString:@"promo"]) {
             UIWindow *window = [[UIApplication sharedApplication] keyWindow];
             OOnboardingController *viewMain = (OOnboardingController *)window.rootViewController;
-            [viewMain viewAppDelegateCalled:[parameters objectForKey:@"code"]];
+            [viewMain viewAppDelegateCallback:OOOnboardingControllerCallbackTypePromo data:[parameters objectForKey:@"code"]];
 
         }
         
@@ -193,7 +193,6 @@
 -(void)applicationWillEnterForeground:(UIApplication *)application {
     
 }
-
 
 -(void)applicationDidBecomeActive:(UIApplication *)application {
     self.data =  [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
@@ -248,23 +247,48 @@
 
 -(void)applicationSetupShortcuts {
     NSMutableArray *shortcuts = [[NSMutableArray alloc] init];
-    UIApplicationShortcutItem *shortcut = [[UIApplicationShortcutItem alloc]
+    UIApplicationShortcutItem *capture = [[UIApplicationShortcutItem alloc]
                                            initWithType:@"com.ovatar.montage.quickaction.capture"
                                            localizedTitle:NSLocalizedString(@"Extension_Shortcut_Capture", nil)
                                            localizedSubtitle:nil
                                            icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeCaptureVideo]
                                            userInfo:nil];
     
-    [shortcuts addObject:shortcut];
+    UIApplicationShortcutItem *todays = [[UIApplicationShortcutItem alloc]
+                                           initWithType:@"com.ovatar.montage.quickaction.importtoday"
+                                           localizedTitle:NSLocalizedString(@"Extension_Shortcut_Todays", nil)
+                                           localizedSubtitle:nil
+                                           icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeTime]
+                                           userInfo:nil];
     
-    //[[UIApplication sharedApplication] setShortcutItems:shortcuts];
+    //[shortcuts addObject:capture];
+    [shortcuts addObject:todays];
+    
+    [[UIApplication sharedApplication] setShortcutItems:shortcuts];
     
     
 }
 
 -(void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
-    if ([shortcutItem.type isEqualToString:@"com.ovatar.montage.quickaction.capture"]) {
-
+    self.dataobj = [[ODataObject alloc] init];
+    self.imageobj = [OImageObject sharedInstance];
+    if ([shortcutItem.type isEqualToString:@"com.ovatar.montage.quickaction.importtoday"]) {
+        [self.imageobj imageReturnFromDay:[NSDate date] completion:^(NSArray *images) {
+            NSMutableArray *append = [[NSMutableArray alloc] initWithArray:images];
+            NSString *story = self.dataobj.storyActiveKey;
+            for (PHAsset *asset in append) {
+                if ([self.dataobj storyContainsAssets:story asset:asset.localIdentifier]) {
+                    [append removeObject:asset];
+                    
+                }
+                
+            }
+            
+            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+            OOnboardingController *viewMain = (OOnboardingController *)window.rootViewController;
+            [viewMain viewAppDelegateCallback:OOOnboardingControllerCallbackTypeShortcut data:append];
+            
+        }];
         
     }
     

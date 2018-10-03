@@ -20,6 +20,12 @@
 
 #import "SAMLabel.h"
 
+typedef enum {
+    OOOnboardingControllerCallbackTypePromo,
+    OOOnboardingControllerCallbackTypeShortcut
+    
+} OOOnboardingControllerCallbackType;
+
 @interface OOnboardingController : UIViewController <OActionDelegate, OMainDelegate>
 
 @property (nonatomic, strong) OImageObject *imageobj;
@@ -40,6 +46,6 @@
 @property (nonatomic, strong) OMainController *viewMain;
 @property (nonatomic, strong) OActionButton *viewAction;
 
--(void)viewAppDelegateCalled:(NSString *)promocode;
+-(void)viewAppDelegateCallback:(OOOnboardingControllerCallbackType)type data:(id)data;
 
 @end

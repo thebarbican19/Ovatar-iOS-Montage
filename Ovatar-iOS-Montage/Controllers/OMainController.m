@@ -178,8 +178,24 @@
 }
 
 -(void)viewPresentError:(NSError *)error key:(NSString *)key {
-    [self.viewAlert setError:error];
-    [self.viewAlert setType:OAlertControllerTypeError];
+    NSMutableArray *buttons = [[NSMutableArray alloc] init];
+    [buttons addObject:@{@"title":NSLocalizedString(@"Settings_ActionSheet_Dismiss", nil),
+                         @"key":@"dismiss",
+                         @"primary":@(false),
+                         @"dismiss":@(true)}];
+    
+    if (error.code == 200 || error == nil) {
+        [self.viewAlert setSubtitle:error.domain];
+        [self.viewAlert setType:OAlertControllerTypeComplete];
+    }
+    else {
+        [self.viewAlert setError:error];
+        [self.viewAlert setType:OAlertControllerTypeError];
+        
+    }
+    
+    [self.viewAlert setCandismiss:true];
+    [self.viewAlert setButtons:buttons];
     [self.viewAlert setKey:key];
     [self.viewAlert present];
     
