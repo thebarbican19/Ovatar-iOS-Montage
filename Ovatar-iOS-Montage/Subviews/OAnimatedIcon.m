@@ -68,6 +68,7 @@
         }
         else {
             [self.loader loaderPresentWithImages:@[@"splash_loader_0", @"splash_loader_1", @"splash_loader_2", @"splash_loader_3", @"splash_loader_4", @"splash_loader_5", @"splash_loader_6"] animated:false];
+            
         }
     }
     else {

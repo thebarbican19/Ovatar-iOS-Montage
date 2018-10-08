@@ -31,6 +31,7 @@ typedef NS_ENUM(NSInteger, OPaymentState) {
 @property (nonatomic, strong) SKProduct *product;
 @property (nonatomic, assign) BOOL purchase;
 @property (nonatomic, assign) BOOL restoring;
+@property (nonatomic, assign) BOOL requesting;
 
 -(void)paymentRecordInterest;
 -(void)paymentDestroyCurrentPricing;

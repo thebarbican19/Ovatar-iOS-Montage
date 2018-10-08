@@ -59,6 +59,7 @@ typedef enum {
 @property (nonatomic, assign) CGRect keyboard;
 
 -(void)present:(OSettingsSubviewType)type;
+-(void)dismiss:(void (^)(BOOL dismissed))completion;
 
 @end
 

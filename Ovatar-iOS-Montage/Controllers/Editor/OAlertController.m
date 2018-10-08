@@ -15,7 +15,7 @@
 
 @implementation OAlertController
 
-#define MODAL_HEIGHT 320.0
+#define MODAL_HEIGHT 340.0
 #define MODAL_HEIGHT_LOADING 210.0
 #define MODAL_BUTTON_HEIGHT 80.0
 
@@ -38,12 +38,16 @@
 }
 
 -(void)present {
-    if (self.type != OAnimatedIconTypeLoading) self.height = MODAL_HEIGHT;
+    if (self.type != OAlertControllerTypeLoading) self.height = MODAL_HEIGHT;
     else self.height = MODAL_HEIGHT_LOADING;
     
+    float bheight = 0.0;
     float bwidth = 0.0;
     if (self.buttons.count == 1) bwidth = 220.0;
     else bwidth = [UIApplication sharedApplication].delegate.window.bounds.size.width - 28.0;
+    
+    if (self.type == OAlertControllerTypeSubscribe) bheight = MODAL_BUTTON_HEIGHT + 30.0;
+    else bheight = MODAL_BUTTON_HEIGHT;
 
     if (![[UIApplication sharedApplication].delegate.window.subviews containsObject:self.viewOverlay]) {
         self.viewOverlay = [[UIView alloc] initWithFrame:[UIApplication sharedApplication].delegate.window.bounds];
@@ -68,7 +72,7 @@
         self.viewGesture.enabled = true;
         [self.viewOverlay addGestureRecognizer:self.viewGesture];
         
-        self.viewPages = [[UIScrollView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.viewOverlay.bounds.size.width, MODAL_HEIGHT - (MODAL_BUTTON_HEIGHT + self.padding))];
+        self.viewPages = [[UIScrollView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.viewOverlay.bounds.size.width, MODAL_HEIGHT - (bheight + self.padding))];
         self.viewPages.pagingEnabled = true;
         self.viewPages.scrollEnabled = true;
         self.viewPages.delegate = self;
@@ -82,7 +86,7 @@
         self.viewPlaceholder.alpha = self.type==OAlertControllerTypeSubscribe?0.0:1.0;
         [self.viewContainer addSubview:self.viewPlaceholder];
         
-        self.viewPaging = [[UIPageControl alloc] initWithFrame:CGRectMake((self.viewContainer.bounds.size.width / 2) - 100.0, self.viewPages.bounds.size.height - 35.0, 200.0, 20.0)];
+        self.viewPaging = [[UIPageControl alloc] initWithFrame:CGRectMake((self.viewContainer.bounds.size.width / 2) - 100.0, self.viewPages.bounds.size.height - 24.0, 200.0, 20.0)];
         self.viewPaging.backgroundColor = [UIColor clearColor];
         self.viewPaging.alpha = self.type==OAlertControllerTypeSubscribe?0.2:0.0;
         self.viewPaging.pageIndicatorTintColor = UIColorFromRGB(0xAAAAB8);
@@ -118,20 +122,30 @@
             
             [self.viewPaging setNumberOfPages:[products count]];
             [self.viewPaging setCurrentPage:0];
-            
             [self.viewPages setContentSize:CGSizeMake(self.viewPages.bounds.size.width * [products count], self.viewPages.bounds.size.height)];
         
         }
         
-        self.viewButtons = [[UIView alloc] initWithFrame:CGRectMake(14.0 + ((self.viewPages.bounds.size.width / 2) - (bwidth / 2)), self.viewPages.bounds.size.height, bwidth - 28.0, MODAL_BUTTON_HEIGHT)];
+        self.viewButtons = [[UIView alloc] initWithFrame:CGRectMake(14.0 + ((self.viewPages.bounds.size.width / 2) - (bwidth / 2)), self.viewPages.bounds.size.height, bwidth - 28.0, bheight)];
         self.viewButtons.backgroundColor = [UIColor clearColor];
         [self.viewContainer addSubview:self.viewButtons];
         
+        self.viewTerms = [[UIButton alloc] initWithFrame:CGRectMake(0.0, self.viewButtons.bounds.size.height - 30.0, self.viewButtons.bounds.size.width, 30.0)];
+        self.viewTerms.titleLabel.font = [UIFont fontWithName:@"Avenir-Medium" size:10];;
+        self.viewTerms.titleLabel.textAlignment = NSTextAlignmentCenter;
+        self.viewTerms.backgroundColor = [UIColor clearColor];
+        self.viewTerms.tag = 99;
+        self.viewTerms.alpha = self.type==OAlertControllerTypeSubscribe?1.0:0.0;
+        [self.viewTerms setTitleColor:UIColorFromRGB(0xAAAAB8) forState:UIControlStateNormal];
+        [self.viewTerms setTitle:NSLocalizedString(@"Subscription_Terms_Action", nil) forState:UIControlStateNormal];
+        [self.viewTerms addTarget:self action:@selector(terms) forControlEvents:UIControlEventTouchUpInside];
+        [self.viewButtons addSubview:self.viewTerms];
+
         [UIView animateWithDuration:0.2 delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
             [self.viewOverlay setAlpha:1.0];
             
         } completion:^(BOOL finished) {
-            if (self.type == OAnimatedIconTypeError) [self.generator notificationOccurred:UINotificationFeedbackTypeError];
+            if (self.type == OAlertControllerTypeError) [self.generator notificationOccurred:UINotificationFeedbackTypeError];
             else [self.generator notificationOccurred:UINotificationFeedbackTypeSuccess];
             [self.generator prepare];
             
@@ -156,11 +170,12 @@
     else {
         [UIView animateWithDuration:0.3 delay:0.1 options:UIViewAnimationOptionCurveEaseIn animations:^{
             [self.viewContainer setFrame:CGRectMake(0.0, self.viewOverlay.bounds.size.height - self.height, self.viewOverlay.bounds.size.width, self.height)];
-            [self.viewButtons setFrame:CGRectMake(14.0 + ((self.viewOverlay.bounds.size.width / 2) - (bwidth / 2)), self.viewContainer.bounds.size.height - (MODAL_BUTTON_HEIGHT + self.padding), bwidth - 28.0, MODAL_BUTTON_HEIGHT)];
+            [self.viewButtons setFrame:CGRectMake(14.0 + ((self.viewOverlay.bounds.size.width / 2) - (bwidth / 2)), self.viewContainer.bounds.size.height - (bheight + self.padding), bwidth - 28.0, bheight)];
             [self.viewPlaceholder setAlpha:self.type==OAlertControllerTypeSubscribe?0.0:1.0];
             [self.viewPages setAlpha:self.type==OAlertControllerTypeSubscribe?1.0:0.0];
             [self.viewPaging setAlpha:self.type==OAlertControllerTypeSubscribe?0.2:0.0];
             [self.viewButtons setAlpha:self.type==OAlertControllerTypeLoading?0.0:1.0];
+            [self.viewTerms setAlpha:self.type==OAlertControllerTypeSubscribe?1.0:0.0];
 
         } completion:^(BOOL finished) {
             [self setup:true];
@@ -170,14 +185,14 @@
     }
     
     for (UIView *subview in self.viewButtons.subviews) {
-        [subview removeFromSuperview];
+        if (subview.tag != 99) [subview removeFromSuperview];
         
     }
     
     for (int i = 0; i < self.buttons.count; i++) {
         NSDictionary *button = [self.buttons objectAtIndex:i];
 
-        UIView *container = [[UIView alloc] initWithFrame:CGRectMake((self.viewButtons.bounds.size.width / 2) * i, 0.0, (self.viewButtons.bounds.size.width / self.buttons.count), self.viewButtons.bounds.size.height)];
+        UIView *container = [[UIView alloc] initWithFrame:CGRectMake((self.viewButtons.bounds.size.width / 2) * i, 0.0, (self.viewButtons.bounds.size.width / self.buttons.count), MODAL_BUTTON_HEIGHT)];
         container.backgroundColor = [UIColor clearColor];
         [self.viewButtons addSubview:container];
         
@@ -251,6 +266,13 @@
         [self.viewPlaceholder setup:errortitle subtitle:errorsubtitle icon:OAnimatedIconTypeRender animate:false];
         
     }
+    else if (self.type == OAlertControllerTypeImporting) {
+        NSString *errortitle = NSLocalizedString(@"Export_Importing_Title", nil);
+        NSString *errorsubtitle = [NSString stringWithFormat:NSLocalizedString(@"Export_Importing_Description", nil), self.dataobj.storyActiveName, 0];;
+        
+        [self.viewPlaceholder setup:errortitle subtitle:errorsubtitle icon:OAnimatedIconTypeRender animate:false];
+        
+    }
     
 }
 
@@ -273,6 +295,11 @@
         [self.viewOverlay removeFromSuperview];
         [self.viewContainer removeFromSuperview];
         
+        if ([self.delegate respondsToSelector:@selector(modalAlertDismissed:)]) {
+            [self.delegate modalAlertDismissed:self];
+            
+        }
+        
         [[UIApplication sharedApplication].delegate.window removeFromSuperview];
         [[UIApplication sharedApplication].delegate.window setWindowLevel:UIWindowLevelNormal];
         
@@ -288,6 +315,17 @@
         
     }];
 
+}
+
+-(void)terms {
+    [self dismiss:^(BOOL dismissed) {
+        if (![self.payment paymentPurchasedItemWithProducts:@[@"montage.monthly", @"montage.yearly"]]) {
+            [self.delegate modalAlertCallDocumentController:ODocumentTypeSubscription];
+            
+        }
+        
+    }];
+    
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {

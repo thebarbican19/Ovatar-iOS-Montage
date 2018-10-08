@@ -47,6 +47,38 @@
     self.viewPercent.font = [UIFont fontWithName:@"Avenir-Black" size:21];
     [self.viewContainer addSubview:self.viewPercent];
     
+    /*
+    self.viewProgress = [CAShapeLayer layer];
+    self.viewProgress.path = [UIBezierPath bezierPathWithArcCenter:CGPointMake(self.viewImages.bounds.size.height,  self.viewImages.bounds.size.height) radius:self.viewImages.bounds.size.height startAngle:10 endAngle:20 clockwise:true].CGPath;
+    self.viewProgress.position = CGPointMake(self.frame.size.width / 2 - self.viewImages.bounds.size.height, self.frame.size.height / 2 - self.viewImages.bounds.size.height);
+    self.viewProgress.fillColor = [UIColor colorWithWhite:0.5 alpha:0.3].CGColor;
+    self.viewProgress.strokeColor = [UIColor redColor].CGColor;
+    self.viewProgress.lineWidth = 8;
+    self.viewProgress.lineCap = kCALineCapRound;
+    //self.viewProgress.shouldRasterize = true;
+    //self.viewProgress.rasterizationScale = 2 * [UIScreen mainScreen].scale;
+    [self.viewContainer.layer addSublayer:self.viewProgress];
+    
+    CABasicAnimation *drawAnimation = [CABasicAnimation animationWithKeyPath:@"strokeEnd"];
+    drawAnimation.duration            = 20; // "animate over 10 seconds or so.."
+    drawAnimation.repeatCount         = 1.0;  // Animate only once..
+    
+    // Animate from no part of the stroke being drawn to the entire stroke being drawn
+    drawAnimation.fromValue = [NSNumber numberWithFloat:0.0f];
+    drawAnimation.toValue   = [NSNumber numberWithFloat:1.0f];
+    
+    // Experiment with timing to get the appearence to look the way you want
+    drawAnimation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    
+    // Add the animation to the circle
+    [self.viewProgress addAnimation:drawAnimation forKey:@"drawCircleAnimation"];
+    */
+    
+}
+
+-(void)progress {
+   
+    
 }
 
 -(void)loaderPresentWithImages:(NSArray *)images animated:(BOOL)animated {

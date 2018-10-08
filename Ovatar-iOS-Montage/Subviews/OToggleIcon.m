@@ -67,7 +67,7 @@
         } completion:nil];
         
         if (toggled) {
-            [UIView animateWithDuration:0.3 delay:0.3 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [UIView animateWithDuration:0.4 delay:0.4 options:UIViewAnimationOptionCurveEaseOut animations:^{
                 [self.toggleIcon setAlpha:1.0];
                 [self.toggleIcon setTransform:CGAffineTransformMakeScale(0.8, 0.8)];
                 

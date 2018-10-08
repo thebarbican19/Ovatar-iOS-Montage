@@ -12,6 +12,7 @@
 #import "OActionButton.h"
 #import "OPaymentObject.h"
 #import "ODataObject.h"
+#import "ODocumentController.h"
 
 #import "Mixpanel.h"
 
@@ -21,7 +22,8 @@ typedef enum {
     OAlertControllerTypeComplete,
     OAlertControllerTypeLoading,
     OAlertControllerTypeSubscribe,
-    OAlertControllerTypeRender
+    OAlertControllerTypeRender,
+    OAlertControllerTypeImporting
     
 } OAlertControllerType;
 
@@ -36,6 +38,7 @@ typedef enum {
 @property (nonatomic, strong) OAlertPlaceholder *viewPlaceholder;
 @property (nonatomic, strong) UIScrollView *viewPages;
 @property (nonatomic, strong) UIPageControl *viewPaging;
+@property (nonatomic, strong) UIButton *viewTerms;
 @property (nonatomic, strong) UIView *viewButtons;
 
 @property (nonatomic, strong) UINotificationFeedbackGenerator *generator;
@@ -64,6 +67,7 @@ typedef enum {
 -(void)modalAlertDismissed:(id)view;
 -(void)modalAlertDismissedWithAction:(id)view action:(OActionButton *)action;
 -(void)modalAlertActionCountdownComplete:(id)view action:(OActionButton *)action;
+-(void)modalAlertCallDocumentController:(ODocumentType)type;
 
 -(void)viewPurchaseInitialiseWithIdentifyer;
 

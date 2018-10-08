@@ -123,75 +123,11 @@
             [self.images addObjectsFromArray:images];
             
             [self.viewCollection reloadData];
-
-            [self.mixpanel identify:self.mixpanel.distinctId];
-            [self.mixpanel.people set:@{@"Photos":@([[images.firstObject objectForKey:@"images"] count])}];
             
             [PHPhotoLibrary.sharedPhotoLibrary registerChangeObserver:self];
             
         }];
-    
-        for (NSDictionary *item in [images.firstObject objectForKey:@"images"]) {
-            [self.queue addOperationWithBlock:^{
-                PHAsset *asset = [item objectForKey:@"asset"];
-                if (asset.location) {
-                    [self.geocoder reverseGeocodeLocation:asset.location completionHandler:^(NSArray *placemarks, NSError *error) {
-                        CLPlacemark *placemark = placemarks.lastObject;
-                        NSString *placetown = @"";
-                        NSString *placecountry = @"";
-                        
-                        if (placemark.subLocality != nil) placetown = placemark.subLocality;
-                        else if (placemark.locality != nil) placetown = placemark.locality;
-                        if (placemark.country != nil) placecountry = placemark.country;
-                        
-                        if (placecountry != nil && placetown != nil) {
-                            [self.places addObject:@{@"town":placetown, @"city":placecountry}];
-                            NSLog(@"User Location Updated: %@, %@" ,placetown ,placecountry);
 
-                        }
-                        
-                    }];
-                    
-                }
-                
-            }];
-            
-        }
-            
-        [self.queue addOperationWithBlock:^{
-            if ([self.places count] > 0) {
-                NSCountedSet *counted = [[NSCountedSet alloc] initWithArray:self.places];
-                NSMutableArray *merged = [[NSMutableArray alloc] init];
-                for (NSDictionary *place in counted) {
-                    NSMutableDictionary *append = [[NSMutableDictionary alloc] init];
-                    [append addEntriesFromDictionary:place];
-                    [append setObject:@([counted countForObject:merged]) forKey:@"counted"];
-                    
-                    [merged addObject:append];
-                    
-                }
-                
-                NSLog(@"merged %@" ,merged);
-                
-                NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"counted" ascending:true];
-                NSDictionary *placesorted = [[merged sortedArrayUsingDescriptors:@[sort]] firstObject];
-                NSString *placentown = [placesorted objectForKey:@"town"];
-                NSString *placencountry = [placesorted objectForKey:@"country"];
-                
-                if (placentown != nil) [self.data setObject:placentown forKey:@"ovatar_town"];
-                if (placencountry != nil) [self.data setObject:placencountry forKey:@"ovatar_country"];
-                [self.data synchronize];
-                
-                if (placentown != nil) {
-                    [self.mixpanel identify:self.mixpanel.distinctId];
-                    [self.mixpanel.people set:@{@"$city":placentown}];
-                    
-                }
-                
-            }
-            
-        }];
-        
     }];
      
 }
@@ -337,7 +273,7 @@
     if (button == OTitleButtonTypeSelect) {
         if (self.selected.count > 0) {
             [self dismiss:^(BOOL dismissed) {
-                [self.delegate viewGallerySelectedImage:self.selected];
+                [self.delegate viewGallerySelectedImage:self.selected shortcut:false];
 
             }];
             

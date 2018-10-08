@@ -53,23 +53,27 @@
 -(void)paymentRetriveCurrentPricing {
     if ([self.data objectForKey:@"app_product"] == nil) {
         self.purchase = false;
+        self.requesting = true;
         if ([SKPaymentQueue canMakePayments] && ![self paymentPurchasedItemWithProducts:@[@"montage.monthly", @"montage.yearly", @"montage_watermark"]]) {
-            [self paymentPricingTier:^(BOOL elite, BOOL completed) {
-                if (completed) {
-                    [self.mixpanel identify:self.mixpanel.distinctId];
-                    [self.mixpanel.people set:@{@"Elite":@(elite)}];
+            if (self.requesting == false) {
+                [self paymentPricingTier:^(BOOL elite, BOOL completed) {
+                    if (completed) {
+                        [self.mixpanel identify:self.mixpanel.distinctId];
+                        [self.mixpanel.people set:@{@"Elite":@(elite)}];
+
+                        NSString *identifyer = nil;
+                        if (elite) identifyer = @"com.ovatar.montage.monthly.tier_2";
+                        else identifyer = @"com.ovatar.montage.monthly.tier_1";
+                        
+                        SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:identifyer]];
+                        [request setDelegate:self];
+                        [request start];
+                        
+                    }
                     
-                    NSString *identifyer = nil;
-                    if (elite) identifyer = @"com.ovatar.montage.monthly.tier_2";
-                    else identifyer = @"com.ovatar.montage.monthly.tier_1";
-                    
-                    SKProductsRequest *request = [[SKProductsRequest alloc] initWithProductIdentifiers:[NSSet setWithObject:identifyer]];
-                    [request setDelegate:self];
-                    [request start];
-                    
-                }
+                }];
                 
-            }];
+            }
             
         }
         
@@ -272,12 +276,15 @@
     if (response.products.count > 0) {
         self.product = response.products.firstObject;
         self.payment = [SKPayment paymentWithProduct:response.products.firstObject];
-        
+
         if (self.product != nil) {
-            [self.data setObject:@{@"currency":self.product.priceLocale.currencySymbol,
+            NSString *currency = [NSString stringWithFormat:@"%@" ,self.product.priceLocale.currencySymbol];
+            NSString *identifyer = [NSString stringWithFormat:@"%@" ,self.product.productIdentifier];
+            NSString *name = [NSString stringWithFormat:@"%@" ,self.product.localizedTitle];
+            [self.data setObject:@{@"currency":currency,
                                    @"price":[NSNumber numberWithFloat:self.product.price.floatValue],
-                                   @"name":self.product.localizedTitle,
-                                   @"identifyer":self.product.productIdentifier}
+                                   @"name":name,
+                                   @"identifyer":identifyer}
                           forKey:@"app_product"];
             [self.data synchronize];
             
@@ -297,6 +304,8 @@
             }
             
         });
+        
+        self.requesting = false;
         
     }
     

@@ -15,6 +15,7 @@
 @property (nonatomic, strong) UIView *viewContainer;
 @property (nonatomic, strong) UIImageView *viewImages;
 @property (nonatomic, strong) UILabel *viewPercent;
+@property (nonatomic, strong) CAShapeLayer *viewProgress;;
 
 @property (nonatomic, assign) float speed;
 @property (nonatomic, assign) float scale;

@@ -22,7 +22,7 @@
         self.viewContent.backgroundColor = [UIColor clearColor];
         self.viewContent.verticalTextAlignment = SAMLabelVerticalTextAlignmentTop;
         self.viewContent.textAlignment = NSTextAlignmentCenter;
-        self.viewContent.numberOfLines = 5;
+        self.viewContent.numberOfLines = 3;
         [self addSubview:self.viewContent];
         
     }

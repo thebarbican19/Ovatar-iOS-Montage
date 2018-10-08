@@ -32,6 +32,7 @@ typedef enum {
 @property (nonatomic, strong) NSEntityDescription *music;
 
 @property (nonatomic, strong) NSUserDefaults *data;
+@property (nonatomic, strong) CLGeocoder *geocoder;
 @property (nonatomic, strong) OImageObject *imageobj;
 @property (nonatomic, strong) NSMutableArray *importlist;
 
@@ -44,6 +45,7 @@ typedef enum {
 -(NSString *)storyActiveKey;
 -(NSURL *)storyDirectory:(NSString *)story;
 -(NSArray *)storyEntries:(NSString *)key;
+-(NSArray *)storyAssetKeys:(NSString *)key;
 -(int)storyEntriesWithAssets:(NSString *)key;
 -(BOOL)storyContainsAssets:(NSString *)key asset:(NSString *)asset;
 -(NSArray *)storyEntriesPreviews:(NSString *)key;

@@ -29,20 +29,27 @@
 "Export_Stop_Action" = "Cancel";
 "Export_Rendering_Title" = "Creating Montage...";
 "Export_Rendering_Description" = "*%@*";
+"Export_Importing_Title" = "Importing Media...";
+"Export_Importing_Description" = "Please wait while we process your images into *%@*";
 
 "Settings_About_Title" = "*montage* by ovatar.io"; //Everything in between ** is BOLD
 "Settings_About_Subtitle" = "Version %@ Build #%@"; //Version 1.0 Build #1
 "Settings_Item_Share" = "Share";
 "Settings_Item_Support" = "Feedback & Support";
 "Settings_Item_Ovatar" = "About Us";
+"Settings_Item_Legal" = "Legal";
 "Settings_Item_Purchases" = "Restore Subscription";
 "Settings_Subtitle_Title" = "Tap to edit montage name";
 "Settings_Share_Text" = "Tell your story with with #montage by ovatar.io";
 "Settings_ActionSheet_Website" = "Website";
 "Settings_ActionSheet_Instagram" = "Instagram";
+"Settings_ActionSheet_Privacy" = "Privacy Policy";
 "Settings_ActionSheet_Dismiss" = "Dismiss";
 "Settings_Watermark_None" = "None";
 "Settings_Watermark_Title" = "Montage Name";
+"Settings_Watermark_Timestamp" = "Timestamp";
+"Settings_Watermark_Location" = "Location";
+"Settings_Watermark_EmptyLocation" = "Unknown Location";
 "Settings_Watermark_Default" = "Default";
 "Settings_Music_None" = "No Music";
 "Settings_Music_Custom" = "Add from your Music Library";
@@ -54,7 +61,7 @@
 "Settings_Music_Artist" = "By %@";
 
 "Permissions_Title_Notifications" = "Create Your Daily Journal";
-"Permissions_Description_Notifications" = "Allow us to remind you to add new moments to your montage everyday, and tell the epic story of the life you lead...";
+"Permissions_Description_Notifications" = "Allow us to remind you to add new moments to your montage everyday!";
 "Permissions_Action_Begin" = "Create my first Montage!";
 "Permissions_Action_Allow" = "Allow";
 "Permissions_Action_Update" = "Update Permissions";
@@ -63,6 +70,7 @@
 "Subscription_Loading_Title" = "Connecting to store";
 "Subscription_Loading_Description" = "Please wait...";
 "Subscription_PurchaseMonthly_Action" = "%@%.2f Monthly";
+"Subscription_Terms_Action" = "Subscription Terms & Conditions";
 "Subscription_Plan_Title" = "Montage Pro";
 "Subscription_Complete_Title_1" = "Hurrah!";
 "Subscription_Complete_Title_2" = "Noice!";
@@ -92,7 +100,6 @@
 "Error_Description_NoCapturesToday" = "You have not captured any images or videos today, so there is nothing to add. ";
 "Error_Description_AddedCapturesToday" = "Added *%d images* to your story";
 
-
 "Document_StoryName_Title" = "Story Title";
 "Document_Speed_Title" = "Clip Speed";
 "Document_Music_Title" = "Music";
@@ -107,4 +114,7 @@
 
 "Notification_Title_Reminder" = "Tell todays story...";
 "Notification_Body_Reminder" = "Add your photos and videos to your story now!";
+
+"Terms_Subscription_Title" = "Subscription Terms";
+"Terms_Subscription_Content" = "Your iTunes Account will be charged *%@%.2f* per month. Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of each month. You can manage your subscription and turn off auto-renew from your iTunes Account settings.\n\nFor more information about subscriptions, please visit our website http://ovatar.io";
 

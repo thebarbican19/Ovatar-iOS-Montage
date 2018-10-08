@@ -32,13 +32,14 @@
 #import "OAlertController.h"
 #import "OPlaybackController.h"
 #import "OShareController.h"
+#import "ODocumentController.h"
 
 #import "AppDelegate.h"
 #import "Mixpanel.h"
 #import "NSlackObject.h"
 
 @protocol OMainDelegate;
-@interface OMainController : UIViewController <OTitleViewDelegate, OEntryViewDelegate, OGalleryPickerDelegate, ODataDelegate, OPaymentDelegate, OAlertDelegate, OFeedbackDelegate, OSettingsDelegate, OPlaybackDelegate, OShareDelegate, GDActionSheetDelegate, UNUserNotificationCenterDelegate, SFSafariViewControllerDelegate, MPMediaPickerControllerDelegate>
+@interface OMainController : UIViewController <OTitleViewDelegate, OEntryViewDelegate, OGalleryPickerDelegate, ODataDelegate, OPaymentDelegate, OAlertDelegate, OFeedbackDelegate, OSettingsDelegate, OPlaybackDelegate, OShareDelegate, GDActionSheetDelegate, ODocumentDelegate, UNUserNotificationCenterDelegate, SFSafariViewControllerDelegate, MPMediaPickerControllerDelegate>
 
 -(void)viewAuthorize;
 
@@ -50,6 +51,7 @@
 @property (nonatomic, strong) NSOperationQueue *queue;
 @property (nonatomic, strong) AppDelegate *appdel;
 @property (nonatomic, strong) OPaymentObject *payment;
+@property (nonatomic, strong) OStatsObject *stats;
 @property (nonatomic, strong) Mixpanel *mixpanel;
 @property (nonatomic, strong) UINotificationFeedbackGenerator *generator;
 @property (nonatomic, strong) NSlackObject *slack;
@@ -62,6 +64,7 @@
 @property (nonatomic, assign) ODayCell *selected;
 @property (nonatomic, strong) NSURL *exported;
 @property (nonatomic, assign) BOOL exporting;
+@property (nonatomic, assign) BOOL importing;
 
 @property (nonatomic, strong) OEntryController *viewStory;
 @property (nonatomic, strong) OStoriesLayout *viewStoriesLayout;
@@ -72,6 +75,7 @@
 @property (nonatomic, strong) OAlertController *viewAlert;
 @property (nonatomic, strong) OPlaybackController *viewPlayer;
 @property (nonatomic, strong) OShareController *viewShare;
+@property (nonatomic, strong) ODocumentController *viewDocument;
 @property (nonatomic, strong) GDActionSheet *viewSheet;
 
 -(void)paymentApplyPromoCode:(NSString *)code;

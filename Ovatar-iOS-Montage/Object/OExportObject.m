@@ -36,12 +36,14 @@
         
     }
     else {
+        int clip = 1;
         NSMutableDictionary *storydata = [[NSMutableDictionary alloc] init];
         [storydata addEntriesFromDictionary:[self.dataobj storyWithKey:story]];
 
         AVMutableComposition *mutableComposition = [AVMutableComposition composition];
         AVMutableCompositionTrack *videoCompositionTrack = [mutableComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
         
+        NSMutableArray *watermark = [[NSMutableArray alloc] init];
         NSMutableArray *instructions = [[NSMutableArray alloc] init];
         CMTime videotime = kCMTimeZero;
         for (NSDictionary *item in [self.dataobj storyEntries:story]) {
@@ -78,8 +80,15 @@
                 [videoCompositionInstruction setTimeRange:CMTimeRangeMake(videotime, videoduration)];
                 [videoCompositionInstruction setLayerInstructions:@[videolayerInstruction]];
                 
+                [watermark addObject:@{@"begin":@(CMTimeGetSeconds(videotime)),
+                                       @"duration":@(CMTimeGetSeconds(videoduration)),
+                                       @"timestamp":[item objectForKey:@"captured"],
+                                       @"location":[self exportLocation:item story:storydata]
+                                       }];
+
                 videotime = CMTimeAdd(videotime, videoduration);
-                
+                clip++;
+
                 [instructions addObject:videoCompositionInstruction];
                 
             }
@@ -87,7 +96,6 @@
         }
         
         if ([self.dataobj musicActive] != nil) {
-            NSLog(@"music %@" ,self.dataobj.musicActive);
             if ([[self.dataobj.musicActive objectForKey:@"type"] isEqualToString:@"bundle"]) {
                 NSString *soundtrack = [[NSBundle mainBundle] pathForResource:[self.dataobj.musicActive objectForKey:@"file"] ofType:@"mp3"];
                 AVMutableCompositionTrack *soundtrackCompositionTrack = [mutableComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
@@ -120,7 +128,7 @@
         mutableVideoComposition.instructions = instructions;
         mutableVideoComposition.frameDuration = CMTimeMake(1.0, self.videoframes);
         mutableVideoComposition.renderSize =  CGSizeMake(self.videoresize.width, self.videoresize.height);;
-        mutableVideoComposition.animationTool = [self exportWatermark:storydata];
+        mutableVideoComposition.animationTool = [self exportWatermark:storydata instructions:watermark];
         
         self.exporttimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(exportStatus:) userInfo:nil repeats:true];
         self.exporter = [[AVAssetExportSession alloc] initWithAsset:mutableComposition presetName:AVAssetExportPresetHighestQuality];
@@ -150,6 +158,25 @@
         }];
         
     }
+    
+}
+
+-(NSString *)exportLocation:(NSDictionary *)asset story:(NSDictionary *)story {
+    NSMutableString *append = [[NSMutableString alloc] init];
+    if ([[asset objectForKey:@"city"] length] > 0) [append appendString:[asset objectForKey:@"city"]];
+    if ([append length] > 1 && [[asset objectForKey:@"country"] length] > 0) [append appendString:@", "];
+    if ([[asset objectForKey:@"country"] length] > 0) [append appendString:[asset objectForKey:@"country"]];
+    
+    if ([append length] < 3) {
+        if ([[story objectForKey:@"city"] length] > 0) [append appendString:[story objectForKey:@"city"]];
+        if ([append length] > 1 && [[story objectForKey:@"country"] length] > 0) [append appendString:@", "];
+        if ([[story objectForKey:@"country"] length] > 0) [append appendString:[story objectForKey:@"country"]];
+        
+    }
+    
+    if ([append length] < 3) [append appendString:NSLocalizedString(@"Settings_Watermark_EmptyLocation", nil)];
+    
+    return append;
     
 }
 
@@ -252,29 +279,104 @@
     
 }
 
--(AVVideoCompositionCoreAnimationTool *)exportWatermark:(NSDictionary *)data {
+-(AVVideoCompositionCoreAnimationTool *)exportWatermark:(NSDictionary *)data instructions:(NSArray *)instructions {
+    CALayer *watermark = [CALayer layer];
     UIImage *wimage = nil;
     NSString *wtext = @"";
-    if ([[data objectForKey:@"watermark"] isEqualToString:@"watermark_default"]) {
-        wimage = [UIImage imageNamed:@"watermark_default"];
-        wtext = @"ovatar.io/montage";
+    NSString *wkey = [data objectForKey:@"watermark"];
+
+    NSLog(@"watermarl %@" ,data);
+    if ([wkey isEqualToString:@"watermark_default"] || [wkey isEqualToString:@"watermark_title"]) {
+        if ([wkey isEqualToString:@"watermark_title"]) {
+            wimage = nil;
+            wtext = [data objectForKey:@"name"];
+            
+        }
+        else {
+            wimage = [UIImage imageNamed:@"watermark_default"];
+            wtext = @"ovatar.io/montage";
+            
+        }
+        
+        CATextLayer *watermarktext = [[CATextLayer alloc] init];
+        [watermarktext setFont:@"Avenir-Black"];
+        [watermarktext setFontSize:36];
+        if (wimage == nil) [watermarktext setFrame:CGRectMake(30.0, 0.0, self.videoresize.width, 70.0)];
+        else [watermarktext setFrame:CGRectMake(70.0, 0.0, self.videoresize.width, 70.0)];
+        [watermarktext setString:wtext];
+        [watermarktext setAlignmentMode:kCAAlignmentLeft];
+        [watermarktext setOpacity:1.0];
+        [watermarktext setForegroundColor:[[UIColor colorWithWhite:1.0 alpha:0.7] CGColor]];
+        [watermarktext setBackgroundColor:[[UIColor clearColor] CGColor]];
+        [watermark addSublayer:watermarktext];
         
     }
-    else if ([[data objectForKey:@"watermark"] isEqualToString:@"watermark_title"]) {
-        wimage = nil;
-        wtext = [data objectForKey:@"name"];
-        
-    }
+    else {
+        for (int i = 0; i < [instructions count]; i++) {
+            NSDictionary *wprevious;
+            if (i > 0) wprevious = [instructions objectAtIndex:i - 1];
+            NSString *wpreviousstring = nil;
+            NSDictionary *wnext;
+            if (i < ([instructions count] - 1)) wnext = [instructions objectAtIndex:i + 1];
+            NSString *wnextstring = nil;
+            NSDictionary *instruction = [instructions objectAtIndex:i];
+            float watermarkbegin = [[instruction objectForKey:@"begin"] floatValue];
+            float watermarkduration = [[instruction objectForKey:@"duration"] floatValue];
+
+            if (watermarkbegin == 0) watermarkbegin = 0.01;
+            
+            if ([[data objectForKey:@"watermark"] isEqualToString:@"watermark_timetamp"]) {
+                NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                formatter.dateFormat = @"EEE d MMMM YYYY";
+                formatter.calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+                
+                if (wprevious != nil) wpreviousstring = [formatter stringFromDate:[wprevious objectForKey:@"timestamp"]];
+                if (wnext != nil) wnextstring = [formatter stringFromDate:[wnext objectForKey:@"timestamp"]];
+                
+                wtext = [formatter stringFromDate:[instruction objectForKey:@"timestamp"]];
+                wimage = nil;
+                
+            }
+            else if ([[data objectForKey:@"watermark"] isEqualToString:@"watermark_location"]) {
+                if (wprevious != nil) wpreviousstring = [wprevious objectForKey:@"location"];
+                if (wnext != nil) wnextstring = [wnext objectForKey:@"location"];
+                
+                wtext = [instruction objectForKey:@"location"];
+                wimage = nil;
+                
+            }
+            
+            float wstartopacity = 0;
+            if ([wpreviousstring isEqualToString:wtext]) wstartopacity = 1.0;
+            else wstartopacity = 0.0;
+            
+            float wendopacity = 0;
+            if ([wnextstring isEqualToString:wtext]) wendopacity = 1.0;
+            else wendopacity = 0.0;
     
-    CATextLayer *watermarktext = [[CATextLayer alloc] init];
-    [watermarktext setFont:@"Avenir-Black"];
-    [watermarktext setFontSize:36];
-    if (wimage == nil) [watermarktext setFrame:CGRectMake(30.0, 0.0, self.videoresize.width, 70.0)];
-    else [watermarktext setFrame:CGRectMake(70.0, 0.0, self.videoresize.width, 70.0)];
-    [watermarktext setString:wtext];
-    [watermarktext setAlignmentMode:kCAAlignmentLeft];
-    [watermarktext setForegroundColor:[[UIColor colorWithWhite:1.0 alpha:0.7] CGColor]];
-    [watermarktext setBackgroundColor:[[UIColor clearColor] CGColor]];
+            CATextLayer *watermarktext = [[CATextLayer alloc] init];
+            [watermarktext setFont:@"Avenir-Black"];
+            [watermarktext setFontSize:36];
+            if (wimage == nil) [watermarktext setFrame:CGRectMake(30.0, 0.0, self.videoresize.width, 70.0)];
+            else [watermarktext setFrame:CGRectMake(70.0, 0.0, self.videoresize.width, 70.0)];
+            [watermarktext setString:wtext];
+            [watermarktext setAlignmentMode:kCAAlignmentLeft];
+            [watermarktext setOpacity:0.0];
+            [watermarktext setForegroundColor:[[UIColor colorWithWhite:1.0 alpha:0.7] CGColor]];
+            [watermarktext setBackgroundColor:[[UIColor clearColor] CGColor]];
+            [watermark addSublayer:watermarktext];
+            
+            CAKeyframeAnimation *watermarkreveal = [CAKeyframeAnimation animationWithKeyPath:@"opacity"];
+            watermarkreveal.values = @[@(wstartopacity), @(1.0), @(1.0), @(wendopacity)];
+            watermarkreveal.keyTimes = @[@(0.0), @(0.1), @(0.9), @(1.0)];
+            watermarkreveal.beginTime = watermarkbegin;
+            watermarkreveal.duration = watermarkduration;
+            watermarkreveal.removedOnCompletion = false;
+            [watermarktext addAnimation:watermarkreveal forKey:[instruction objectForKey:@"label"]];
+            
+        }
+        
+    }
     
     CALayer *watermarklogo = [CALayer layer];
     [watermarklogo setContents:(id)wimage.CGImage];
@@ -282,10 +384,8 @@
     [watermarklogo setOpacity:0.8];
     [watermarklogo setContentsGravity:kCAGravityResizeAspect];
     
-    CALayer *watermark = [CALayer layer];
-    [watermark addSublayer:watermarktext];
     [watermark addSublayer:watermarklogo];
-    [watermark setFrame:CGRectMake(0.0, 0.0, self.videoresize.width, watermarktext.bounds.size.height)];
+    [watermark setFrame:CGRectMake(0.0, 0.0, self.videoresize.width, 70.0)];
     [watermark setBackgroundColor:[UIColor clearColor].CGColor];
     [watermark setMasksToBounds:true];
     

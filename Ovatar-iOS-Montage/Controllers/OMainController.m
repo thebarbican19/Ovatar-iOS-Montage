@@ -21,6 +21,9 @@
     float videoscale = (self.view.bounds.size.width - 60.0) / self.exportobj.videoresize.width;
     float videoheight = self.exportobj.videoresize.height * videoscale;
     float videowidth = self.exportobj.videoresize.width * videoscale;
+    float videomax = self.view.bounds.size.height - (self.paddingbottom + self.paddingtop + 60 + MAIN_HEADER_HEIGHT);
+
+    if (videoheight > videomax) videoheight = videomax;
     
     self.viewStory.view.frame = CGRectMake(0.0, MAIN_HEADER_HEIGHT + self.paddingtop, self.view.bounds.size.width, videoheight + 60.0);
     self.viewStoriesLayout.itemSize = CGSizeMake(videowidth, videoheight);
@@ -29,6 +32,7 @@
     self.viewSettings.padding = self.paddingbottom;
     self.viewPlayer.paddingtop = self.paddingtop;
     self.viewPlayer.paddingbottom = self.paddingbottom;
+    self.viewSheet.safearea = self.paddingbottom;
 
 }
 
@@ -100,6 +104,8 @@
     
     self.view.backgroundColor = [UIColor orangeColor];
     
+    self.stats = [[OStatsObject alloc] init];
+    
     self.slack = [[NSlackObject alloc] init];
     
     self.data = [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
@@ -147,7 +153,7 @@
     self.viewSheet = [[GDActionSheet alloc] initWithFrame:self.view.bounds];
     self.viewSheet.backgroundColor = [UIColor clearColor];
     self.viewSheet.delegate = self;
-    
+
     self.viewGallery = [[OGalleryPickerController alloc] init];
     self.viewGallery.backgroundColor = [UIColor clearColor];
     self.viewGallery.delegate = self;
@@ -167,6 +173,10 @@
     self.viewShare = [[OShareController alloc] init];
     self.viewShare.backgroundColor = [UIColor clearColor];
     self.viewShare.delegate = self;
+    
+    self.viewDocument = [[ODocumentController alloc] init];
+    self.viewDocument.backgroundColor = [UIColor clearColor];
+    self.viewDocument.delegate = self;
     
     self.viewHeader = [[OTitleView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.bounds.size.width, MAIN_HEADER_HEIGHT)];
     self.viewHeader.backgroundColor = [UIColor clearColor];
@@ -252,7 +262,10 @@
                     [self.viewHeader setup:@[] animate:true];
                     [self.viewShare setExported:self.exported];
                     [self.viewShare present];
-                    [self.mixpanel track:@"App Exported Video" properties:@{@"Items":@([self.dataobj storyEntriesWithAssets:self.dataobj.storyActiveKey])}];
+                    [self.mixpanel track:@"App Exported Video" properties:@{
+                                                @"Items":@([self.dataobj storyEntriesWithAssets:self.dataobj.storyActiveKey]),
+                                                @"Tags":[self.stats tagsFromAssetKeys:[self.dataobj storyAssetKeys:self.dataobj.storyActiveKey]]}];
+                    
 
                 }
                 else {
@@ -293,6 +306,8 @@
         [self.exportobj setVideoframes:29.96];
         [self.exportobj setVideoseconds:1.3];
         [self.exportobj setVideoresize:size];
+        
+        NSLog(@"Stats tags: %@" ,[self.stats tagsFromAssetKeys:[self.dataobj storyAssetKeys:self.dataobj.storyActiveKey]]);
         [self.exportobj exportMontage:self.dataobj.storyActiveKey completion:^(NSString *file, NSError *error) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 if (error.code == 200 || error == nil) {
@@ -306,7 +321,9 @@
                                 [self.viewPlayer setVideosize:size];
                                 [self.viewPlayer setup:[NSURL fileURLWithPath:file]];
                                 
-                                [self.mixpanel track:@"App Previewed Video" properties:@{@"Items":@([self.dataobj storyEntriesWithAssets:self.dataobj.storyActiveKey])}];
+                                [self.mixpanel track:@"App Previewed Video" properties:@{
+                                                     @"Items":@([self.dataobj storyEntriesWithAssets:self.dataobj.storyActiveKey]),
+                                                     @"Tags":[self.stats tagsFromAssetKeys:[self.dataobj storyAssetKeys:self.dataobj.storyActiveKey]]}];
                                 
                                 [self.viewHeader setHeadergeature:false];
                                 [self.viewHeader setBackbutton:true];
@@ -350,9 +367,14 @@
     
 }
 
--(void)viewGallerySelectedImage:(NSArray *)assets {
+-(void)viewGallerySelectedImage:(NSArray *)assets shortcut:(BOOL)shortcut {
     int originalcount = (int)[[self.dataobj storyEntries:self.dataobj.storyActiveKey] count];
     NSMutableArray *append = [[NSMutableArray alloc] initWithArray:assets];
+    NSMutableArray *buttons = [[NSMutableArray alloc] init];
+    [buttons addObject:@{@"title":NSLocalizedString(@"Export_Stop_Action", nil),
+                         @"key":@"stop",
+                         @"primary":@(false),
+                         @"dismiss":@(true)}];
     
     [self.viewStory viewUpdateEntry:self.selected loading:true];
     if (self.selected != nil) {
@@ -384,6 +406,8 @@
                         
                     }
                     
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"LoaderExportStatus" object:@{@"progress":@(0)}];
+                    
                 }];
             
             }];
@@ -395,59 +419,85 @@
     }
     
     if (append.count > 0) {
+        [self setImporting:true];
+        [self.viewAlert setType:OAlertControllerTypeImporting];
+        [self.viewAlert setKey:@"import_images"];
+        [self.viewAlert setButtons:buttons];
+        [self.viewAlert present];
+        
         [self.dataobj entryCreate:self.dataobj.storyActiveKey assets:append completion:^(NSError *error, NSArray *keys) {
+            float __block progress = 0;
+            float __block added = 0;
+            float __block total = keys.count;
             for (int i = 0; i < keys.count; i++) {
-                [self.queue addOperationWithBlock:^{
-                    NSString *key = [keys objectAtIndex:i];
-                    NSDictionary *entry = [self.dataobj entryWithKey:key];
-                    [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
-                    [self.imageobj imageReturnFromAssetKey:[entry objectForKey:@"assetid"] completion:^(PHAsset *asset) {
-                        if (asset != nil) {
-                            [self.imageobj imageCreateEntryFromAsset:asset animate:true key:key completion:^(NSError *error, BOOL animated) {
-                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                    NSIndexPath *index = [NSIndexPath indexPathForRow:originalcount + i inSection:0];
-                                    ODayCell *day = (ODayCell *)[self.viewStory.collectionView cellForItemAtIndexPath:index];
-                                    
-                                    [self.viewStory viewUpdateEntry:day loading:true];
-                                    [self.dataobj entryAppendWithImageData:asset animated:true entry:key completion:^(NSError *error) {
+                NSString *key = [keys objectAtIndex:i];
+                NSDictionary *entry = [self.dataobj entryWithKey:key];
+                [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
+                [self.imageobj imageReturnFromAssetKey:[entry objectForKey:@"assetid"] completion:^(PHAsset *asset) {
+                    if (asset != nil && self.importing) {
+                        [self.imageobj imageCreateEntryFromAsset:asset animate:true key:key completion:^(NSError *error, BOOL animated) {
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                NSIndexPath *index = [NSIndexPath indexPathForRow:originalcount + i inSection:0];
+                                ODayCell *day = (ODayCell *)[self.viewStory.collectionView cellForItemAtIndexPath:index];
+                                
+                                [self.viewStory viewUpdateEntry:day loading:true];
+                                [self.dataobj entryAppendWithImageData:asset animated:true entry:key completion:^(NSError *error) {
+                                    added += 1;
+                                    progress = (100.0 / total) * added;
+                                    NSLog(@"progress : %f" ,progress);
+                                    if (added == total) {
+                                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                            if (shortcut) {
+                                                [self viewPresentError:[NSError errorWithDomain:[NSString stringWithFormat:NSLocalizedString(@"Error_Description_AddedCapturesToday", nil), total] code:200 userInfo:nil] key:@"noimages"];
+                                                
+                                            }
+                                            else {
+                                                [self.stats suspend];
+                                                [self.viewAlert dismiss:^(BOOL dismissed) {
+                                                    [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
+                                                    [self viewMonitorEnties];
+
+                                                }];
+                                                
+                                            }
+                                            
+                                            [self setImporting:false];
+                                            
+                                        }];
+                                        
+                                    }
+                                    else {
                                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                             [self.viewStory viewUpdateEntry:day loading:false];
                                             
                                         }];
                                         
-                                        if (i == keys.count) {
-                                            NSLog(@"");
-                                            
-                                        }
-                                        
-                                    }];
+                                    }
                                     
+                                    [[NSNotificationCenter defaultCenter] postNotificationName:@"LoaderExportStatus" object:@{@"progress":@(progress / 100)}];
+
                                 }];
                                 
                             }];
                             
-                        }
-                        
-                    }];
-                    
+                        }];
+                            
+                    }
+             
                 }];
             
             }
             
         }];
         
-        [self.queue addOperationWithBlock:^{
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                NSLog(@"auto render video");
-                
-            }];
-            
-        }];
-        
     }
     else {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self viewMonitorEnties];
+            [self.viewAlert dismiss:^(BOOL dismissed) {
+                [self viewMonitorEnties];
+                [self setImporting:false];
+
+            }];
             
         }];
         
@@ -462,23 +512,26 @@
     }
     else if ([self.dataobj storyEntriesWithAssets:self.dataobj.storyActiveKey] > 3 && ![[self.data objectForKey:@"modal_push_viewed"] boolValue]) {
         [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
-            if (settings.authorizationStatus == UNAuthorizationStatusNotDetermined) {
-                NSMutableArray *buttons = [[NSMutableArray alloc] init];
-                [buttons addObject:@{@"title":NSLocalizedString(@"Permissions_Action_Allow", nil),
-                                     @"key":@"authorize",
-                                     @"primary":@(true),
-                                     @"dismiss":@(true)}];
-                [buttons addObject:@{@"title":NSLocalizedString(@"Permissions_Action_Skip", nil),
-                                     @"key":@"dismiss",
-                                     @"primary":@(false),
-                                     @"dismiss":@(true)}];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                if (settings.authorizationStatus == UNAuthorizationStatusNotDetermined) {
+                    NSMutableArray *buttons = [[NSMutableArray alloc] init];
+                    [buttons addObject:@{@"title":NSLocalizedString(@"Permissions_Action_Allow", nil),
+                                         @"key":@"authorize",
+                                         @"primary":@(true),
+                                         @"dismiss":@(true)}];
+                    [buttons addObject:@{@"title":NSLocalizedString(@"Permissions_Action_Skip", nil),
+                                         @"key":@"dismiss",
+                                         @"primary":@(false),
+                                         @"dismiss":@(true)}];
+                    
+                    [self.viewAlert setType:OAlertControllerTypePush];
+                    [self.viewAlert setKey:@"push_notify"];
+                    [self.viewAlert setButtons:buttons];
+                    [self.viewAlert present];
+                    
+                }
                 
-                [self.viewAlert setType:OAlertControllerTypePush];
-                [self.viewAlert setKey:@"push_notify"];
-                [self.viewAlert setButtons:buttons];
-                [self.viewAlert present];
-                
-            }
+            }];
             
         }];
        
@@ -579,6 +632,18 @@
     
 }
 
+-(void)modalAlertPresented:(id)view {
+    if ([view isKindOfClass:[OAlertController class]]) {
+        OAlertController *alert = (OAlertController *)view;
+        if (alert.type == OAlertControllerTypeImporting || alert.type == OAlertControllerTypeRender || alert.type == OAlertControllerTypeImporting) {
+            [self.stats initiate];
+            
+        }
+
+    }
+    
+}
+
 -(void)modalAlertDismissed:(id)view {
     if ([view isKindOfClass:[OSettingsController class]]) {
         [self.viewHeader setTitle:self.dataobj.storyActiveName];
@@ -586,6 +651,10 @@
         [self.viewHeader setHeadergeature:true];
         [self.viewHeader setup:@[@"navigation_settings", @"navigation_preview"] animate:true];
         
+    }
+    else if ([view isKindOfClass:[OAlertController class]]) {
+        [self.stats suspend];
+
     }
     
     [self.delegate viewStatusStyle:UIStatusBarStyleDefault];
@@ -639,6 +708,16 @@
                 
             }
             
+        }
+        else if ([alert.key containsString:@"import"]) {
+            if ([action.key isEqualToString:@"stop"]) {
+                [self setImporting:false];
+                [self.viewAlert dismiss:^(BOOL dismissed) {
+                    [self.viewStory viewUpdateContent:[self.dataobj storyEntries:self.dataobj.storyActiveKey]];
+
+                }];
+                
+            }
         }
         else {
             if ([action.key isEqualToString:@"share"]) {
@@ -746,6 +825,29 @@
     
 }
 
+-(void)modalAlertCallDocumentController:(ODocumentType)type {
+    NSMutableString *content = [[NSMutableString alloc] init];
+    NSString *title = nil;
+    if (type == ODocumentTypeSubscription) {
+        title = NSLocalizedString(@"Terms_Subscription_Title", nil);
+        for (NSDictionary *items in [self.payment productsFromIdentifyer:@"montage.monthly"]) {
+            [content appendString:@"• "];
+            [content appendString:[items objectForKey:@"summary"]];
+            [content appendString:@"\n"];
+            
+        }
+        
+        [content appendString:@"\n\n"];
+        [content appendString:[NSString stringWithFormat:NSLocalizedString(@"Terms_Subscription_Content", nil) ,self.payment.paymentCurrency , self.payment.paymentAmount]];
+        
+    }
+    
+    [self.viewDocument setHeader:title];
+    [self.viewDocument setContent:content];
+    [self.viewDocument present];
+    
+}
+
 -(void)mediaPicker:(MPMediaPickerController *)mediaPicker didPickMediaItems:(MPMediaItemCollection *)mediaItemCollection {
     if (mediaItemCollection.count > 0) {
         MPMediaItem *song = mediaItemCollection.items.firstObject;
@@ -811,6 +913,20 @@
             
         }
         
+    }
+    else if ([action.key isEqualToString:@"legal"]) {
+        [self.viewSettings dismiss:^(BOOL dismissed) {
+            if ([[[action.buttons objectAtIndex:index] objectForKey:@"key"] isEqualToString:@"subscription"]) {
+                [self modalAlertCallDocumentController:ODocumentTypeSubscription];
+
+            }
+            else {
+                [self modalAlertCallSafariController:[NSURL URLWithString:@"https://ovatar.io/legal"]];
+
+            }
+            
+        }];
+
     }
     
 }

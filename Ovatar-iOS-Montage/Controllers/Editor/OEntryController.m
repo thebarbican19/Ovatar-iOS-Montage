@@ -35,9 +35,9 @@
     self.viewInformation.backgroundColor = [UIColor clearColor];
     //[self.view addSubview:self.viewInformation];
     
-    [self.collectionView setDragDelegate:self];
-    [self.collectionView setDragInteractionEnabled:true];
-    [self.collectionView setDropDelegate:self];
+//    [self.collectionView setDragDelegate:self];
+//    [self.collectionView setDragInteractionEnabled:true];
+//    [self.collectionView setDropDelegate:self];
     [self.collectionView setBackgroundColor:[UIColor clearColor]];
     [self.collectionView registerClass:[ODayCell class] forCellWithReuseIdentifier:@"day"];
     [self.collectionView setShowsHorizontalScrollIndicator:false];

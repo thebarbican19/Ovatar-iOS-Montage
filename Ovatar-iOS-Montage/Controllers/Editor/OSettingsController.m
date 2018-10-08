@@ -50,7 +50,7 @@
         self.viewRounded = [CAShapeLayer layer];
         self.viewRounded.path = [UIBezierPath bezierPathWithRoundedRect:self.viewOverlay.bounds byRoundingCorners:UIRectCornerTopLeft| UIRectCornerTopRight cornerRadii:CGSizeMake(MAIN_CORNER_EDGES, MAIN_CORNER_EDGES)].CGPath;
         
-        self.viewContainer = [[UIView alloc] initWithFrame:CGRectMake(0.0, self.viewOverlay.bounds.size.height, self.viewOverlay.bounds.size.width, MODAL_HEIGHT)];
+        self.viewContainer = [[UIView alloc] initWithFrame:CGRectMake(0.0, self.viewOverlay.bounds.size.height, self.viewOverlay.bounds.size.width, MODAL_HEIGHT - self.padding)];
         self.viewContainer.backgroundColor = UIColorFromRGB(0xF4F6F8);
         self.viewContainer.layer.mask = self.viewRounded;
         
@@ -123,18 +123,27 @@
     self.music = [[NSMutableArray alloc] init];
     self.imported = [[NSMutableArray alloc] init];;
     self.watermarks = [[NSMutableArray alloc] init];
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"EEE d MMMM YYYY";
+    formatter.calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    
+    NSString *location = [NSString stringWithFormat:@"%@, %@" ,[self.dataobj.storyActive objectForKey:@"city"], [self.dataobj.storyActive objectForKey:@"country"]];
+    
     if (type == OSettingsSubviewTypeMusic) {
         [self.music addObject:@{@"key":@"audio_empty",
                                 @"title":NSLocalizedString(@"Settings_Music_None", nil),
                                 @"file":@"",
-                                @"type":@"selection"
+                                @"type":@"selection",
+                                @"pro":@(false)
                                 }];
         
         [self.music addObject:@{@"key":@"audio_custom",
                                 @"title":NSLocalizedString(@"Settings_Music_Custom", nil),
                                 @"subtitle":NSLocalizedString(@"Settings_Music_Custom_Description", nil),
                                 @"file":@"",
-                                @"type":@"selection"
+                                @"type":@"selection",
+                                @"pro":@(true)
                                 }];
         
         [self.music addObject:@{@"key":@"audio_1",
@@ -143,7 +152,8 @@
                                 @"subtitle":@"Stefan Netsman",
                                 @"bpm":@(149),
                                 @"type":@"selection",
-                                @"source":@"bundle"
+                                @"source":@"bundle",
+                                @"pro":@(false)
                                 }];
         
         [self.music addObject:@{@"key":@"audio_2",
@@ -152,7 +162,8 @@
                                 @"subtitle":@"Johannes Bornlöf",
                                 @"bpm":@(136),
                                 @"type":@"selection",
-                                @"source":@"bundle"
+                                @"source":@"bundle",
+                                @"pro":@(false)
                                 }];
         
         [self.music addObject:@{@"key":@"audio_3",
@@ -161,7 +172,8 @@
                                 @"subtitle":@"Qeeo",
                                 @"bpm":@(101),
                                 @"type":@"selection",
-                                @"source":@"bundle"
+                                @"source":@"bundle",
+                                @"pro":@(false)
                                 }];
         
         [self.music addObject:@{@"key":@"audio_4",
@@ -170,7 +182,8 @@
                                 @"subtitle":@"A P O L L O",
                                 @"bpm":@(134),
                                 @"type":@"selection",
-                                @"source":@"bundle"
+                                @"source":@"bundle",
+                                @"pro":@(false)
                                 }];
         
         for (NSDictionary *song in self.dataobj.musicImported) {
@@ -180,6 +193,7 @@
                                     @"subtitle":[song objectForKey:@"artist"],
                                     @"type":@"selection",
                                     @"source":[song objectForKey:@"type"],
+                                    @"pro":@(true)
                                     }];
             
         }
@@ -194,25 +208,46 @@
 
     }
     else if (type == OSettingsSubviewTypeWatermark) {
+       
+        
         [self.watermarks addObject:@{@"key":@"watermark_default",
                                     @"title":NSLocalizedString(@"Settings_Watermark_Default", nil),
                                     @"example":@"ovatar.io/montage",
                                     @"type":@"selection",
-                                    @"subtitle":@"ovatar.io/montage"
+                                    @"subtitle":@"ovatar.io/montage",
+                                    @"pro":@(false)
                                     }];
         
         [self.watermarks addObject:@{@"key":@"watermark_title",
                                      @"title":NSLocalizedString(@"Settings_Watermark_Title", nil),
                                      @"example":@"",
                                      @"type":@"selection",
-                                     @"subtitle":self.dataobj.storyActiveName
+                                     @"subtitle":self.dataobj.storyActiveName,
+                                     @"pro":@(true)
+                                     }];
+        
+        [self.watermarks addObject:@{@"key":@"watermark_timetamp",
+                                     @"title":NSLocalizedString(@"Settings_Watermark_Timestamp", nil),
+                                     @"example":@"",
+                                     @"type":@"selection",
+                                     @"subtitle":[formatter stringFromDate:[NSDate date]],
+                                     @"pro":@(true)
+                                     }];
+        
+        [self.watermarks addObject:@{@"key":@"watermark_location",
+                                     @"title":NSLocalizedString(@"Settings_Watermark_Location", nil),
+                                     @"example":@"",
+                                     @"type":@"selection",
+                                     @"subtitle":location,
+                                     @"pro":@(true)
                                      }];
         
         [self.watermarks addObject:@{@"key":@"watermark_none",
                                     @"title":NSLocalizedString(@"Settings_Watermark_None", nil),
                                     @"example":@"",
-                                    @"type":@"selection"
-                                     }];
+                                    @"type":@"selection",
+                                    @"pro":@(true)
+                                    }];
         
         [self.sections addObject:@{@"key":@"watermark", @"title":NSLocalizedString(@"Main_Project_Title", nil), @"items":self.watermarks}];
         
@@ -239,6 +274,10 @@
             watermark = @"ovatar.io/montage";
         else if ([[self.dataobj.storyActive objectForKey:@"watermark"] isEqualToString:@"watermark_title"])
             watermark = self.dataobj.storyActiveName;
+        else if ([[self.dataobj.storyActive objectForKey:@"watermark"] isEqualToString:@"watermark_timestamp"])
+            watermark = [formatter stringFromDate:[NSDate date]];
+        else if ([[self.dataobj.storyActive objectForKey:@"watermark"] isEqualToString:@"watermark_location"])
+            watermark = location;
         else
             watermark = NSLocalizedString(@"Settings_Watermark_None", nil);
 
@@ -287,6 +326,12 @@
                                    @"title":NSLocalizedString(@"Settings_Item_Ovatar", nil),
                                    @"type":@"action",
                                    @"icon":@"settings_ovatar"
+                                   }];
+        
+        [self.settings addObject:@{@"key":@"legal",
+                                   @"title":NSLocalizedString(@"Settings_Item_Legal", nil),
+                                   @"type":@"action",
+                                   @"icon":@"settings_legal"
                                    }];
         
         [self.settings addObject:@{@"key":@"purchases",
@@ -355,7 +400,11 @@
     NSString *key = [item objectForKey:@"key"];
     NSString *file = [item objectForKey:@"file"];
     NSString *subtitle = [item objectForKey:@"subtitle"];
+    BOOL pro = false;
 
+    if ([self.payment paymentPurchasedItemWithProducts:@[@"montage.monthly", @"montage.yearly"]]) pro = false;
+    else pro = [[item objectForKey:@"pro"] boolValue];
+    
     [cell setIndex:indexPath];
     
     if ([type isEqualToString:@"action"]) {
@@ -445,6 +494,7 @@
     }
     
     [cell.cellTitle setText:title];
+    [cell.cellBadge setHidden:!pro];
     
     [cell.contentView setBackgroundColor:UIColorFromRGB(0xF4F6F8)];
     [cell setBackgroundColor:[UIColorFromRGB(0xAAAAB8) colorWithAlphaComponent:0.2]];
@@ -483,6 +533,14 @@
                 [self.delegate modalAlertCallFeedbackSubview];
 
             }];
+            
+        }
+        
+        if ([key isEqualToString:@"legal"]) {
+            [self.delegate modalAlertCallActionSheet:@[
+                                                       @{@"key":@"subscription", @"title":NSLocalizedString(@"Terms_Subscription_Title", nil)},
+                                                       @{@"key":@"terms", @"title":NSLocalizedString(@"Settings_ActionSheet_Privacy", nil)}]
+                                                 key:@"legal"];
             
         }
         
@@ -626,7 +684,8 @@
     [cell.cellInput setFrame:cell.cellTitle.frame];
     [cell.cellAccessory setFrame:CGRectMake(cell.contentView.bounds.size.width - 58.0, 24.0, 51.0, cell.contentView.bounds.size.height - 48.0)];
     [cell.cellToggled setFrame:CGRectMake(cell.contentView.bounds.size.width - 58.0, 19.0, cell.contentView.bounds.size.height - 38.0, cell.contentView.bounds.size.height - 38.0)];
-    
+    [cell.cellBadge setFrame:CGRectMake(cell.contentView.bounds.size.width - 98.0, 19.0, cell.contentView.bounds.size.height - 38.0, cell.contentView.bounds.size.height - 38.0)];
+
 }
 
 -(void)tableViewReloadContent:(OSettingsSubviewType)content {

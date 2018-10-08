@@ -32,6 +32,8 @@
 @property (nonatomic, strong) NSString *key;
 @property (nonatomic, strong) UIImage *icon;
 
+-(void)title:(NSString *)title;
+
 @end
 
 @protocol OActionDelegate <NSObject>

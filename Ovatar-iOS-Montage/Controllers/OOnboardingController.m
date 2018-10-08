@@ -36,12 +36,18 @@
                     [self.viewContainer scrollRectToVisible:CGRectMake(0.0, self.viewContainer.bounds.size.height, self.viewContainer.bounds.size.width, self.viewContainer.bounds.size.height) animated:false];
                     
                 } completion:^(BOOL finished) {
+                    [self.viewOverlay setHidden:true];
                     [self viewStatusStyle:UIStatusBarStyleDefault];
-
+                    
                 }];
                
             }
             else {
+                if (status == PHAuthorizationStatusRestricted || status == PHAuthorizationStatusDenied) {
+                    [self.viewAction title:NSLocalizedString(@"Permissions_Action_Update", nil)];
+                    
+                }
+
                 [UIView animateWithDuration:0.4 delay:1.2 options:UIViewAnimationOptionCurveEaseOut animations:^{
                     [self.viewLogo setFrame:CGRectMake((self.viewContainer.bounds.size.width * 0.5) - 100.0, ((self.viewContainer.bounds.size.height - 150.0) * 0.3) - 100.0, 200.0, 200.0)];
                     [self.viewLabel setFrame:CGRectMake(30.0, ((self.viewContainer.bounds.size.height - 50.0) * 0.6) - 50.0, self.view.bounds.size.width - 60.0, 100)];
@@ -107,11 +113,13 @@
     self.viewContainer.pagingEnabled = true;
     self.viewContainer.backgroundColor = [UIColor clearColor];
     self.viewContainer.scrollEnabled = false;
+    self.viewContainer.userInteractionEnabled = true;
     [self.view addSubview:self.viewContainer];
 
     self.viewBackground = [[UIImageView alloc] initWithFrame:self.view.bounds];
     self.viewBackground.contentMode = UIViewContentModeScaleAspectFill;
     self.viewBackground.image = [UIImage imageNamed:@"splash_background"];
+    self.viewBackground.userInteractionEnabled = true;
     [self.viewContainer addSubview:self.viewBackground];
 
     self.viewAnimation = [[AVPlayerViewController alloc] init];
@@ -123,7 +131,6 @@
     self.viewAnimation.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
     self.viewAnimation.player.allowsExternalPlayback = false;
     self.viewAnimation.allowsPictureInPicturePlayback = false;
-    self.viewAnimation.view.userInteractionEnabled = false;
     [self.viewBackground addSubview:self.viewAnimation.view];
     
     self.viewLogo = [[UIImageView alloc] initWithFrame:CGRectMake((self.viewBackground.bounds.size.width * 0.5) - 100.0, (self.viewBackground.bounds.size.height * 0.5) - 100.0, 200.0, 200.0)];
@@ -148,10 +155,11 @@
     self.viewRounded = [CAShapeLayer layer];
     self.viewRounded.path = [UIBezierPath bezierPathWithRoundedRect:self.viewContainer.bounds byRoundingCorners:UIRectCornerTopLeft| UIRectCornerTopRight cornerRadii:CGSizeMake(MAIN_CORNER_EDGES, MAIN_CORNER_EDGES)].CGPath;
     
-    self.viewOverlay = [[UIView alloc] initWithFrame:CGRectMake(0.0, self.viewContainer.bounds.size.height, self.viewContainer.bounds.size.width, 150.0)];
+    self.viewOverlay = [[UIView alloc] initWithFrame:CGRectMake(0.0, self.viewBackground.bounds.size.height, self.viewBackground.bounds.size.width, 150.0)];
     self.viewOverlay.backgroundColor = UIColorFromRGB(0xF4F6F8);
     self.viewOverlay.layer.mask = self.viewRounded;
-    [self.viewContainer addSubview:self.viewOverlay];
+    self.viewOverlay.userInteractionEnabled = true;
+    [self.viewBackground addSubview:self.viewOverlay];
     
     self.viewAction = [[OActionButton alloc] initWithFrame:CGRectMake(30.0, 30.0, self.viewOverlay.bounds.size.width - 60.0, self.viewOverlay.bounds.size.height - 60.0)];
     self.viewAction.backgroundColor = [UIColor clearColor];
@@ -161,16 +169,18 @@
     self.viewAction.key = @"authorize";
     self.viewAction.grayscale = false;
     self.viewAction.padding = 20.0;
+    self.viewAction.userInteractionEnabled = true;
     [self.viewOverlay addSubview:self.viewAction];
 
     self.viewMain = [[OMainController alloc] init];
     self.viewMain.delegate = self;
     self.viewMain.view.clipsToBounds = true;
     self.viewMain.view.frame = CGRectMake(0.0, self.viewContainer.bounds.size.height, self.view.bounds.size.width, self.view.bounds.size.height);
-    self.viewMain.view.backgroundColor = [UIColor clearColor];
+    self.viewMain.view.backgroundColor = [UIColor redColor];
     [self addChildViewController:self.viewMain];
     [self.viewContainer addSubview:self.viewMain.view];
-    
+    [self.viewBackground bringSubviewToFront:self.viewOverlay];
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(viewVideoLoop:)  name:AVPlayerItemDidPlayToEndTimeNotification object:self.viewAnimation.player.currentItem];
     
 }
@@ -183,13 +193,7 @@
     else if (type == OOOnboardingControllerCallbackTypeShortcut) {
         NSString *error = nil;
         NSArray *import = (NSArray *)data;
-        if ([import count] > 0) {
-            error = [NSString stringWithFormat:NSLocalizedString(@"Error_Description_AddedCapturesToday", nil), import.count];
-
-            [self.viewMain viewGallerySelectedImage:import];
-            [self.viewMain viewPresentError:[NSError errorWithDomain:error code:200 userInfo:nil] key:@"noimages"];
-            
-        }
+        if ([import count] > 0) [self.viewMain viewGallerySelectedImage:import shortcut:true];
         else {
             error = NSLocalizedString(@"Error_Description_NoCapturesToday", nil);
 
@@ -209,6 +213,7 @@
 }
 
 -(void)viewActionTapped:(OActionButton *)action {
+    NSLog(@"viewActionTapped %@" ,action);
     [self.imageobj imageAuthorization:true completion:^(PHAuthorizationStatus status) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if (status == PHAuthorizationStatusAuthorized) {
@@ -218,7 +223,10 @@
                 
             }
             else {
-                NSLog(@"not authorized");
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString] options:@{} completionHandler:^(BOOL success) {
+
+                }];
+                
             }
             
         }];

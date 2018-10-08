@@ -50,6 +50,13 @@
         self.cellInput.keyboardType = UIKeyboardTypeDefault;
         [self.contentView addSubview:self.cellInput];
         
+        self.cellBadge = [[UIImageView alloc] initWithFrame:CGRectMake(self.bounds.size.width - 78.0, 20.0, 51.0, self.bounds.size.height - 30.0)];
+        self.cellBadge.contentMode = UIViewContentModeCenter;
+        self.cellBadge.userInteractionEnabled = false;
+        self.cellBadge.alpha = 0.5;
+        self.cellBadge.image = [UIImage imageNamed:@"settings_pro_badge"];
+        [self.contentView addSubview:self.cellBadge];
+        
         self.cellAccessory = [[UIImageView alloc] initWithFrame:CGRectMake(self.bounds.size.width - 58.0, 20.0, 51.0, self.bounds.size.height - 30.0)];
         self.cellAccessory.contentMode = UIViewContentModeCenter;
         self.cellAccessory.userInteractionEnabled = false;

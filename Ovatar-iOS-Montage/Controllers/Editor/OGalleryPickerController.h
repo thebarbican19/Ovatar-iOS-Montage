@@ -56,7 +56,7 @@
 
 @optional
 
--(void)viewGallerySelectedImage:(NSArray *)assets;
+-(void)viewGallerySelectedImage:(NSArray *)assets shortcut:(BOOL)shortcut;
 
 @end
 

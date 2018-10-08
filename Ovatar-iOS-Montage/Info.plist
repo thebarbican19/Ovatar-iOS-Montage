@@ -32,7 +32,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>6</string>
+	<string>10</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppleMusicUsageDescription</key>
@@ -41,6 +41,10 @@
 	<string>Montage requires camera access to allow you to capture short, sweet videos for your montage</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Montage requires acces to your photos to help you build stunning montages! </string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+	</array>
 	<key>UIFileSharingEnabled</key>
 	<false/>
 	<key>UILaunchStoryboardName</key>

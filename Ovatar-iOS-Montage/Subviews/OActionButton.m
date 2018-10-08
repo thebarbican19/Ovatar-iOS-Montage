@@ -103,7 +103,14 @@
 
 }
 
+-(void)title:(NSString *)title {
+    [self setTitle:title];
+    [self.viewLabel setAttributedText:[self format:self.title]];
+    
+}
+
 -(void)action:(UIButton *)button {
+    NSLog(@"action %@" ,button);
     if (button) {
         [self.generator notificationOccurred:UINotificationFeedbackTypeSuccess];
         [self.generator prepare];

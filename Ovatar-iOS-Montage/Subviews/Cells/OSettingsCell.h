@@ -18,6 +18,7 @@
 @property (nonatomic, strong) UISwitch *cellSwitch;
 @property (nonatomic, strong) UIImageView *cellAccessory;
 @property (nonatomic, strong) OToggleIcon *cellToggled;
+@property (nonatomic, strong) UIImageView *cellBadge;
 
 @property (nonatomic ,strong) NSIndexPath *index;
 

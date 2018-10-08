@@ -12,6 +12,8 @@
 		7703EA6F2163CA0000A74604 /* ES_Green_Summer_Waves_Qeeo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7703EA6A2163CA0000A74604 /* ES_Green_Summer_Waves_Qeeo.mp3 */; };
 		7703EA702163CA0000A74604 /* ES_Barefoot_Summer_24_Stefan_Netsman.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7703EA6B2163CA0000A74604 /* ES_Barefoot_Summer_24_Stefan_Netsman.mp3 */; };
 		7703EA722163CBFD00A74604 /* ES_Generation_Z_APOLLO.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7703EA712163CBFD00A74604 /* ES_Generation_Z_APOLLO.mp3 */; };
+		7703EA752164CFD800A74604 /* OStatsObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 7703EA742164CFD800A74604 /* OStatsObject.m */; };
+		7703EA7821652D3000A74604 /* ODocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7703EA7721652D3000A74604 /* ODocumentController.m */; };
 		7705AC2C2155176300598647 /* OCaptureController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7705AC2B2155176300598647 /* OCaptureController.m */; };
 		7705AC3121551AE000598647 /* OOnboardingController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7705AC3021551AE000598647 /* OOnboardingController.m */; };
 		771E4F652157E0B200B51373 /* Montage-Icon-Error.mov in Resources */ = {isa = PBXBuildFile; fileRef = 771E4F622157E0B100B51373 /* Montage-Icon-Error.mov */; };
@@ -19,8 +21,10 @@
 		771E4F672157E0B200B51373 /* Montage-Icon-Push.mov in Resources */ = {isa = PBXBuildFile; fileRef = 771E4F642157E0B200B51373 /* Montage-Icon-Push.mov */; };
 		771E4F6A2157E0C200B51373 /* OAnimatedIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 771E4F692157E0C200B51373 /* OAnimatedIcon.m */; };
 		771E4F6C2158A66F00B51373 /* complete_sfx.wav in Resources */ = {isa = PBXBuildFile; fileRef = 771E4F6B2158A66F00B51373 /* complete_sfx.wav */; };
+		771ED074216BA3AC0000C689 /* Unesco.json in Resources */ = {isa = PBXBuildFile; fileRef = 771ED073216BA3AC0000C689 /* Unesco.json */; };
 		772B1475214815F30081959D /* OGalleryReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 772B1474214815F30081959D /* OGalleryReusableView.m */; };
 		772B1477214A2F3C0081959D /* Locations.json in Resources */ = {isa = PBXBuildFile; fileRef = 772B1476214A2F3C0081959D /* Locations.json */; };
+		772CFA2821662FCE00CCA144 /* GoogLeNetPlaces.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 772CFA2721662FCE00CCA144 /* GoogLeNetPlaces.mlmodel */; };
 		772E2480213527130025DD85 /* OFeedbackController.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E247F213527130025DD85 /* OFeedbackController.m */; };
 		772E2483213528060025DD85 /* UITextView+Placeholder.m in Sources */ = {isa = PBXBuildFile; fileRef = 772E2482213528060025DD85 /* UITextView+Placeholder.m */; };
 		772E24922136C8070025DD85 /* Montage-Icon-Ovatar.mov in Resources */ = {isa = PBXBuildFile; fileRef = 772E24912136C8070025DD85 /* Montage-Icon-Ovatar.mov */; };
@@ -36,6 +40,11 @@
 		77465C462124078300EAF97E /* OExportObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C452124078300EAF97E /* OExportObject.m */; };
 		77465C4921242D6D00EAF97E /* OStoriesLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465C4821242D6D00EAF97E /* OStoriesLayout.m */; };
 		77465CAF2125B8CC00EAF97E /* OInformationLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 77465CAE2125B8CC00EAF97E /* OInformationLabel.m */; };
+		777AF50521676D7300BE37A9 /* Food101.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 777AF50421676D7300BE37A9 /* Food101.mlmodel */; };
+		777AF5072169DA5200BE37A9 /* Inceptionv3.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 777AF5062169DA5100BE37A9 /* Inceptionv3.mlmodel */; };
+		777AF509216A163100BE37A9 /* Airports.json in Resources */ = {isa = PBXBuildFile; fileRef = 777AF508216A163100BE37A9 /* Airports.json */; };
+		7781A679216B2DC5000CAA31 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 772B1471214691870081959D /* AuthenticationServices.framework */; };
+		7781A67E216B6D84000CAA31 /* OAlbumSegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 7781A67D216B6D84000CAA31 /* OAlbumSegment.m */; };
 		778AD4FC21553A970043E823 /* Montage-Onboarding.mov in Resources */ = {isa = PBXBuildFile; fileRef = 778AD4FB21553A970043E823 /* Montage-Onboarding.mov */; };
 		779F2AE0215A78E600F131BD /* OToggleIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 779F2ADF215A78E600F131BD /* OToggleIcon.m */; };
 		77AC65112156178B009F8081 /* OSettingsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 77AC65102156178B009F8081 /* OSettingsController.m */; };
@@ -98,6 +107,10 @@
 		7703EA6A2163CA0000A74604 /* ES_Green_Summer_Waves_Qeeo.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ES_Green_Summer_Waves_Qeeo.mp3; sourceTree = "<group>"; };
 		7703EA6B2163CA0000A74604 /* ES_Barefoot_Summer_24_Stefan_Netsman.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ES_Barefoot_Summer_24_Stefan_Netsman.mp3; sourceTree = "<group>"; };
 		7703EA712163CBFD00A74604 /* ES_Generation_Z_APOLLO.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ES_Generation_Z_APOLLO.mp3; sourceTree = "<group>"; };
+		7703EA732164CFD800A74604 /* OStatsObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OStatsObject.h; sourceTree = "<group>"; };
+		7703EA742164CFD800A74604 /* OStatsObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OStatsObject.m; sourceTree = "<group>"; };
+		7703EA7621652D3000A74604 /* ODocumentController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ODocumentController.h; sourceTree = "<group>"; };
+		7703EA7721652D3000A74604 /* ODocumentController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ODocumentController.m; sourceTree = "<group>"; };
 		7705AC2A2155176300598647 /* OCaptureController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OCaptureController.h; sourceTree = "<group>"; };
 		7705AC2B2155176300598647 /* OCaptureController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OCaptureController.m; sourceTree = "<group>"; };
 		7705AC2F21551AE000598647 /* OOnboardingController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OOnboardingController.h; sourceTree = "<group>"; };
@@ -108,10 +121,12 @@
 		771E4F682157E0C200B51373 /* OAnimatedIcon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OAnimatedIcon.h; sourceTree = "<group>"; };
 		771E4F692157E0C200B51373 /* OAnimatedIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OAnimatedIcon.m; sourceTree = "<group>"; };
 		771E4F6B2158A66F00B51373 /* complete_sfx.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = complete_sfx.wav; sourceTree = "<group>"; };
+		771ED073216BA3AC0000C689 /* Unesco.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Unesco.json; sourceTree = "<group>"; };
 		772B1471214691870081959D /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		772B1473214815F30081959D /* OGalleryReusableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OGalleryReusableView.h; sourceTree = "<group>"; };
 		772B1474214815F30081959D /* OGalleryReusableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OGalleryReusableView.m; sourceTree = "<group>"; };
 		772B1476214A2F3C0081959D /* Locations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = Locations.json; sourceTree = "<group>"; };
+		772CFA2721662FCE00CCA144 /* GoogLeNetPlaces.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = GoogLeNetPlaces.mlmodel; sourceTree = "<group>"; };
 		772E247E213527130025DD85 /* OFeedbackController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OFeedbackController.h; sourceTree = "<group>"; };
 		772E247F213527130025DD85 /* OFeedbackController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OFeedbackController.m; sourceTree = "<group>"; };
 		772E2481213528050025DD85 /* UITextView+Placeholder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITextView+Placeholder.h"; sourceTree = "<group>"; };
@@ -138,6 +153,11 @@
 		77465C4821242D6D00EAF97E /* OStoriesLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OStoriesLayout.m; sourceTree = "<group>"; };
 		77465CAD2125B8CC00EAF97E /* OInformationLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OInformationLabel.h; sourceTree = "<group>"; };
 		77465CAE2125B8CC00EAF97E /* OInformationLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OInformationLabel.m; sourceTree = "<group>"; };
+		777AF50421676D7300BE37A9 /* Food101.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Food101.mlmodel; sourceTree = "<group>"; };
+		777AF5062169DA5100BE37A9 /* Inceptionv3.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Inceptionv3.mlmodel; sourceTree = "<group>"; };
+		777AF508216A163100BE37A9 /* Airports.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = Airports.json; sourceTree = "<group>"; };
+		7781A67C216B6D84000CAA31 /* OAlbumSegment.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OAlbumSegment.h; sourceTree = "<group>"; };
+		7781A67D216B6D84000CAA31 /* OAlbumSegment.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OAlbumSegment.m; sourceTree = "<group>"; };
 		778AD4FB21553A970043E823 /* Montage-Onboarding.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = "Montage-Onboarding.mov"; sourceTree = "<group>"; };
 		779F2ADE215A78E600F131BD /* OToggleIcon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OToggleIcon.h; sourceTree = "<group>"; };
 		779F2ADF215A78E600F131BD /* OToggleIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OToggleIcon.m; sourceTree = "<group>"; };
@@ -208,6 +228,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7781A679216B2DC5000CAA31 /* AuthenticationServices.framework in Frameworks */,
 				E9BF044E69E635045C507491 /* libPods-Ovatar-iOS-Montage.a in Frameworks */,
 				77357EF32144F37500F3A6E0 /* StoreKit.framework in Frameworks */,
 			);
@@ -256,6 +277,8 @@
 		7705AC2E215519B900598647 /* Other */ = {
 			isa = PBXGroup;
 			children = (
+				7703EA7621652D3000A74604 /* ODocumentController.h */,
+				7703EA7721652D3000A74604 /* ODocumentController.m */,
 				772E247E213527130025DD85 /* OFeedbackController.h */,
 				772E247F213527130025DD85 /* OFeedbackController.m */,
 			);
@@ -268,6 +291,16 @@
 				771E4F6B2158A66F00B51373 /* complete_sfx.wav */,
 			);
 			path = SFX;
+			sourceTree = "<group>";
+		};
+		772CFA2621662F8F00CCA144 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				777AF50421676D7300BE37A9 /* Food101.mlmodel */,
+				772CFA2721662FCE00CCA144 /* GoogLeNetPlaces.mlmodel */,
+				777AF5062169DA5100BE37A9 /* Inceptionv3.mlmodel */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		772E2486213560490025DD85 /* Video */ = {
@@ -288,6 +321,8 @@
 			children = (
 				772E46D5213BB95000B14596 /* NamesDetect.json */,
 				772B1476214A2F3C0081959D /* Locations.json */,
+				777AF508216A163100BE37A9 /* Airports.json */,
+				771ED073216BA3AC0000C689 /* Unesco.json */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -368,6 +403,7 @@
 		77DF60E0211DBAA200073439 /* Assets */ = {
 			isa = PBXGroup;
 			children = (
+				772CFA2621662F8F00CCA144 /* Model */,
 				779F2AE1215A958B00F131BD /* Music */,
 				772E46D4213BB8FC00B14596 /* Data */,
 				772E2486213560490025DD85 /* Video */,
@@ -418,6 +454,8 @@
 				779F2ADF215A78E600F131BD /* OToggleIcon.m */,
 				773C5A332160F509000A0515 /* OPlayerControls.h */,
 				773C5A342160F509000A0515 /* OPlayerControls.m */,
+				7781A67C216B6D84000CAA31 /* OAlbumSegment.h */,
+				7781A67D216B6D84000CAA31 /* OAlbumSegment.m */,
 			);
 			path = Subviews;
 			sourceTree = "<group>";
@@ -479,6 +517,8 @@
 				77DF610B211DBAAE00073439 /* OPaymentObject.m */,
 				77465C442124078300EAF97E /* OExportObject.h */,
 				77465C452124078300EAF97E /* OExportObject.m */,
+				7703EA732164CFD800A74604 /* OStatsObject.h */,
+				7703EA742164CFD800A74604 /* OStatsObject.m */,
 			);
 			path = Object;
 			sourceTree = "<group>";
@@ -588,6 +628,9 @@
 							com.apple.AutoFillCredentialProvider = {
 								enabled = 1;
 							};
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
 							com.apple.InAppPurchase = {
 								enabled = 1;
 							};
@@ -653,8 +696,10 @@
 				778AD4FC21553A970043E823 /* Montage-Onboarding.mov in Resources */,
 				7703EA6D2163CA0000A74604 /* ES_Castle_In_The_Sky_Johannes_Bornlöf.mp3 in Resources */,
 				7703EA6F2163CA0000A74604 /* ES_Green_Summer_Waves_Qeeo.mp3 in Resources */,
+				771ED074216BA3AC0000C689 /* Unesco.json in Resources */,
 				771E4F662157E0B200B51373 /* Montage-Icon-Complete.mov in Resources */,
 				772B1477214A2F3C0081959D /* Locations.json in Resources */,
+				777AF509216A163100BE37A9 /* Airports.json in Resources */,
 				7703EA702163CA0000A74604 /* ES_Barefoot_Summer_24_Stefan_Netsman.mp3 in Resources */,
 				77DF60EA211DBAA200073439 /* Muli-Light.ttf in Resources */,
 				771E4F652157E0B200B51373 /* Montage-Icon-Error.mov in Resources */,
@@ -794,12 +839,14 @@
 			files = (
 				77DF610F211DBAAE00073439 /* OGalleryCell.m in Sources */,
 				772B1475214815F30081959D /* OGalleryReusableView.m in Sources */,
+				772CFA2821662FCE00CCA144 /* GoogLeNetPlaces.mlmodel in Sources */,
 				77AC651A2156A3B5009F8081 /* OAlertController.m in Sources */,
 				77DF6116211DBAAE00073439 /* OEntryController.m in Sources */,
 				77DF611D211DBAAE00073439 /* OPaymentObject.m in Sources */,
 				77DF6115211DBAAE00073439 /* OMainController.m in Sources */,
 				77F26C1C215D3A3700D3A8C9 /* OPlaybackController.m in Sources */,
 				77DF613121200E1C00073439 /* OSettingsCell.m in Sources */,
+				777AF50521676D7300BE37A9 /* Food101.mlmodel in Sources */,
 				772E2483213528060025DD85 /* UITextView+Placeholder.m in Sources */,
 				77AC651D2156A5FB009F8081 /* OAlertPlaceholder.m in Sources */,
 				77DF60DF211DBA7C00073439 /* ODataModel.xcdatamodeld in Sources */,
@@ -812,16 +859,20 @@
 				77DF60B8211DBA5200073439 /* main.m in Sources */,
 				772E46D9213CD32500B14596 /* GDActionSheet.m in Sources */,
 				77465C462124078300EAF97E /* OExportObject.m in Sources */,
+				777AF5072169DA5200BE37A9 /* Inceptionv3.mlmodel in Sources */,
 				7705AC2C2155176300598647 /* OCaptureController.m in Sources */,
+				7703EA7821652D3000A74604 /* ODocumentController.m in Sources */,
 				77465CAF2125B8CC00EAF97E /* OInformationLabel.m in Sources */,
 				77DF6110211DBAAE00073439 /* ODayCell.m in Sources */,
 				773D005521624576001957AB /* OShareController.m in Sources */,
 				779F2AE0215A78E600F131BD /* OToggleIcon.m in Sources */,
 				77DF611B211DBAAE00073439 /* ODataObject.m in Sources */,
+				7703EA752164CFD800A74604 /* OStatsObject.m in Sources */,
 				77465C4921242D6D00EAF97E /* OStoriesLayout.m in Sources */,
 				77DF60AA211DBA4D00073439 /* AppDelegate.m in Sources */,
 				771E4F6A2157E0C200B51373 /* OAnimatedIcon.m in Sources */,
 				77DF6113211DBAAE00073439 /* OActionButton.m in Sources */,
+				7781A67E216B6D84000CAA31 /* OAlbumSegment.m in Sources */,
 				772E2480213527130025DD85 /* OFeedbackController.m in Sources */,
 				77DF612E21200A9A00073439 /* OLoaderView.m in Sources */,
 				772E46D3213812C300B14596 /* OTabbarView.m in Sources */,
@@ -1012,7 +1063,7 @@
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = NV488MSHMX;
 				INFOPLIST_FILE = "Ovatar-iOS-Montage/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1036,7 +1087,7 @@
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = NV488MSHMX;
 				INFOPLIST_FILE = "Ovatar-iOS-Montage/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

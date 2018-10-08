@@ -21,6 +21,7 @@
     self.data =  [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
     self.payment = [[OPaymentObject alloc] init];
     self.mixpanel = [Mixpanel sharedInstance];
+    self.statsobj = [OStatsObject sharedInstance];
 
     [[NSUserDefaults standardUserDefaults] setValue:@(NO) forKey:@"_UIConstraintBasedLayoutLogUnsatisfiable"];
 
@@ -43,23 +44,55 @@
         [self.data setBool:true forKey:@"app_installed"];
         [self.mixpanel track:@"App Installed" properties:nil];
         if ([self applicationUserData]) {
+            NSString *name = [NSString stringWithFormat:@"%@" ,[[self applicationUserData] objectForKey:@"name"]];
+            NSString *sex = [NSString stringWithFormat:@"%@" ,[[self applicationUserData] objectForKey:@"sex"]];
+
             [self.mixpanel identify:self.mixpanel.distinctId];
-            [self.mixpanel.people set:@{@"$first_name":[[self applicationUserData] objectForKey:@"name"],
-                                        @"Gender":[[self applicationUserData] objectForKey:@"sex"],
+            [self.mixpanel.people set:@{@"$first_name":name,
+                                        @"Gender":sex,
                                         @"Installed On":[NSDate date],
                                         @"Installed Version":APP_VERSION}];
             
             NSLog(@"Set Name in Mixpanel %@" ,[self applicationUserData]);
-
+            
         }
     
     }
-    else [self.mixpanel track:@"App Opened" properties:@{@"version":APP_VERSION, @"build":APP_BUILD}];
+    else {
+        NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+        formatter.dateFormat = @"MMMM YYYY";
+        
+        NSMutableDictionary *stats = [[NSMutableDictionary alloc] init];
+        if (self.statsobj.capturesTotal > 5) {
+            [stats setObject:@(self.statsobj.capturesTotal) forKey:@"Photos Total"];
+            [stats setObject:@(self.statsobj.capturesThisMonth) forKey:[NSString stringWithFormat:@"Photos %@" ,[formatter stringFromDate:[NSDate date]]]];
+
+        }
+        
+        if (self.statsobj.visitedCountries.count > 0) {
+            [stats setObject:self.statsobj.visitedCountries forKey:@"Visited Countries"];
+            [stats setObject:self.statsobj.vistedUnescoSites forKey:@"Visited Unesco Sites"];
+            [stats setObject:self.statsobj.favoritePlace forKey:@"Favorite Place"];
+
+        }
+        
+        [self.mixpanel identify:self.mixpanel.distinctId];
+        [self.mixpanel.people set:stats];
+        
+        NSLog(@"Set Mixpanel Stats: %@" ,stats);
+                                
+        [self.mixpanel track:@"App Opened" properties:@{@"version":APP_VERSION, @"build":APP_BUILD}];
     
+    }
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback withOptions:AVAudioSessionCategoryOptionMixWithOthers error:nil];
     
     return true;
     
+}
+
+-(void)applicationStatsInitialize {
+    [[OStatsObject sharedInstance] initiate];
+
 }
 
 -(BOOL)applicationInstalled {
@@ -186,12 +219,13 @@
 }
 
 -(void)applicationDidEnterBackground:(UIApplication *)application {
-   
+    [[OStatsObject sharedInstance] initiate];
+    
 }
 
-
 -(void)applicationWillEnterForeground:(UIApplication *)application {
-    
+    [[OStatsObject sharedInstance] suspend];
+
 }
 
 -(void)applicationDidBecomeActive:(UIApplication *)application {
@@ -219,13 +253,15 @@
         
         NSDate *date = [NSDate dateWithTimeIntervalSinceNow:60*60*24*i];
         NSCalendar *calendar = [NSCalendar currentCalendar];
-        NSDateComponents *triggerdate = [calendar components:NSCalendarUnitYear +
-                                         NSCalendarUnitMonth + NSCalendarUnitDay +
-                                         NSCalendarUnitHour + NSCalendarUnitMinute +
-                                         NSCalendarUnitSecond fromDate:date];
+        NSDateComponents *triggerdate = [calendar components:NSCalendarUnitYear|
+                                         NSCalendarUnitMonth|NSCalendarUnitDay|
+                                         NSCalendarUnitHour|NSCalendarUnitMinute|
+                                         NSCalendarUnitSecond|NSCalendarUnitTimeZone fromDate:date];
         triggerdate.hour = 19;
         triggerdate.minute = 30;
         triggerdate.second = 0;
+        triggerdate.timeZone = triggerdate.timeZone;
+        
         UNCalendarNotificationTrigger *trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:triggerdate repeats:false];
         UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:@"reminder_notification"
                                                                               content:content
@@ -247,12 +283,12 @@
 
 -(void)applicationSetupShortcuts {
     NSMutableArray *shortcuts = [[NSMutableArray alloc] init];
-    UIApplicationShortcutItem *capture = [[UIApplicationShortcutItem alloc]
-                                           initWithType:@"com.ovatar.montage.quickaction.capture"
-                                           localizedTitle:NSLocalizedString(@"Extension_Shortcut_Capture", nil)
-                                           localizedSubtitle:nil
-                                           icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeCaptureVideo]
-                                           userInfo:nil];
+//    UIApplicationShortcutItem *capture = [[UIApplicationShortcutItem alloc]
+//                                           initWithType:@"com.ovatar.montage.quickaction.capture"
+//                                           localizedTitle:NSLocalizedString(@"Extension_Shortcut_Capture", nil)
+//                                           localizedSubtitle:nil
+//                                           icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeCaptureVideo]
+//                                           userInfo:nil];
     
     UIApplicationShortcutItem *todays = [[UIApplicationShortcutItem alloc]
                                            initWithType:@"com.ovatar.montage.quickaction.importtoday"

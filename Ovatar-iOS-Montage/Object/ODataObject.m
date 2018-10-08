@@ -15,6 +15,7 @@
     self = [super init];
     if (self) {
         self.imageobj = [[OImageObject alloc] init];
+        self.geocoder = [[CLGeocoder alloc] init];
         self.data = [[NSUserDefaults alloc] initWithSuiteName:APP_SAVE_DIRECTORY];
         self.persistancecont = [[NSPersistentContainer alloc] initWithName:@"ODataModel"];
         [self.persistancecont loadPersistentStoresWithCompletionHandler:^(NSPersistentStoreDescription *description, NSError *error) {
@@ -157,16 +158,20 @@
             
         }
         else {
+            NSString *key = [NSString stringWithFormat:@"%@" ,[entry objectForKey:@"key"]];
+            NSString *path = [APP_DOCUMENTS stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", key]];
             if ([self storyEntry:[entry objectForKey:@"key"]] != nil) {
                 [self.context deleteObject:[self storyEntry:[entry objectForKey:@"key"]]];
                 
-                NSString *key = [NSString stringWithFormat:@"%@" ,[entry objectForKey:@"key"]];
-                NSString *path = [APP_DOCUMENTS stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.mov", key]];
                 if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
                     [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
                     
                 }
                 
+            }
+            else if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+                [self.context deleteObject:[self storyEntry:[entry objectForKey:@"key"]]];
+
             }
             
         }
@@ -178,6 +183,17 @@
             [output addObject:[self entryWithKey:keys.firstObject]];
             
         }];
+        
+    }
+    
+    return output;
+    
+}
+
+-(NSArray *)storyAssetKeys:(NSString *)key {
+    NSMutableArray *output = [[NSMutableArray alloc] init];
+    for (NSDictionary *entry in [self storyEntries:key]) {
+        [output addObject:[entry objectForKey:@"assetid"]];
         
     }
     
@@ -254,9 +270,9 @@
                 astory.exported = [NSDate date];
                 
                 [self.context save:nil];
-                
+
                 completion([NSError errorWithDomain:@"Exported" code:200 userInfo:nil]);
-                
+
             }
             else {
                 if (error.code == 404) {
@@ -412,54 +428,6 @@
     
 }
 
-/*
--(NSArray *)storyDates:(NSString *)story {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,story];
-    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
-    NSMutableArray *dates = [[NSMutableArray alloc] init];
-    fetch.predicate = predicate;
-    fetch.returnsDistinctResults = true;
-    fetch.resultType = NSDictionaryResultType;
-
-    NSDictionary *item = [[self.context executeFetchRequest:fetch error:nil] firstObject];
-    if (item != nil) {
-        NSDate *start = [item objectForKey:@"startdate"];
-        NSDate *end = [item objectForKey:@"enddate"];
-        NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-        NSDateComponents *components = [calendar components:NSCalendarUnitDay fromDate:start toDate:end options:0];
-        for (int i = 0; i < components.day; i++) {
-            [dates addObject:[start dateByAddingTimeInterval:60*60*24*i]];
-            
-        }
-        
-        return dates;
-
-    }
-    else return nil;
-
-}
-
-
--(void)entryAutoImport:(BOOL)initiate story:(NSString *)story {
-    if (initiate) {
-        self.importlist = [[NSMutableArray alloc] initWithArray:[self storyDates:story]];
-
-    }
-    
-    if (self.importlist.count > 0) {
-        [self.delegate dataImportUpdatedWithProgress:(100 / ([[self storyDates:story] count] - [self.importlist count]))];
-        [self entryCreateWithDate:self.importlist.firstObject story:story completion:^(NSError *error) {
-            [self.importlist removeObjectAtIndex:0];
-            [self entryAutoImport:false story:story];
-            
-        }];
-        
-    }
-    else [self.delegate dataImportCompleteWithError:[NSError errorWithDomain:@"import complete" code:200 userInfo:nil]];
-    
-}
-*/
-
 -(Entry *)storyEntry:(NSString *)key {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,key];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
@@ -559,6 +527,28 @@
 
     }
     else {
+        CLLocation *location = [self storyCentralLocation:story];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"key == %@" ,story];
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Story"];
+        fetch.predicate = predicate;
+        fetch.returnsDistinctResults = true;
+        
+        if ([[self.context executeFetchRequest:fetch error:nil] count] > 0) {
+            Story *astory = [[self.context executeFetchRequest:fetch error:nil] firstObject];
+            [self.geocoder reverseGeocodeLocation:location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+                CLPlacemark *placemark = placemarks.lastObject;
+                astory.country = placemark.country;
+                astory.updated = [NSDate date];
+                
+                if (placemark.subLocality != nil) astory.city = placemark.subLocality;
+                else if (placemark.locality != nil) astory.city = placemark.locality;
+                
+                [self.context save:nil];
+                
+            }];
+            
+        }
+    
         if (assets != nil) {
             for (PHAsset *asset in assets) {
                 created += 1;
@@ -579,11 +569,27 @@
                 newentry.filedirectory = @"";
                 newentry.type = [self entryAssetType:asset];
                 newentry.order = [[self storyEntries:self.storyActiveKey] count] + 1;
+                
+                [self.geocoder reverseGeocodeLocation:asset.location completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+                    CLPlacemark *placemark = placemarks.lastObject;
+                    newentry.country = placemark.country;
+                    
+                    if (placemark.subLocality != nil) newentry.city = placemark.subLocality;
+                    else if (placemark.locality != nil) newentry.city = placemark.locality;
+                    
+                }];
 
                 [added addObject:newentry.key];
                 
             }
             
+            NSError *saveerr;
+            if ([self.context save:&saveerr]) {
+                completion([NSError errorWithDomain:@"Entry saved" code:200 userInfo:nil], added);
+                
+            }
+            else completion(saveerr, nil);
+                        
         }
         else {
             Entry *newentry = [[Entry alloc] initWithEntity:self.entry insertIntoManagedObjectContext:self.context];
@@ -596,15 +602,15 @@
             
             [added addObject:newentry.key];
 
-        }
-        
-        NSError *saveerr;
-        if ([self.context save:&saveerr]) {
-            completion([NSError errorWithDomain:@"Entry saved" code:200 userInfo:nil], added);
+            NSError *saveerr;
+            if ([self.context save:&saveerr]) {
+                completion([NSError errorWithDomain:@"Entry saved" code:200 userInfo:nil], added);
+                
+            }
+            else completion(saveerr, nil);
             
         }
-        else completion(saveerr, nil);
-        
+    
     }
     
 }

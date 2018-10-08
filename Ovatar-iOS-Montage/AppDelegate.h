@@ -13,7 +13,7 @@
 #import "Mixpanel.h"
 #import "ODataObject.h"
 #import "OPaymentObject.h"
-#import "OLoaderView.h"
+#import "OStatsObject.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, UNUserNotificationCenterDelegate>
 
@@ -24,7 +24,7 @@
 @property (strong, nonatomic) ODataObject *dataobj;
 @property (strong, nonatomic) OPaymentObject *payment;
 @property (strong, nonatomic) OImageObject *imageobj;
-@property (strong, nonatomic) UIView *splash;
+@property (strong, nonatomic) OStatsObject *statsobj;
 @property (assign) float padding;
 
 -(int)applicationTimer;
@@ -32,6 +32,7 @@
 -(NSDictionary *)applicationUserData;
 
 -(void)applicationRatePrompt;
+-(void)applicationStatsInitialize;
 
 @end
 
